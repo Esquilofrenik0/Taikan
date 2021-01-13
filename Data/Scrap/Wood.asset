@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0047293bea148e45b893b31ec661685, type: 3}
+  m_Name: Wood
+  m_EditorClassIdentifier: 
+  resource: {fileID: 3878300646211823214, guid: 99d9ec255f8551f469201903d418a9d2, type: 3}
+  type: 0
+  Name: Wood
+  description: Can be gathered from trees using a Wood Axe.
+  icon: {fileID: 21300000, guid: 02965bb096d1ff24897cfbedbc22f1a7, type: 3}
+  value: 0.01
+  weight: 0.01
+  stack: 100
