@@ -103,7 +103,7 @@ namespace SRPG {
             }
           }
         }
-        else if (crouching && state == pS.Sprint) { SetState(pS.Idle); }
+        else if (crouching || !grounded) { if (state == pS.Sprint) { SetState(pS.Idle); } }
       }
       else if (!sprint && anim.GetInteger("State") == (int)pS.Sprint) { SetState(pS.Idle); }
     }
@@ -144,16 +144,12 @@ namespace SRPG {
           anim.SetInteger("Weapon", (int)wT.Unarmed);
         }
       }
-      if (aiming) {
-        anim.SetLayerWeight(1, 1);
-      }
+      if (aiming) {anim.SetLayerWeight(1, 1);}
       else {
         if (!equipment.holstered.Value || state == pS.Dodge || state == pS.Sprint) {
           anim.SetLayerWeight(1, 0);
         }
-        else if (equipment.holstered.Value) {
-          anim.SetLayerWeight(1, 1);
-        }
+        else if (equipment.holstered.Value) {anim.SetLayerWeight(1, 1);}
       }
     }
     #endregion
@@ -161,16 +157,16 @@ namespace SRPG {
     #region Stats
     public void RefreshStats() {
       if (!IsLocalPlayer) { return; }
-      defense = baseDefense;
-      if (equipment.item[2] != 0) { defense += GetNetworkedObject(equipment.item[2]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[3] != 0) { defense += GetNetworkedObject(equipment.item[3]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[4] != 0) { defense += GetNetworkedObject(equipment.item[4]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[5] != 0) { defense += GetNetworkedObject(equipment.item[5]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[6] != 0) { defense += GetNetworkedObject(equipment.item[6]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[1] != 0) { defense += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.defense; }
-      damage = baseDamage;
-      if (equipment.item[0] != 0) { damage += GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.damage; }
-      if (equipment.item[1] != 0) { damage += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.damage; }
+      defense.Value = baseDefense;
+      if (equipment.item[2] != 0) { defense.Value += GetNetworkedObject(equipment.item[2]).GetComponent<Armor>().dArmor.defense; }
+      if (equipment.item[3] != 0) { defense.Value += GetNetworkedObject(equipment.item[3]).GetComponent<Armor>().dArmor.defense; }
+      if (equipment.item[4] != 0) { defense.Value += GetNetworkedObject(equipment.item[4]).GetComponent<Armor>().dArmor.defense; }
+      if (equipment.item[5] != 0) { defense.Value += GetNetworkedObject(equipment.item[5]).GetComponent<Armor>().dArmor.defense; }
+      if (equipment.item[6] != 0) { defense.Value += GetNetworkedObject(equipment.item[6]).GetComponent<Armor>().dArmor.defense; }
+      if (equipment.item[1] != 0) { defense.Value += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.defense; }
+      damage.Value = baseDamage;
+      if (equipment.item[0] != 0) { damage.Value += GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.damage; }
+      if (equipment.item[1] != 0) { damage.Value += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.damage; }
       if (GetComponent<Hero>()) {
         Hero hero = GetComponent<Hero>();
         hero.hud.Refresh();

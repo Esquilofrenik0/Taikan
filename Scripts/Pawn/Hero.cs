@@ -30,7 +30,8 @@ namespace SRPG {
     public float dodgeCost = 5;
     public float attackCost = 5;
     public float sprintCost = 5;
-    public float dodgeStrength = 10;
+    public float climbCost = 5;
+    public float dodgeStrength = 20;
     [HideInInspector] public float mana = 100;
     [HideInInspector] public float stamina = 100;
     [HideInInspector] public Vector3 impact = Vector3.zero;
@@ -82,13 +83,63 @@ namespace SRPG {
     #endregion
 
     #region Actions
+    public void AddImpact(Vector3 dir, float force) {
+      dir.Normalize();
+      if (dir.y < 0) dir.y = -dir.y;
+      impact += dir.normalized * force;
+    }
+
+    public void UpdateImpact() {
+      if (impact.magnitude > 1) { cc.Move(impact * Time.deltaTime); }
+      impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
+    }
+
+    public void ApplyGravity() {
+      if (state != pS.Climb && state != pS.Swim) {
+        velocity.y += gravity * Time.deltaTime;
+        if (grounded && velocity.y < 0) { velocity.y = 0f; }
+        cc.Move(velocity * Time.deltaTime);
+      }
+      if (containerOpen) {
+        if (Vector3.Distance(transform.position, container.transform.position) > 5) {
+          CloseInventory();
+        }
+      }
+    }
+
     public void Jump() {
-      if (grounded) {
+      if (state == pS.Climb) { SetState(pS.Idle); }
+      else if (grounded) {
         if (state == pS.Idle || state == pS.Block || state == pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
           velocity.y += Mathf.Sqrt(jumpHeight * -gravity);
           anim.SetTrigger("Jump");
         }
+      }
+      else if (StaminaCost(climbCost * Time.deltaTime)) {
+        if (HitWall()) {
+          SetState(pS.Climb);
+          anim.SetTrigger("Climb");
+        }
+      }
+    }
+
+    public bool HitWall() {
+      RaycastHit hit = new RaycastHit();
+      Ray ray = new Ray(col.bounds.center, transform.forward);
+      if (Physics.Raycast(ray, out hit, 0.5f)) {
+        transform.rotation = Quaternion.FromToRotation(transform.forward, -hit.normal) * transform.rotation;
+        return true;
+      }
+      else { return false; }
+    }
+
+    public void ClimbLedge() {
+      RaycastHit hit = new RaycastHit();
+      Ray ray = new Ray(col.bounds.center+(transform.forward*2), Vector3.down);
+      if (Physics.Raycast(ray, out hit, 0.5f)) {
+        // transform.rotation = Quaternion.FromToRotation(transform.forward, -hit.normal) * transform.rotation;
+        transform.position = hit.point;
       }
     }
 
@@ -96,18 +147,17 @@ namespace SRPG {
       if (inventoryOpen) { xIn = 0f; yIn = 0f; }
       anim.SetFloat("Horizontal", xIn * speed);
       anim.SetFloat("Vertical", yIn * speed);
-      direction = new Vector3(xIn, 0f, yIn);
-      direction = transform.rotation * direction;
-      direction = direction * speed;
-      cc.Move(direction * Time.deltaTime);
-      if (player.input.jump) { Jump(); player.input.jump = false; }
-      velocity.y += gravity * Time.deltaTime;
-      if (grounded && velocity.y < 0) { velocity.y = 0f; }
-      cc.Move(velocity * Time.deltaTime);
-      if (containerOpen) {
-        if (Vector3.Distance(transform.position, container.transform.position) > 4) {
-          CloseInventory();
+      if (xIn != 0 || yIn != 0) {
+        if (state == pS.Climb) {
+          if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
+            ClimbLedge();
+            SetState(pS.Idle);
+          }
+          else { direction = new Vector3(xIn, yIn, 0f); }
         }
+        else { direction = new Vector3(xIn, 0f, yIn); }
+        direction = transform.rotation * direction * speed;
+        cc.Move(direction * Time.deltaTime);
       }
     }
 
@@ -122,26 +172,17 @@ namespace SRPG {
       }
       camTarget.transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
       if (equipment.holstered.Value || direction.sqrMagnitude > 0) {
-        transform.rotation = Quaternion.Euler(0, mouseX, 0);
-        if (state != pS.Dodge) {
-          spineLook.transform.localRotation = Quaternion.Euler(spineLook.transform.localEulerAngles.x, mouseY, spineLook.transform.localEulerAngles.z);
+        if (state != pS.Climb) {
+          transform.rotation = Quaternion.Euler(0, mouseX, 0);
+          if (state != pS.Dodge) {
+            spineLook.transform.localRotation = Quaternion.Euler(spineLook.transform.localEulerAngles.x, mouseY, spineLook.transform.localEulerAngles.z);
+          }
         }
       }
       if (state != pS.Dodge) {
         headLook.transform.localRotation = Quaternion.Euler(0, 0, 0);
         camTarget.transform.position = new Vector3(headLook.transform.position.x, headLook.transform.position.y + 0.05f, headLook.transform.position.z);
       }
-    }
-
-    public void AddImpact(Vector3 dir, float force) {
-      dir.Normalize();
-      if (dir.y < 0) dir.y = -dir.y;
-      impact += dir.normalized * force;
-    }
-
-    public void UpdateImpact() {
-      if (impact.magnitude > 1) { cc.Move(impact * Time.deltaTime); }
-      impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
     }
 
     public void Dodge(float xIn, float yIn) {

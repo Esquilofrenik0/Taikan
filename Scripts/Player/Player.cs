@@ -62,7 +62,9 @@ namespace SRPG {
         if (input.attack) { hero.Attack(); }
         if (input.dodge) { hero.Dodge(input.movement.x, input.movement.y); input.dodge = false; }
       }
+      if (input.jump) { hero.Jump(); input.jump = false; }
       hero.Move(input.movement.x, input.movement.y);
+      hero.ApplyGravity();
       hero.UpdateImpact();
       hero.Regenerate();
     }

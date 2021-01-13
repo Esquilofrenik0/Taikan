@@ -28,7 +28,7 @@ namespace SRPG {
         if (other.GetComponent<Pawn>()) {
           Pawn pawn = other.GetComponent<Pawn>();
           if (hitPawns.Contains(pawn)) { return; }
-          pawn.TakeDamage(GetNetworkedObject(owner.Value).GetComponent<Pawn>().damage);
+          pawn.TakeDamage(GetNetworkedObject(owner.Value).GetComponent<Pawn>().damage.Value);
           hitPawns.Add(pawn);
         }
         else if (GetNetworkedObject(owner.Value).GetComponent<Hero>()) {

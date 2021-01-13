@@ -145,8 +145,8 @@ namespace SRPG {
       stats[0].text = "Health: " + hero.maxHealth + " (+" + hero.healthRegen + "/s)";
       stats[1].text = "Stamina: " + hero.maxStamina + " (+" + hero.staminaRegen + "/s)";
       stats[2].text = "Mana: " + hero.maxMana + " (+" + hero.manaRegen + "/s)";
-      stats[3].text = "Damage: " + hero.damage;
-      stats[4].text = "Defense: " + hero.defense;
+      stats[3].text = "Damage: " + hero.damage.Value;
+      stats[4].text = "Defense: " + hero.defense.Value;
     }
 
     public void DisplayInfo(dItem dItem) {

@@ -22,18 +22,19 @@ namespace SRPG {
     public Faction faction = Faction.Loner;
     [HideInInspector] public pS state = pS.Idle;
     public NetworkedVarFloat health = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 100f);
+    public NetworkedVarFloat damage = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
+    public NetworkedVarFloat defense = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
 
     [Header("Movement")]
     [HideInInspector] public float speed = 5;
     [HideInInspector] public bool grounded = true;
     [HideInInspector] public float gravity = -9.81f;
+    [HideInInspector] public Vector3 spawnPoint;
 
     [Header("Combat")]
     public float baseDamage = 1;
     public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
-    [HideInInspector] public float damage = 1;
-    [HideInInspector] public float defense = 1;
     [HideInInspector] public Coroutine resetCombo;
     [HideInInspector] public Coroutine disableHealthBar;
 
@@ -41,8 +42,6 @@ namespace SRPG {
     [HideInInspector] public Rigidbody[] bonesRB;
     [HideInInspector] public Collider[] bonesCol;
 
-    [Header("Networking")]
-    public Vector3 spawnPoint;
 
     #region Init
     public void initRagdoll() {
@@ -133,7 +132,7 @@ namespace SRPG {
         raycast = Physics.Raycast(player.vcam.transform.position, player.vcam.transform.forward, out hit, 100, layerMask);
       }
       else { raycast = Physics.Raycast(transform.position, transform.forward, out hit, 100, layerMask); }
-      if (raycast && hit.collider.GetComponent<Pawn>()) { hit.collider.GetComponent<Pawn>().TakeDamage(damage); }
+      if (raycast && hit.collider.GetComponent<Pawn>()) { hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value); }
     }
 
     public void ResetCombo() {
