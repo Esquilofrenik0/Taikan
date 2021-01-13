@@ -136,10 +136,10 @@ namespace SRPG {
 
     public void ClimbLedge() {
       RaycastHit hit = new RaycastHit();
-      Ray ray = new Ray(col.bounds.center+(transform.forward*2), Vector3.down);
+      Ray ray = new Ray(col.bounds.center + (transform.forward), Vector3.down*5);
       if (Physics.Raycast(ray, out hit, 0.5f)) {
-        // transform.rotation = Quaternion.FromToRotation(transform.forward, -hit.normal) * transform.rotation;
-        transform.position = hit.point;
+        Teleport(hit.point);
+        print("Climbed Ledge");
       }
     }
 
