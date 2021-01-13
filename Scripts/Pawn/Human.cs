@@ -88,23 +88,6 @@ namespace SRPG {
       crouching = crouch;
     }
 
-    public void Dodge(float xIn, float yIn) {
-      if (grounded) {
-        if (state == pS.Idle || state == pS.Block || state == pS.Sprint) {
-          if (GetComponent<Hero>()) {
-            Hero hero = GetComponent<Hero>();
-            if (!hero.StaminaCost(hero.dodgeCost)) { return; }
-          }
-          SetState(pS.Dodge);
-          if (yIn < 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); }
-          else if (yIn > 0) { anim.SetInteger("DodgeDirection", 1); anim.SetTrigger("Dodge"); }
-          else if (xIn < 0) { anim.SetInteger("DodgeDirection", 2); anim.SetTrigger("Dodge"); }
-          else if (xIn > 0) { anim.SetInteger("DodgeDirection", 3); anim.SetTrigger("Dodge"); }
-          else if (yIn == 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); }
-        }
-      }
-    }
-
     public void Sprint(bool sprint) {
       if (sprint) {
         if (grounded && !crouching) {

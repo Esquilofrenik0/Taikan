@@ -15,7 +15,6 @@ namespace SRPG {
     public Collider col;
     public Inventory inventory;
     public Equipment equipment;
-    public NPC npc;
 
     [Header("Stats")]
     public float maxHealth = 100;
@@ -47,37 +46,27 @@ namespace SRPG {
 
     #region Init
     public void initRagdoll() {
-      nInitRagdoll();
-      // InvokeServerRpc(sInitRagdoll);
-    }
-
-    // [ServerRPC(RequireOwnership = false)]
-    // public void sInitRagdoll() {
-    // InvokeClientRpcOnEveryone(cInitRagdoll);
-    // }
-
-    public void nInitRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       bonesCol = transform.GetChild(0).GetComponentsInChildren<Collider>(true);
     }
 
-    // public void DisableRagdoll() {
-    //   anim.enabled = true;
-    //   col.enabled = true;
-    //   for (int i = 0; i < bonesRB.Length; i++) {
-    //     bonesCol[i].enabled = false;
-    //     bonesRB[i].isKinematic = true;
-    //   }
-    // }
+    public void DisableRagdoll() {
+      anim.enabled = true;
+      col.enabled = true;
+      for (int i = 0; i < bonesRB.Length; i++) {
+        bonesCol[i].enabled = false;
+        bonesRB[i].isKinematic = true;
+      }
+    }
 
-    // public void EnableRagdoll() {
-    //   anim.enabled = false;
-    //   col.enabled = false;
-    //   for (int i = 0; i < bonesRB.Length; i++) {
-    //     bonesCol[i].enabled = true;
-    //     bonesRB[i].isKinematic = false;
-    //   }
-    // }
+    public void EnableRagdoll() {
+      anim.enabled = false;
+      col.enabled = false;
+      for (int i = 0; i < bonesRB.Length; i++) {
+        bonesCol[i].enabled = true;
+        bonesRB[i].isKinematic = false;
+      }
+    }
 
     public virtual void Respawn() {
       transform.position = spawnPoint;
@@ -86,7 +75,7 @@ namespace SRPG {
       equipment.holstered.Value = false;
       equipment.Holster(equipment.holstered.Value);
       state = pS.Idle;
-      // DisableRagdoll();
+      DisableRagdoll();
     }
     #endregion
 

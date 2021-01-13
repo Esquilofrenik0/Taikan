@@ -22,22 +22,21 @@ namespace SRPG {
         NetworkedObject player = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject;
         netID.Value = player.NetworkId;
       }
-      // hero.initRagdoll();
+      hero.initRagdoll();
       hero.LoadAvatar();
     }
 
 
     #region Unity
     void Start() {
-      if (IsLocalPlayer) {
-        GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
-        vcam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
-        vcam.Follow = hero.camTarget.transform;
-        view = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-        gameObject.layer = 9;
-        hero.hud.initHUD();
-        hero.Respawn();
-      }
+      if (!IsLocalPlayer) { return; }
+      GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
+      vcam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
+      vcam.Follow = hero.camTarget.transform;
+      view = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+      gameObject.layer = 9;
+      hero.hud.initHUD();
+      hero.Respawn();
     }
 
     void FixedUpdate() {
@@ -64,6 +63,7 @@ namespace SRPG {
         if (input.dodge) { hero.Dodge(input.movement.x, input.movement.y); input.dodge = false; }
       }
       hero.Move(input.movement.x, input.movement.y);
+      hero.UpdateImpact();
       hero.Regenerate();
     }
 

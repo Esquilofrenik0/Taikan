@@ -27,7 +27,7 @@ namespace SRPG {
         }
       }
       if (holst) {
-        Timer.Delay(this, dHolster,0.05f);
+        Timer.Delay(this, dHolster, 0.05f);
         Timer.Delay(this, human.RefreshStats, 0.1f);
       }
     }
@@ -48,7 +48,7 @@ namespace SRPG {
       nHolster(equipped);
     }
 
-    public void dHolster(){
+    public void dHolster() {
       Holster(holstered.Value);
     }
 
@@ -82,11 +82,6 @@ namespace SRPG {
           if (item[0] != 0 && GetNetworkedObject(item[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); }
         }
       }
-      else {
-        dArmor armor = dItem as dArmor;
-        human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
-        human.avatar.BuildCharacter();
-      }
       InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId);
       Timer.Delay(this, dHolster, 0.05f);
       Timer.Delay(this, human.RefreshStats, 0.1f);
@@ -98,6 +93,11 @@ namespace SRPG {
       NetworkedObject spawn = Instantiate(dItem.resource).GetComponent<NetworkedObject>();
       spawn.GetComponent<NetworkedObject>().SpawnWithOwnership(clientID);
       item[slot] = spawn.GetComponent<NetworkedObject>().NetworkId;
+      if (slot > 1) {
+        dArmor armor = dItem as dArmor;
+        human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
+        human.avatar.BuildCharacter();
+      }
     }
 
     public void UnequipItem(int slot) {

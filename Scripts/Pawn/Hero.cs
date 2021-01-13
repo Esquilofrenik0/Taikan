@@ -30,8 +30,10 @@ namespace SRPG {
     public float dodgeCost = 5;
     public float attackCost = 5;
     public float sprintCost = 5;
+    public float dodgeStrength = 10;
     [HideInInspector] public float mana = 100;
     [HideInInspector] public float stamina = 100;
+    [HideInInspector] public Vector3 impact = Vector3.zero;
 
     [Header("Inventory")]
     [HideInInspector] public Container container;
@@ -75,7 +77,7 @@ namespace SRPG {
       grounded = true;
       crouching = false;
       state = pS.Idle;
-      // DisableRagdoll();
+      DisableRagdoll();
     }
     #endregion
 
@@ -97,13 +99,11 @@ namespace SRPG {
       direction = new Vector3(xIn, 0f, yIn);
       direction = transform.rotation * direction;
       direction = direction * speed;
-
       cc.Move(direction * Time.deltaTime);
       if (player.input.jump) { Jump(); player.input.jump = false; }
       velocity.y += gravity * Time.deltaTime;
       if (grounded && velocity.y < 0) { velocity.y = 0f; }
       cc.Move(velocity * Time.deltaTime);
-
       if (containerOpen) {
         if (Vector3.Distance(transform.position, container.transform.position) > 4) {
           CloseInventory();
@@ -130,6 +130,34 @@ namespace SRPG {
       if (state != pS.Dodge) {
         headLook.transform.localRotation = Quaternion.Euler(0, 0, 0);
         camTarget.transform.position = new Vector3(headLook.transform.position.x, headLook.transform.position.y + 0.05f, headLook.transform.position.z);
+      }
+    }
+
+    public void AddImpact(Vector3 dir, float force) {
+      dir.Normalize();
+      if (dir.y < 0) dir.y = -dir.y;
+      impact += dir.normalized * force;
+    }
+
+    public void UpdateImpact() {
+      if (impact.magnitude > 1) { cc.Move(impact * Time.deltaTime); }
+      impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
+    }
+
+    public void Dodge(float xIn, float yIn) {
+      if (grounded) {
+        if (state == pS.Idle || state == pS.Block || state == pS.Sprint) {
+          if (GetComponent<Hero>()) {
+            Hero hero = GetComponent<Hero>();
+            if (!hero.StaminaCost(hero.dodgeCost)) { return; }
+          }
+          SetState(pS.Dodge);
+          if (yIn < 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); AddImpact(-transform.forward, dodgeStrength); }
+          else if (yIn > 0) { anim.SetInteger("DodgeDirection", 1); anim.SetTrigger("Dodge"); AddImpact(transform.forward, dodgeStrength); }
+          else if (xIn < 0) { anim.SetInteger("DodgeDirection", 2); anim.SetTrigger("Dodge"); AddImpact(-transform.right, dodgeStrength); }
+          else if (xIn > 0) { anim.SetInteger("DodgeDirection", 3); anim.SetTrigger("Dodge"); AddImpact(transform.right, dodgeStrength); }
+          else if (yIn == 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); AddImpact(-transform.forward, dodgeStrength); }
+        }
       }
     }
 
