@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAPI;
 
 namespace SRPG {
   public class Survivor: NPC {
@@ -10,7 +9,6 @@ namespace SRPG {
     public dItem[] equippedItems;
 
     public override void NetworkStart() {
-      // if (!IsLocalPlayer) { return; }
       base.NetworkStart();
       human.initRagdoll();
       for (int i = 0; i < equippedItems.Length; i++) {
@@ -21,7 +19,7 @@ namespace SRPG {
     }
 
     void FixedUpdate() {
-      // if (!IsLocalPlayer) { return; }
+      if (!IsServer) { return; }
       if (human.state == pS.Dead) {
         behaviorTree.DisableBehavior();
         agent.isStopped = true;
@@ -33,7 +31,7 @@ namespace SRPG {
     }
 
     void Update() {
-      // if (!IsLocalPlayer) { return; }
+      if (!IsServer) { return; }
       human.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);
     }
   }

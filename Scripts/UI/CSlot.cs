@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using MLAPI;
 
 namespace SRPG {
-  public class CSlot : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
+  public class CSlot: NetworkedBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     [HideInInspector] public Hero hero;
     [HideInInspector] public int number;
     [HideInInspector] public Slot slot;
@@ -25,10 +26,11 @@ namespace SRPG {
       slot = hero.container.inventory.slot[number];
       if (slot.amount > 0) {
         textAmount.text = slot.amount.ToString();
-        if (slot.amount == 1) { textAmount.gameObject.SetActive(false); } 
+        if (slot.amount == 1) { textAmount.gameObject.SetActive(false); }
         else { textAmount.gameObject.SetActive(true); }
         slotIcon.GetComponent<Image>().sprite = slot.dItem.icon;
-      } else {
+      }
+      else {
         textAmount.text = slot.amount.ToString();
         textAmount.gameObject.SetActive(false);
         slotIcon.GetComponent<Image>().sprite = background;
@@ -44,7 +46,6 @@ namespace SRPG {
           hero.hud.iSlot[freeSlot].UpdateSlot();
           UpdateSlot();
         }
-
       }
     }
 

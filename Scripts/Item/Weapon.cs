@@ -44,15 +44,13 @@ namespace SRPG {
       base.NetworkStart();
       NetworkedObject nObject = GetComponent<NetworkedObject>();
       if (nObject.IsSceneObject == true) { return; }
-      if (nObject.GetComponent<Collider>()) { nObject.GetComponent<Collider>().isTrigger = true; }
-      if (IsServer) {
-        NetworkedObject player = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject;
-        owner.Value = player.NetworkId;
-      }
       if (owner.Value != 0) {
         NetworkedObject actor = GetNetworkedObject(owner.Value);
-        if (nObject.GetComponent<Collider>() && actor.GetComponent<Collider>()) {
-          Physics.IgnoreCollision(nObject.GetComponent<Collider>(), GetNetworkedObject(owner.Value).GetComponent<Collider>());
+        if (nObject.GetComponent<Collider>()) {
+          nObject.GetComponent<Collider>().isTrigger = true;
+          if (actor.GetComponent<Collider>()) {
+            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), GetNetworkedObject(owner.Value).GetComponent<Collider>());
+          }
         }
       }
     }

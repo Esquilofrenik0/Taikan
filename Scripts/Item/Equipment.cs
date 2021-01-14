@@ -11,8 +11,8 @@ using MLAPI.Connection;
 namespace SRPG {
   public class Equipment: NetworkedBehaviour {
     public Human human;
-    public NetworkedObject itemSpawner;
     public GameObject[] equipSlot = new GameObject[9];
+    [HideInInspector] public NetworkedObject itemSpawner;
     public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
     public NetworkedList<ulong> item = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0, 0, 0, 0, 0, 0 });
 
@@ -32,24 +32,12 @@ namespace SRPG {
       }
     }
 
-    public void Holster(bool equipped) {
-      if (!IsLocalPlayer) { return; }
-      InvokeServerRpc(sHolster, equipped);
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void sHolster(bool equipped) {
-      nHolster(equipped);
-      InvokeClientRpcOnEveryone(cHolster, equipped);
-    }
-
-    [ClientRPC]
-    public void cHolster(bool equipped) {
-      nHolster(equipped);
-    }
-
     public void dHolster() {
       Holster(holstered.Value);
+    }
+
+    public void Holster(bool equipped) {
+      InvokeServerRpc(sHolster, equipped);
     }
 
     public void nHolster(bool equipped) {
@@ -68,8 +56,18 @@ namespace SRPG {
       }
     }
 
+    [ServerRPC(RequireOwnership = false)]
+    public void sHolster(bool equipped) {
+      nHolster(equipped);
+      InvokeClientRpcOnEveryone(cHolster, equipped);
+    }
+
+    [ClientRPC]
+    public void cHolster(bool equipped) {
+      nHolster(equipped);
+    }
+
     public void EquipItem(dItem dItem) {
-      if (!IsLocalPlayer) { return; }
       int slot = GetSlot(dItem);
       UnequipItem(slot);
       if (slot < 2) {
@@ -91,6 +89,7 @@ namespace SRPG {
     public void SpawnEquip(int slot, string name, ulong clientID) {
       dItem dItem = itemSpawner.GetComponent<ItemSpawner>().GetItem(name);
       NetworkedObject spawn = Instantiate(dItem.resource).GetComponent<NetworkedObject>();
+      if (slot < 2) { spawn.GetComponent<Weapon>().owner.Value = GetComponent<NetworkedObject>().NetworkId; }
       spawn.GetComponent<NetworkedObject>().SpawnWithOwnership(clientID);
       item[slot] = spawn.GetComponent<NetworkedObject>().NetworkId;
       if (slot > 1) {
@@ -101,7 +100,6 @@ namespace SRPG {
     }
 
     public void UnequipItem(int slot) {
-      if (!IsLocalPlayer) { return; }
       InvokeServerRpc(sUnequipItem, slot);
     }
 

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
-using MLAPI.NetworkedVar.Collections;
 using MLAPI.Messaging;
 
 namespace SRPG {
@@ -42,6 +41,9 @@ namespace SRPG {
     [HideInInspector] public Rigidbody[] bonesRB;
     [HideInInspector] public Collider[] bonesCol;
 
+    public override void NetworkStart() {
+      if (!IsServer) { spawnPoint = transform.position; }
+    }
 
     #region Init
     public void initRagdoll() {
@@ -161,20 +163,26 @@ namespace SRPG {
     #region Stats
     public void TakeDamage(float amount) {
       UpdateHealth(-amount);
-      UpdateFloatingHealthBar(health.Value / maxHealth);
+      Timer.Delay(this, UpdateFloatingHealthBar, 0.1f);
+      Timer.Delay(this, UpdateFloatingHealthBar, 0.2f);
     }
 
-
     public void UpdateHealth(float amount) {
+      InvokeServerRpc(sUpdateHealth, amount);
+    }
+
+    [ServerRPC(RequireOwnership = false)]
+    public void sUpdateHealth(float amount) {
       health.Value += amount;
       if (health.Value > maxHealth) { health.Value = maxHealth; }
       else if (health.Value <= 0) {
         health.Value = 0f;
-        Die();
+        sDie();
       }
     }
 
-    public void UpdateFloatingHealthBar(float percent) {
+    public void UpdateFloatingHealthBar() {
+      float percent = health.Value / maxHealth;
       floatingHealthBar.SetActive(true);
       floatingHealthBar.GetComponent<UI_Bar>().SetPercent(percent);
       Timer.rDelay(this, DisableHealthBar, 5, disableHealthBar);
@@ -204,7 +212,7 @@ namespace SRPG {
     [ClientRPC]
     public void cDie() {
       SetState(pS.Dead);
-      // EnableRagdoll();
+      EnableRagdoll();
       Timer.Delay(this, Respawn, 5);
     }
     #endregion

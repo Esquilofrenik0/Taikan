@@ -1,15 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
-using MLAPI;
-using MLAPI.Messaging;
-using MLAPI.NetworkedVar;
-using MLAPI.NetworkedVar.Collections;
-using MLAPI.Spawning;
 using UMA;
 using UMA.CharacterSystem;
-using UnityEngine.UI;
 
 
 namespace SRPG {
@@ -144,19 +137,18 @@ namespace SRPG {
           anim.SetInteger("Weapon", (int)wT.Unarmed);
         }
       }
-      if (aiming) {anim.SetLayerWeight(1, 1);}
+      if (aiming) { anim.SetLayerWeight(1, 1); }
       else {
         if (!equipment.holstered.Value || state == pS.Dodge || state == pS.Sprint) {
           anim.SetLayerWeight(1, 0);
         }
-        else if (equipment.holstered.Value) {anim.SetLayerWeight(1, 1);}
+        else if (equipment.holstered.Value) { anim.SetLayerWeight(1, 1); }
       }
     }
     #endregion
 
     #region Stats
     public void RefreshStats() {
-      if (!IsLocalPlayer) { return; }
       defense.Value = baseDefense;
       if (equipment.item[2] != 0) { defense.Value += GetNetworkedObject(equipment.item[2]).GetComponent<Armor>().dArmor.defense; }
       if (equipment.item[3] != 0) { defense.Value += GetNetworkedObject(equipment.item[3]).GetComponent<Armor>().dArmor.defense; }
@@ -167,6 +159,7 @@ namespace SRPG {
       damage.Value = baseDamage;
       if (equipment.item[0] != 0) { damage.Value += GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.damage; }
       if (equipment.item[1] != 0) { damage.Value += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.damage; }
+      if (!IsLocalPlayer) { return; }
       if (GetComponent<Hero>()) {
         Hero hero = GetComponent<Hero>();
         hero.hud.Refresh();

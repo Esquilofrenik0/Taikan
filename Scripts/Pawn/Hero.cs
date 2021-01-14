@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
-using MLAPI;
-using MLAPI.Messaging;
 
 namespace SRPG {
   [System.Serializable]

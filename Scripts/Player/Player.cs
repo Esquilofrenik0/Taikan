@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using MLAPI;
-using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
 
 namespace SRPG {

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using MLAPI;
 
 namespace SRPG {
-  public class UI_Bar : MonoBehaviour {
+  public class UI_Bar: NetworkedBehaviour {
     public Text txt;
     public Slider slider;
 
