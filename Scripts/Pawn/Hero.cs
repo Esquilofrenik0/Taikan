@@ -267,7 +267,9 @@ namespace SRPG {
 
     public void Regenerate() {
       UpdateHealth(healthRegen * Time.deltaTime);
-      UpdateStamina(staminaRegen * Time.deltaTime);
+      if(grounded && state != pS.Block && state != pS.Climb && state != pS.Sprint){
+        UpdateStamina(staminaRegen * Time.deltaTime);
+      }
       UpdateMana(manaRegen * Time.deltaTime);
     }
     #endregion

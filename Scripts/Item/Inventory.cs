@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
+using MLAPI.Serialization;
 
 namespace SRPG {
   [System.Serializable]
   public struct Slot {
     public dItem dItem;
     public int amount;
+    
   }
 
   [System.Serializable]

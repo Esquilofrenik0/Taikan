@@ -26,12 +26,12 @@ namespace SRPG {
       hero.LoadAvatar();
     }
 
-
     #region Unity
     void Start() {
       if (!IsLocalPlayer) { return; }
+      hero.transform.Find("MinimapIcon").gameObject.SetActive(true);
       GameObject.Find("MinimapCamera").transform.SetParent(hero.transform);
-      GameObject.Find("MainCamera").transform.SetParent(hero.camTarget.transform);
+      GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
       vcam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
       vcam.Follow = hero.camTarget.transform;
       view = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
@@ -46,7 +46,7 @@ namespace SRPG {
       if (hero.state == pS.Dead) { return; }
       hero.IsGrounded();
       hero.RefreshState();
-      if (hero.aiming) { vcam.m_Lens.FieldOfView = 45; } else { vcam.m_Lens.FieldOfView = 60; }
+      if (hero.aiming) { vcam.m_Lens.FieldOfView = 30; } else { vcam.m_Lens.FieldOfView = 45; }
       if (hero.equipment.item[0] != 0) { if (GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx != null) { GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx.SetActive(false); } }
     }
 

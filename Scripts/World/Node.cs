@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MLAPI;
+using MLAPI.NetworkedVar;
 
 namespace SRPG {
-  public class Node : MonoBehaviour {
+  public class Node: NetworkedBehaviour {
     public Rigidbody rb;
     public Collider col;
     public dItem resource;
@@ -14,11 +16,12 @@ namespace SRPG {
     [HideInInspector] public Vector3 pos;
     [HideInInspector] public Vector3 rot;
 
-    public void Start(){
+    public void Start() {
       pos = transform.position;
-      rot = new Vector3(transform.rotation.x,transform.rotation.y,transform.rotation.z);
+      rot = new Vector3(transform.rotation.x, transform.rotation.y, transform.rotation.z);
       Spawn();
     }
+
 
     public void TakeDamage(Hero hero) {
       Harvest(hero);
@@ -31,13 +34,14 @@ namespace SRPG {
         hero.inventory.Store(resource, 1);
         if (health <= 0) {
           rb.isKinematic = false;
+          rb.useGravity = true;
           Vector3 force = hero.transform.forward * 100 * rb.mass;
           rb.AddForce(force, ForceMode.Force);
           ResetNode();
         }
       }
     }
-    
+
     public void ResetNode() {
       StartCoroutine(Respawn());
     }
@@ -57,6 +61,7 @@ namespace SRPG {
       rb.transform.position = new Vector3(pos.x, pos.y, pos.z);
       rb.transform.rotation = Quaternion.Euler(rot.x, rot.y, rot.z);
       rb.isKinematic = true;
+      rb.useGravity = false;
       health = maxHealth;
       rb.gameObject.SetActive(true);
     }
