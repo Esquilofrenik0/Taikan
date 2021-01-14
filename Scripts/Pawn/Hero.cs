@@ -95,11 +95,9 @@ namespace SRPG {
     }
 
     public void ApplyGravity() {
-      if (state != pS.Climb && state != pS.Swim) {
-        velocity.y += gravity * Time.deltaTime;
-        if (grounded && velocity.y < 0) { velocity.y = 0f; }
-        cc.Move(velocity * Time.deltaTime);
-      }
+      if (grounded && velocity.y < 0 || state == pS.Climb) { velocity.y = 0f; }
+      else { velocity.y += gravity * Time.deltaTime; }
+      cc.Move(velocity * Time.deltaTime);
       if (containerOpen) {
         if (Vector3.Distance(transform.position, container.transform.position) > 5) {
           CloseInventory();
@@ -136,10 +134,9 @@ namespace SRPG {
 
     public void ClimbLedge() {
       RaycastHit hit = new RaycastHit();
-      Ray ray = new Ray(col.bounds.center + (transform.forward), Vector3.down*5);
+      Ray ray = new Ray(col.bounds.center + (transform.forward/2), Vector3.down * 5);
       if (Physics.Raycast(ray, out hit, 0.5f)) {
         Teleport(hit.point);
-        print("Climbed Ledge");
       }
     }
 
@@ -161,7 +158,7 @@ namespace SRPG {
       }
     }
 
-    public void Look(float xIn, float yIn, bool firstPerson) {
+    public void Look(float xIn, float yIn) {
       if (!inventoryOpen) {
         float rot;
         if (!aiming) { rot = rotationSpeed; }
