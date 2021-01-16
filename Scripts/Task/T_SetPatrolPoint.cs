@@ -13,10 +13,10 @@ namespace SRPG {
     }
 
     public override TaskStatus OnUpdate() {
-      float x = npc.spawnPos.x + Random.Range(-npc.patrolDistance,npc.patrolDistance);
-      float y = npc.transform.position.y;
-      float z = npc.spawnPos.z + Random.Range(-npc.patrolDistance,npc.patrolDistance);
-      patrolPoint.Value = new Vector3(x,y,z);
+      // float x = npc.spawnPos.x + Random.Range(-npc.patrolDistance,npc.patrolDistance);
+      // float y = npc.transform.position.y;
+      // float z = npc.spawnPos.z + Random.Range(-npc.patrolDistance,npc.patrolDistance);
+      // patrolPoint.Value = new Vector3(x,y,z);
       return TaskStatus.Success;
     }
   }

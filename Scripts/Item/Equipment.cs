@@ -69,6 +69,13 @@ namespace SRPG {
 
     public void EquipItem(dItem dItem) {
       int slot = GetSlot(dItem);
+      ClearSlot(slot, dItem);
+      InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId);
+      Timer.Delay(this, dHolster, 0.05f);
+      Timer.Delay(this, human.RefreshStats, 0.1f);
+    }
+
+    public void ClearSlot(int slot, dItem dItem) {
       UnequipItem(slot);
       if (slot < 2) {
         dWeapon dWeapon = dItem as dWeapon;
@@ -80,9 +87,11 @@ namespace SRPG {
           if (item[0] != 0 && GetNetworkedObject(item[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); }
         }
       }
-      InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId);
-      Timer.Delay(this, dHolster, 0.05f);
-      Timer.Delay(this, human.RefreshStats, 0.1f);
+      else if (slot > 1) {
+        dArmor armor = dItem as dArmor;
+        human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
+        human.avatar.BuildCharacter();
+      }
     }
 
     [ServerRPC(RequireOwnership = false)]
@@ -92,11 +101,6 @@ namespace SRPG {
       if (slot < 2) { spawn.GetComponent<Weapon>().owner.Value = GetComponent<NetworkedObject>().NetworkId; }
       spawn.GetComponent<NetworkedObject>().SpawnWithOwnership(clientID);
       item[slot] = spawn.GetComponent<NetworkedObject>().NetworkId;
-      if (slot > 1) {
-        dArmor armor = dItem as dArmor;
-        human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
-        human.avatar.BuildCharacter();
-      }
     }
 
     public void UnequipItem(int slot) {
@@ -113,7 +117,7 @@ namespace SRPG {
         human.avatar.ClearSlot(armor.armorSlot.ToString());
         human.avatar.BuildCharacter();
       }
-      human.inventory.Store(equip.GetComponent<Item>().dItem, 1);
+      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip.GetComponent<Item>().dItem, 1); }
       equip.UnSpawn();
       Destroy(equip.gameObject);
       item[slot] = 0;

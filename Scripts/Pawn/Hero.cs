@@ -35,6 +35,7 @@ namespace SRPG {
     [HideInInspector] public Vector3 impact = Vector3.zero;
 
     [Header("Inventory")]
+    public Inventory inventory;
     [HideInInspector] public Container container;
     [HideInInspector] public bool containerOpen = false;
     [HideInInspector] public bool inventoryOpen = false;
@@ -132,7 +133,7 @@ namespace SRPG {
 
     public void ClimbLedge() {
       RaycastHit hit = new RaycastHit();
-      Ray ray = new Ray(col.bounds.center + (transform.forward/2), Vector3.down * 5);
+      Ray ray = new Ray(col.bounds.center + (transform.forward), Vector3.down * 5);
       if (Physics.Raycast(ray, out hit, 0.5f)) {
         Teleport(hit.point);
       }
@@ -265,7 +266,7 @@ namespace SRPG {
 
     public void Regenerate() {
       UpdateHealth(healthRegen * Time.deltaTime);
-      if(grounded && state != pS.Block && state != pS.Climb && state != pS.Sprint){
+      if (grounded && state != pS.Block && state != pS.Climb && state != pS.Sprint) {
         UpdateStamina(staminaRegen * Time.deltaTime);
       }
       UpdateMana(manaRegen * Time.deltaTime);

@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e347bcffc5214d8df898a49881a7c, type: 3}
   m_Name: Shield
   m_EditorClassIdentifier: 
-  resource: {fileID: 3754091197357405519, guid: 68a3bf40e779f4b4c80a31bfbfc325db, type: 3}
+  resource: {fileID: 3754091197357405519, guid: 68a3bf40e779f4b4c80a31bfbfc325db,
+    type: 3}
   type: 2
   Name: Shield
   description: Use to efficiently block incoming attacks.
-  icon: {fileID: 21300000, guid: ce1847e0eae595942ba8c89d625516c2, type: 3}
+  icon: {fileID: 21300000, guid: a42b3b2bb82524b4c9e97aca1cb294fe, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
+using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
 using MLAPI.Serialization;
 
@@ -10,7 +11,6 @@ namespace SRPG {
   public struct Slot {
     public dItem dItem;
     public int amount;
-    
   }
 
   [System.Serializable]
@@ -20,8 +20,8 @@ namespace SRPG {
 
     public void Awake() {
       Slot[] _slot = new Slot[nSlots];
-      for(int i=0;i<nSlots;i++){
-        if(i<slot.Length){
+      for (int i = 0; i < nSlots; i++) {
+        if (i < slot.Length) {
           _slot[i] = slot[i];
         }
         else {
@@ -44,6 +44,11 @@ namespace SRPG {
       return -1;
     }
 
+    // public void Store(dItem dItem, int storeAmount) {
+      // InvokeServerRpc(sStore,dItem,storeAmount);
+    // }
+
+    // [ServerRPC(RequireOwnership = false)]
     public void Store(dItem dItem, int storeAmount) {
       if (dItem.stack > 1) {
         int number = SearchItem(dItem);

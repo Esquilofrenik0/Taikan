@@ -1,4 +1,4 @@
-// GENERATED AUTOMATICALLY FROM 'Assets/Plugins/Scripts/InputSystem/InputMaster.inputactions'
+// GENERATED AUTOMATICALLY FROM 'Assets/Scripts/InputSystem/InputMaster.inputactions'
 
 using System;
 using System.Collections;
@@ -414,6 +414,17 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""name"": """",
                     ""id"": ""ca1a363b-2c6a-41e6-a5df-78c8ebccb78e"",
                     ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Menu"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab951add-7fc5-4427-8a57-b35b383ec6ac"",
+                    ""path"": ""<Keyboard>/m"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

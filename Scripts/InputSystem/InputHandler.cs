@@ -45,13 +45,13 @@ namespace SRPG {
       if (!IsLocalPlayer) { return; }
       if (firstPerson) {
         firstPerson = false;
-        player.vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
-        player.vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
+        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
+        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
       }
       else {
         firstPerson = true;
-        player.vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
-        player.vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
+        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
+        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
       }
     }
 
@@ -72,7 +72,14 @@ namespace SRPG {
 
     void OnMenu() {
       if (!IsLocalPlayer) { return; }
-      menu = true;
+      if(menu){
+        menu = false;
+        player.worldCam.Priority = 8;
+      }
+      else{ 
+        menu = true;
+        player.worldCam.Priority = 10;
+      }
     }
 
     void OnInventory() {

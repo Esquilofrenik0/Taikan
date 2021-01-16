@@ -9,7 +9,13 @@ namespace SRPG {
     public GameObject HUD;
     public GameObject menuPanel;
 
-    public void Start() {
+#if UNITY_SERVER
+    void Awake(){
+      NetworkingManager.Singleton.StartServer();
+    }
+#endif
+
+    void Start() {
       HUD.SetActive(false);
       menuPanel.SetActive(true);
     }

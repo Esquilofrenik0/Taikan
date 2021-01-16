@@ -16,6 +16,21 @@ namespace SRPG {
     [HideInInspector] public bool resetAttack = false;
     [HideInInspector] public List<Pawn> hitPawns;
 
+    public override void NetworkStart() {
+      base.NetworkStart();
+      NetworkedObject nObject = GetComponent<NetworkedObject>();
+      if (nObject.IsSceneObject == true) { return; }
+      if (owner.Value != 0) {
+        NetworkedObject actor = GetNetworkedObject(owner.Value);
+        if (nObject.GetComponent<Collider>()) {
+          nObject.GetComponent<Collider>().isTrigger = true;
+          if (actor.GetComponent<Collider>()) {
+            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), GetNetworkedObject(owner.Value).GetComponent<Collider>());
+          }
+        }
+      }
+    }
+
     void Awake() {
       dWeapon = dItem as dWeapon;
       attacking = false;
@@ -35,21 +50,6 @@ namespace SRPG {
           Hero hero = GetNetworkedObject(owner.Value).GetComponent<Hero>();
           if (other.GetComponent<Node>()) {
             other.GetComponent<Node>().TakeDamage(hero);
-          }
-        }
-      }
-    }
-
-    public override void NetworkStart() {
-      base.NetworkStart();
-      NetworkedObject nObject = GetComponent<NetworkedObject>();
-      if (nObject.IsSceneObject == true) { return; }
-      if (owner.Value != 0) {
-        NetworkedObject actor = GetNetworkedObject(owner.Value);
-        if (nObject.GetComponent<Collider>()) {
-          nObject.GetComponent<Collider>().isTrigger = true;
-          if (actor.GetComponent<Collider>()) {
-            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), GetNetworkedObject(owner.Value).GetComponent<Collider>());
           }
         }
       }

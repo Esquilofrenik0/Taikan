@@ -12,11 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e347bcffc5214d8df898a49881a7c, type: 3}
   m_Name: Sword
   m_EditorClassIdentifier: 
-  resource: {fileID: 6939382618588151105, guid: 5f1dc67fd6c31b149b0438b38e552770, type: 3}
+  resource: {fileID: 6939382618588151105, guid: 5f1dc67fd6c31b149b0438b38e552770,
+    type: 3}
   type: 2
   Name: Iron Sword
   description: Sword made with iron.
-  icon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
+  icon: {fileID: 21300000, guid: 4ad16adfdf2d1a441879a598de742eb6, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1

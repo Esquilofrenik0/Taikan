@@ -12,7 +12,8 @@ namespace SRPG {
     public Hero hero;
     public InputHandler input;
     public NetworkedVarULong netID = new NetworkedVarULong(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
-    [HideInInspector] public CinemachineVirtualCamera vcam;
+    [HideInInspector] public CinemachineVirtualCamera heroCam;
+    [HideInInspector] public CinemachineVirtualCamera worldCam;
     [HideInInspector] public Cinemachine3rdPersonFollow view;
 
     public override void NetworkStart() {
@@ -31,9 +32,11 @@ namespace SRPG {
       hero.transform.Find("MinimapIcon").gameObject.SetActive(true);
       GameObject.Find("MinimapCamera").transform.SetParent(hero.transform);
       GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
-      vcam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
-      vcam.Follow = hero.camTarget.transform;
-      view = vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+      heroCam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
+      heroCam.Follow = hero.camTarget.transform;
+      view = heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+      worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
+      worldCam.Priority = 8;
       gameObject.layer = 9;
       hero.hud.initHUD();
       hero.Respawn();
@@ -45,7 +48,7 @@ namespace SRPG {
       if (hero.state == pS.Dead) { return; }
       hero.IsGrounded();
       hero.RefreshState();
-      if (hero.aiming) { vcam.m_Lens.FieldOfView = 30; } else { vcam.m_Lens.FieldOfView = 45; }
+      if (hero.aiming) { heroCam.m_Lens.FieldOfView = 30; } else { heroCam.m_Lens.FieldOfView = 45; }
       if (hero.equipment.item[0] != 0) { if (GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx != null) { GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx.SetActive(false); } }
     }
 

@@ -12,7 +12,6 @@ namespace SRPG {
     public Animator anim;
     public GameObject floatingHealthBar;
     public Collider col;
-    public Inventory inventory;
     public Equipment equipment;
 
     [Header("Stats")]
@@ -34,16 +33,13 @@ namespace SRPG {
     public float baseDamage = 1;
     public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
+    [HideInInspector] public bool aiming = false;
     [HideInInspector] public Coroutine resetCombo;
     [HideInInspector] public Coroutine disableHealthBar;
 
     [Header("Ragdoll")]
     [HideInInspector] public Rigidbody[] bonesRB;
     [HideInInspector] public Collider[] bonesCol;
-
-    public override void NetworkStart() {
-      if (!IsServer) { spawnPoint = transform.position; }
-    }
 
     #region Init
     public void initRagdoll() {
@@ -70,7 +66,6 @@ namespace SRPG {
     }
 
     public virtual void Respawn() {
-      transform.position = spawnPoint;
       health.Value = maxHealth;
       grounded = true;
       equipment.holstered.Value = false;
@@ -83,7 +78,7 @@ namespace SRPG {
     #region Utils
     public void IsGrounded() {
       Ray ray = new Ray(col.bounds.center, Vector3.down);
-      grounded = Physics.SphereCast(ray, 0.15f, col.bounds.extents.y);
+      grounded = Physics.SphereCast(ray, 0.3f, col.bounds.extents.y - 0.1f);
       anim.SetBool("Grounded", grounded);
     }
 
@@ -106,6 +101,7 @@ namespace SRPG {
     }
 
     public void Slash() {
+      print("Slashing");
       SetState(pS.Attack);
       anim.SetInteger("Combo", combo);
       anim.SetTrigger("Attack");
@@ -131,7 +127,7 @@ namespace SRPG {
       layerMask = ~layerMask;
       if (GetComponent<Player>()) {
         Player player = GetComponent<Player>();
-        raycast = Physics.Raycast(player.vcam.transform.position, player.vcam.transform.forward, out hit, 100, layerMask);
+        raycast = Physics.Raycast(player.heroCam.transform.position, player.heroCam.transform.forward, out hit, 100, layerMask);
       }
       else { raycast = Physics.Raycast(transform.position, transform.forward, out hit, 100, layerMask); }
       if (raycast && hit.collider.GetComponent<Pawn>()) { hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value); }
@@ -221,6 +217,29 @@ namespace SRPG {
     public void SetState(pS pState) {
       state = pState;
       anim.SetInteger("State", (int)state);
+    }
+    #endregion
+
+    #region Animator
+    public void SetAnimatorLayer() {
+      if (equipment.item[0] != 0) {
+        Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
+        if (anim.GetInteger("Weapon") != (int)weapon.dWeapon.wType) {
+          anim.SetInteger("Weapon", (int)weapon.dWeapon.wType);
+        }
+      }
+      else {
+        if (anim.GetInteger("Weapon") != (int)wT.Unarmed) {
+          anim.SetInteger("Weapon", (int)wT.Unarmed);
+        }
+      }
+      if (aiming) { anim.SetLayerWeight(1, 1); }
+      else {
+        if (!equipment.holstered.Value || state == pS.Dodge || state == pS.Sprint) {
+          anim.SetLayerWeight(1, 0);
+        }
+        else if (equipment.holstered.Value) { anim.SetLayerWeight(1, 1); }
+      }
     }
     #endregion
   }

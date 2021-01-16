@@ -5,34 +5,36 @@ using UnityEngine;
 namespace SRPG {
   public class Survivor: NPC {
     [Header("Human")]
-    public Human human;
     public dItem[] equippedItems;
 
     public override void NetworkStart() {
       base.NetworkStart();
-      human.initRagdoll();
+      pawn.spawnPoint = transform.position;
+      pawn.initRagdoll();
+      pawn.Respawn();
       for (int i = 0; i < equippedItems.Length; i++) {
         if (equippedItems[i] != null) {
-          human.equipment.EquipItem(equippedItems[i]);
+          pawn.equipment.EquipItem(equippedItems[i]);
         }
       }
     }
 
     void FixedUpdate() {
       if (!IsServer) { return; }
-      if (human.state == pS.Dead) {
-        behaviorTree.DisableBehavior();
-        agent.isStopped = true;
-      }
-      else {
-        behaviorTree.EnableBehavior();
-        human.RefreshState();
-      }
+      if (pawn.anim.GetInteger("State") != (int)pawn.state) { pawn.SetState((pS)(pawn.anim.GetInteger("State"))); }
+      pawn.SetAnimatorLayer();
+      pawn.ResetWeaponTrace();
     }
 
     void Update() {
       if (!IsServer) { return; }
-      human.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);
+      if (pawn.state == pS.Dead) { agent.isStopped = true; return; }
+      if (CanSeeEnemy()) { EngageEnemy(5); }
+      else {
+        if (patrolling) { MoveToPoint(patrolPoint, 2); }
+        else { SetPatrolPoint(); }
+      }
+      pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);
     }
   }
 }

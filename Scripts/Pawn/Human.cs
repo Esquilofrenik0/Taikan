@@ -16,7 +16,6 @@ namespace SRPG {
     public float crouchSpeed = 2;
     public float sprintSpeed = 8;
     public float jumpHeight = 5;
-    [HideInInspector] public bool aiming = false;
     [HideInInspector] public bool crouching = false;
     [HideInInspector] public Vector3 velocity = Vector3.zero;
     [HideInInspector] public Vector3 direction = Vector3.zero;
@@ -121,29 +120,6 @@ namespace SRPG {
       SetAnimatorLayer();
       ResetWeaponTrace();
       SetSpeed();
-    }
-    #endregion
-
-    #region Animator
-    public void SetAnimatorLayer() {
-      if (equipment.item[0] != 0) {
-        Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
-        if (anim.GetInteger("Weapon") != (int)weapon.dWeapon.wType) {
-          anim.SetInteger("Weapon", (int)weapon.dWeapon.wType);
-        }
-      }
-      else {
-        if (anim.GetInteger("Weapon") != (int)wT.Unarmed) {
-          anim.SetInteger("Weapon", (int)wT.Unarmed);
-        }
-      }
-      if (aiming) { anim.SetLayerWeight(1, 1); }
-      else {
-        if (!equipment.holstered.Value || state == pS.Dodge || state == pS.Sprint) {
-          anim.SetLayerWeight(1, 0);
-        }
-        else if (equipment.holstered.Value) { anim.SetLayerWeight(1, 1); }
-      }
     }
     #endregion
 
