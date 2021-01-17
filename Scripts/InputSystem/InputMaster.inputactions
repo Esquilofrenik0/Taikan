@@ -322,6 +322,17 @@
                 },
                 {
                     "name": "",
+                    "id": "045e85c1-ec75-4fde-9035-ac173c2b298b",
+                    "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "148a7709-8d2c-4b46-b5a1-bae2d99f2691",
                     "path": "<Keyboard>/alt",
                     "interactions": "",
@@ -333,8 +344,30 @@
                 },
                 {
                     "name": "",
+                    "id": "cbc29e9f-4cfc-460c-9a21-44e2a45b43ae",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Dodge",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "4d9d19f2-9da7-4bf6-99a1-b291754d3dea",
                     "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ChangeView",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4ec3c97a-9847-4dc9-842e-74dae6c5a7eb",
+                    "path": "<Gamepad>/rightStickPress",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -357,6 +390,17 @@
                     "name": "",
                     "id": "1556da86-cde4-4f83-ae9e-3cce606356ec",
                     "path": "<Keyboard>/numpad7",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bbcd29c0-ad92-4e88-910d-cb4c85733e77",
+                    "path": "<Gamepad>/rightShoulder",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -399,6 +443,17 @@
                 },
                 {
                     "name": "",
+                    "id": "9c6dc33f-a788-495a-94ac-53d740c77658",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ca1a363b-2c6a-41e6-a5df-78c8ebccb78e",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
@@ -421,8 +476,30 @@
                 },
                 {
                     "name": "",
+                    "id": "1ca48e5a-9dc5-424f-88a0-595e8b898a84",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "ff68a2db-6f4f-4c84-aa6f-62c71963d0ec",
                     "path": "<Keyboard>/i",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Inventory",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bf0737c6-36e2-4103-b02c-81b43aa18f8f",
+                    "path": "<Gamepad>/select",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -443,8 +520,30 @@
                 },
                 {
                     "name": "",
+                    "id": "a9ef585b-c71c-4219-b34b-b60f7e57f8d3",
+                    "path": "<Gamepad>/rightTrigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "075c637a-1263-4b61-ac19-872eed33f696",
                     "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "833d29bf-5f9a-4099-b70f-f74fb0f0457b",
+                    "path": "<Gamepad>/buttonWest",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -465,8 +564,30 @@
                 },
                 {
                     "name": "",
+                    "id": "84f12a1e-8bea-42d8-90b7-f54ac0ae4e5e",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Crouch",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "cd029706-56ab-4bc2-8dda-77713b6b98db",
                     "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "efbd337d-6145-4468-a8a1-ad94118c9847",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

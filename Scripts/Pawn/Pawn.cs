@@ -76,10 +76,10 @@ namespace SRPG {
     }
     #endregion
 
-    #region Utilsr
+    #region Utils
     public void IsGrounded() {
       Ray ray = new Ray(col.bounds.center, Vector3.down);
-      grounded = Physics.SphereCast(ray, 0.3f, col.bounds.extents.y);
+      grounded = Physics.SphereCast(ray, 0.15f, col.bounds.extents.y);
       anim.SetBool("Grounded", grounded);
     }
 

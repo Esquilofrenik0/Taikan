@@ -72,6 +72,7 @@ namespace SRPG {
 
     public void MeleeAttack(){
       if(agent.remainingDistance < 1){
+        agent.isStopped = true;
         pawn.Attack();
       }
     }

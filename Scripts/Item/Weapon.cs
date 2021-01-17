@@ -43,7 +43,10 @@ namespace SRPG {
         if (other.GetComponent<Pawn>()) {
           Pawn pawn = other.GetComponent<Pawn>();
           if (hitPawns.Contains(pawn)) { return; }
-          pawn.TakeDamage(GetNetworkedObject(owner.Value).GetComponent<Pawn>().damage.Value);
+          if (pawn.state == pS.Block) {
+            GetNetworkedObject(owner.Value).GetComponent<Pawn>().anim.SetTrigger("Impact");
+          }
+          else {pawn.TakeDamage(GetNetworkedObject(owner.Value).GetComponent<Pawn>().damage.Value);}
           hitPawns.Add(pawn);
         }
         else if (GetNetworkedObject(owner.Value).GetComponent<Hero>()) {
