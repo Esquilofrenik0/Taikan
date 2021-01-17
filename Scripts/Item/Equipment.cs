@@ -97,9 +97,9 @@ namespace SRPG {
     [ServerRPC(RequireOwnership = false)]
     public void SpawnEquip(int slot, string name, ulong clientID) {
       dItem dItem = itemSpawner.GetComponent<ItemSpawner>().GetItem(name);
-      NetworkedObject spawn = Instantiate(dItem.resource).GetComponent<NetworkedObject>();
+      NetworkedObject spawn = Instantiate(dItem.resource,equipSlot[slot].transform).GetComponent<NetworkedObject>();
       if (slot < 2) { spawn.GetComponent<Weapon>().owner.Value = GetComponent<NetworkedObject>().NetworkId; }
-      spawn.GetComponent<NetworkedObject>().SpawnWithOwnership(clientID);
+      spawn.SpawnWithOwnership(clientID);
       item[slot] = spawn.GetComponent<NetworkedObject>().NetworkId;
     }
 

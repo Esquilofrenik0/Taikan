@@ -66,19 +66,20 @@ namespace SRPG {
     }
 
     public virtual void Respawn() {
+      transform.position = spawnPoint;
       health.Value = maxHealth;
       grounded = true;
       equipment.holstered.Value = false;
       equipment.Holster(equipment.holstered.Value);
-      state = pS.Idle;
+      SetState(pS.Idle);
       DisableRagdoll();
     }
     #endregion
 
-    #region Utils
+    #region Utilsr
     public void IsGrounded() {
       Ray ray = new Ray(col.bounds.center, Vector3.down);
-      grounded = Physics.SphereCast(ray, 0.3f, col.bounds.extents.y - 0.1f);
+      grounded = Physics.SphereCast(ray, 0.3f, col.bounds.extents.y);
       anim.SetBool("Grounded", grounded);
     }
 

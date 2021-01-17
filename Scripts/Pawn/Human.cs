@@ -15,7 +15,7 @@ namespace SRPG {
     public float idleSpeed = 5;
     public float crouchSpeed = 2;
     public float sprintSpeed = 8;
-    public float jumpHeight = 5;
+    public float jumpHeight = 2;
     [HideInInspector] public bool crouching = false;
     [HideInInspector] public Vector3 velocity = Vector3.zero;
     [HideInInspector] public Vector3 direction = Vector3.zero;
@@ -28,12 +28,8 @@ namespace SRPG {
     #region Init
     public override void Respawn() {
       base.Respawn();
-      if (avatar.activeRace.name == "HumanMaleDCS") {
-        avatar.SetSlot("Underwear", "MaleUnderwear");
-      }
-      else if (avatar.activeRace.name == "HumanFemaleDCS") {
-        avatar.SetSlot("Underwear", "FemaleUndies2");
-      }
+      if (avatar.activeRace.name == "HumanMaleDCS") {avatar.SetSlot("Underwear", "MaleUnderwear");}
+      else if (avatar.activeRace.name == "HumanFemaleDCS") {avatar.SetSlot("Underwear", "FemaleUndies2");}
       avatar.BuildCharacter();
     }
     #endregion

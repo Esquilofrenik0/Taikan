@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using BehaviorDesigner.Runtime;
 using MLAPI;
 
 namespace SRPG {
@@ -18,7 +17,6 @@ namespace SRPG {
     [HideInInspector] public Transform enemy;
     [HideInInspector] public Vector3 patrolPoint;
     [HideInInspector] public RaycastHit[] possibleTargets;
-    // public BehaviorTree behaviorTree;
 
     public void SetPatrolPoint() {
       float x = pawn.spawnPoint.x + Random.Range(-patrolDistance, patrolDistance);
@@ -53,7 +51,7 @@ namespace SRPG {
           Pawn target = possibleTargets[i].transform.GetComponent<Pawn>();
           if(pawn.faction != target.faction) {
             if(target.state != pS.Dead) {
-              if(WithinSight(transform,FoV)) {
+              if(WithinSight(target.transform,FoV)) {
                 enemy = target.transform;
                 return true;
               }
@@ -69,10 +67,12 @@ namespace SRPG {
       agent.isStopped = false;
       agent.speed = speed;
       agent.SetDestination(enemy.position);
+      MeleeAttack();
+    }
+
+    public void MeleeAttack(){
       if(agent.remainingDistance < 1){
-        agent.isStopped = true;
         pawn.Attack();
-        print("Attacking Enemy");
       }
     }
 

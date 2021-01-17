@@ -59,7 +59,6 @@ namespace SRPG {
     }
 
     public override void Respawn() {
-      spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
       Teleport(spawnPoint);
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
@@ -76,7 +75,7 @@ namespace SRPG {
       mana = maxMana / 2;
       grounded = true;
       crouching = false;
-      state = pS.Idle;
+      SetState(pS.Idle);
       DisableRagdoll();
     }
     #endregion

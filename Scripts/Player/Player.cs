@@ -29,6 +29,7 @@ namespace SRPG {
     #region Unity
     void Start() {
       if (!IsLocalPlayer) { return; }
+      hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
       hero.transform.Find("MinimapIcon").gameObject.SetActive(true);
       GameObject.Find("MinimapCamera").transform.SetParent(hero.transform);
       GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
