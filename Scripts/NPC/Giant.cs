@@ -19,7 +19,7 @@ namespace SRPG {
       }
     }
 
-    void LateUpdate() {
+    void Update() {
       if (!IsServer) { return; }
       if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
       if (CanSeeEnemy()) { EngageEnemy(8); }
@@ -28,6 +28,11 @@ namespace SRPG {
         else { SetPatrolPoint(); }
       }
       pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude / 3);
+    }
+
+    void LateUpdate() {
+      if (!IsServer) { return; }
+      if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
       LookAtEnemy();
     }
   }
