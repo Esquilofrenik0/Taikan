@@ -18,7 +18,7 @@ namespace SRPG {
     public float maxHealth = 100;
     public float healthRegen = 0;
     public Faction faction = Faction.Loner;
-    [HideInInspector] public pS state = pS.Idle;
+    [HideInInspector] public int state = 0;
     public NetworkedVarFloat health = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 100f);
     public NetworkedVarFloat damage = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
     public NetworkedVarFloat defense = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
@@ -30,10 +30,15 @@ namespace SRPG {
     [HideInInspector] public Vector3 spawnPoint;
 
     [Header("Combat")]
+    public GameObject headLook;
+    public GameObject spineLook;
+    public GameObject neckLook;
     public float baseDamage = 1;
     public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
     [HideInInspector] public bool aiming = false;
+    [HideInInspector] public bool attacking = false;
+    [HideInInspector] public bool resetAttack = true;
     [HideInInspector] public Coroutine resetCombo;
     [HideInInspector] public Coroutine disableHealthBar;
 
@@ -71,7 +76,7 @@ namespace SRPG {
       grounded = true;
       equipment.holstered.Value = false;
       equipment.Holster(equipment.holstered.Value);
-      SetState(pS.Idle);
+      SetState(0);
       DisableRagdoll();
     }
     #endregion
@@ -84,7 +89,7 @@ namespace SRPG {
     }
 
     public void Equip() {
-      if (state == pS.Idle || state == pS.Sprint) {
+      if (state == 0 || state == (int)pS.Sprint) {
         equipment.holstered.Value = !equipment.holstered.Value;
         equipment.Holster(equipment.holstered.Value);
       }
@@ -93,17 +98,15 @@ namespace SRPG {
 
     #region Combat
     public void Attack() {
-      if (state == pS.Idle || state == pS.Sprint) {
+      if (state == 0 || state == (int)pS.Sprint) {
         if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-        if (equipment.item[0] == 0) { Slash(); }
+        if (equipment.item[0] == 0) { Melee(); }
         else if (GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
-        else if (!GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) { Slash(); }
+        else if (!GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) { Melee(); }
       }
     }
 
-    public void Slash() {
-      print("Slashing");
-      SetState(pS.Attack);
+    public void Melee() {
       anim.SetInteger("Combo", combo);
       anim.SetTrigger("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
@@ -117,7 +120,7 @@ namespace SRPG {
     }
 
     public void Shoot() {
-      SetState(pS.Attack);
+      SetState((int)pS.Attack);
       anim.SetTrigger("Attack");
       Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
       weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
@@ -138,28 +141,12 @@ namespace SRPG {
       combo = 0;
       resetCombo = null;
     }
-
-    public void ResetWeaponTrace() {
-      if (equipment.item[0] != 0) {
-        Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
-        if (state == pS.Attack) {
-          if (!weapon.dWeapon.isRanged) {
-            weapon.attacking = true;
-          }
-        }
-        else if (state != pS.Attack) {
-          if (weapon.attacking) {
-            weapon.attacking = false;
-            weapon.resetAttack = true;
-          }
-        }
-      }
-    }
     #endregion
 
     #region Stats
     public void TakeDamage(float amount) {
       UpdateHealth(-amount);
+      anim.SetTrigger("Impact");
       Timer.Delay(this, UpdateFloatingHealthBar, 0.1f);
       Timer.Delay(this, UpdateFloatingHealthBar, 0.2f);
     }
@@ -208,39 +195,16 @@ namespace SRPG {
 
     [ClientRPC]
     public void cDie() {
-      SetState(pS.Dead);
+      SetState((int)pS.Dead);
       EnableRagdoll();
       Timer.Delay(this, Respawn, 5);
     }
     #endregion
 
     #region State
-    public void SetState(pS pState) {
+    public void SetState(int pState) {
       state = pState;
-      anim.SetInteger("State", (int)state);
-    }
-    #endregion
-
-    #region Animator
-    public void SetAnimatorLayer() {
-      if (equipment.item[0] != 0) {
-        Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
-        if (anim.GetInteger("Weapon") != (int)weapon.dWeapon.wType) {
-          anim.SetInteger("Weapon", (int)weapon.dWeapon.wType);
-        }
-      }
-      else {
-        if (anim.GetInteger("Weapon") != (int)wT.Unarmed) {
-          anim.SetInteger("Weapon", (int)wT.Unarmed);
-        }
-      }
-      if (aiming) { anim.SetLayerWeight(1, 1); }
-      else {
-        if (!equipment.holstered.Value || state == pS.Dodge || state == pS.Sprint) {
-          anim.SetLayerWeight(1, 0);
-        }
-        else if (equipment.holstered.Value) { anim.SetLayerWeight(1, 1); }
-      }
+      anim.SetInteger("State", state);
     }
     #endregion
   }

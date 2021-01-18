@@ -7,9 +7,9 @@ using MLAPI;
 
 namespace SRPG {
   public class ESlot: NetworkedBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
+    public Transform slotIcon;
     [HideInInspector] public Item item;
     [HideInInspector] public bool empty = true;
-    [HideInInspector] public Transform slotIcon;
     [HideInInspector] public Sprite background;
     [HideInInspector] public Image bgImage;
     [HideInInspector] public Hero hero;
@@ -17,7 +17,6 @@ namespace SRPG {
 
     void Start() {
       bgImage = GetComponent<Image>();
-      slotIcon = transform.GetChild(0);
       background = slotIcon.GetComponent<Image>().sprite;
     }
 

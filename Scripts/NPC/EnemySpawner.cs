@@ -23,7 +23,7 @@ namespace SRPG {
         else {
           if (enemies.Count > 0) {
             for (int i = 0; i < enemies.Count; i++) {
-              if (enemies[i].GetComponent<Pawn>().state == pS.Dead) {
+              if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
                 enemies.RemoveAt(i);
               }
             }

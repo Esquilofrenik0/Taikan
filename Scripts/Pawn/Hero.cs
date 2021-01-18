@@ -75,7 +75,7 @@ namespace SRPG {
       mana = maxMana / 2;
       grounded = true;
       crouching = false;
-      SetState(pS.Idle);
+      SetState(0);
       DisableRagdoll();
     }
     #endregion
@@ -93,7 +93,7 @@ namespace SRPG {
     }
 
     public void ApplyGravity() {
-      if (grounded && velocity.y < 0 || state == pS.Climb) { velocity.y = 0f; }
+      if (grounded && velocity.y < 0 || state == (int)pS.Climb) { velocity.y = 0f; }
       else { velocity.y += gravity * Time.deltaTime; }
       cc.Move(velocity * Time.deltaTime);
       if (containerOpen) {
@@ -104,9 +104,9 @@ namespace SRPG {
     }
 
     public void Jump() {
-      if (state == pS.Climb) { SetState(pS.Idle); }
+      if (state == (int)pS.Climb) { SetState(0); }
       else if (grounded) {
-        if (state == pS.Idle || state == pS.Block || state == pS.Sprint) {
+        if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
           velocity.y += Mathf.Sqrt(jumpHeight * -gravity);
           anim.SetTrigger("Jump");
@@ -114,7 +114,7 @@ namespace SRPG {
       }
       else if (StaminaCost(climbCost * Time.deltaTime)) {
         if (HitWall()) {
-          SetState(pS.Climb);
+          SetState((int)pS.Climb);
           anim.SetTrigger("Climb");
         }
       }
@@ -143,10 +143,10 @@ namespace SRPG {
       anim.SetFloat("Horizontal", xIn * speed);
       anim.SetFloat("Vertical", yIn * speed);
       if (xIn != 0 || yIn != 0) {
-        if (state == pS.Climb) {
+        if (state == (int)pS.Climb) {
           if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
             ClimbLedge();
-            SetState(pS.Idle);
+            SetState(0);
           }
           else { direction = new Vector3(xIn, yIn, 0f); }
         }
@@ -167,14 +167,14 @@ namespace SRPG {
       }
       camTarget.transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
       if (equipment.holstered.Value || direction.sqrMagnitude > 0) {
-        if (state != pS.Climb) {
+        if (state != (int)pS.Climb) {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
-          if (state != pS.Dodge) {
+          if (state != (int)pS.Dodge) {
             spineLook.transform.localRotation = Quaternion.Euler(spineLook.transform.localEulerAngles.x, mouseY, spineLook.transform.localEulerAngles.z);
           }
         }
       }
-      if (state != pS.Dodge) {
+      if (state != (int)pS.Dodge) {
         headLook.transform.localRotation = Quaternion.Euler(0, 0, 0);
         camTarget.transform.position = new Vector3(headLook.transform.position.x, headLook.transform.position.y + 0.05f, headLook.transform.position.z);
       }
@@ -182,12 +182,12 @@ namespace SRPG {
 
     public void Dodge(float xIn, float yIn) {
       if (grounded) {
-        if (state == pS.Idle || state == pS.Block || state == pS.Sprint) {
+        if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
           if (GetComponent<Hero>()) {
             Hero hero = GetComponent<Hero>();
             if (!hero.StaminaCost(hero.dodgeCost)) { return; }
           }
-          SetState(pS.Dodge);
+          SetState((int)pS.Dodge);
           if (yIn < 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); AddImpact(-transform.forward, dodgeStrength); }
           else if (yIn > 0) { anim.SetInteger("DodgeDirection", 1); anim.SetTrigger("Dodge"); AddImpact(transform.forward, dodgeStrength); }
           else if (xIn < 0) { anim.SetInteger("DodgeDirection", 2); anim.SetTrigger("Dodge"); AddImpact(-transform.right, dodgeStrength); }
@@ -265,7 +265,7 @@ namespace SRPG {
 
     public void Regenerate() {
       UpdateHealth(healthRegen * Time.deltaTime);
-      if (grounded && state != pS.Block && state != pS.Climb && state != pS.Sprint) {
+      if (grounded && state != (int)pS.Block && state != (int)pS.Climb && state != (int)pS.Sprint) {
         UpdateStamina(staminaRegen * Time.deltaTime);
       }
       UpdateMana(manaRegen * Time.deltaTime);

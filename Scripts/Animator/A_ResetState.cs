@@ -6,7 +6,7 @@ using MLAPI;
 namespace SRPG {
   public class A_ResetState: StateMachineBehaviour {
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-      animator.SetInteger("State", 0);
+      animator.GetComponent<Pawn>().SetState(0);
     }
   }
 }

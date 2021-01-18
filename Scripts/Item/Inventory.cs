@@ -44,11 +44,6 @@ namespace SRPG {
       return -1;
     }
 
-    // public void Store(dItem dItem, int storeAmount) {
-      // InvokeServerRpc(sStore,dItem,storeAmount);
-    // }
-
-    // [ServerRPC(RequireOwnership = false)]
     public void Store(dItem dItem, int storeAmount) {
       if (dItem.stack > 1) {
         int number = SearchItem(dItem);

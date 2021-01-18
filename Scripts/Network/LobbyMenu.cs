@@ -18,6 +18,7 @@ namespace SRPG {
     void Start() {
       HUD.SetActive(false);
       menuPanel.SetActive(true);
+      Host();
     }
 
     public void Host() {

@@ -11,9 +11,8 @@ namespace SRPG {
     public GameObject fx;
     public AudioSource audioSource;
     public NetworkedVarULong owner = new NetworkedVarULong(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+    [HideInInspector] public Pawn pawn;
     [HideInInspector] public dWeapon dWeapon;
-    [HideInInspector] public bool attacking = false;
-    [HideInInspector] public bool resetAttack = false;
     [HideInInspector] public List<Pawn> hitPawns;
 
     public override void NetworkStart() {
@@ -22,6 +21,7 @@ namespace SRPG {
       if (nObject.IsSceneObject == true) { return; }
       if (owner.Value != 0) {
         NetworkedObject actor = GetNetworkedObject(owner.Value);
+        pawn = actor.GetComponent<Pawn>();
         if (nObject.GetComponent<Collider>()) {
           nObject.GetComponent<Collider>().isTrigger = true;
           if (actor.GetComponent<Collider>()) {
@@ -33,24 +33,23 @@ namespace SRPG {
 
     void Awake() {
       dWeapon = dItem as dWeapon;
-      attacking = false;
-      resetAttack = true;
     }
 
     private void OnTriggerEnter(Collider other) {
-      if (attacking) {
-        if (resetAttack) { hitPawns.Clear(); resetAttack = false; }
-        if (other.GetComponent<Pawn>()) {
-          Pawn pawn = other.GetComponent<Pawn>();
-          if (hitPawns.Contains(pawn)) { return; }
-          if (pawn.state == pS.Block) {
-            GetNetworkedObject(owner.Value).GetComponent<Pawn>().anim.SetTrigger("Impact");
-          }
-          else {pawn.TakeDamage(GetNetworkedObject(owner.Value).GetComponent<Pawn>().damage.Value);}
-          hitPawns.Add(pawn);
+      if (pawn.attacking) {
+        if (pawn.resetAttack) {
+          hitPawns.Clear();
+          pawn.resetAttack = false;
         }
-        else if (GetNetworkedObject(owner.Value).GetComponent<Hero>()) {
-          Hero hero = GetNetworkedObject(owner.Value).GetComponent<Hero>();
+        if (other.GetComponent<Pawn>()) {
+          Pawn hitPawn = other.GetComponent<Pawn>();
+          if (hitPawns.Contains(hitPawn)) { return; }
+          if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
+          else { hitPawn.TakeDamage(pawn.damage.Value); }
+          hitPawns.Add(hitPawn);
+        }
+        else if (pawn.GetComponent<Hero>()) {
+          Hero hero = pawn.GetComponent<Hero>();
           if (other.GetComponent<Node>()) {
             other.GetComponent<Node>().TakeDamage(hero);
           }

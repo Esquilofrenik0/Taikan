@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace SRPG {
-  public class Survivor: NPC {
+  public class Giant: NPC {
     [Header("Human")]
     public dItem[] equippedItems;
 
@@ -19,19 +19,15 @@ namespace SRPG {
       }
     }
 
-    void Update() {
-      if (!IsServer) { return; }
-      if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
-      if (CanSeeEnemy()) { EngageEnemy(5); }
-      else {
-        if (patrolling) { MoveToPoint(patrolPoint, 2); }
-        else { SetPatrolPoint(); }
-      }
-      pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);
-    }
-
     void LateUpdate() {
       if (!IsServer) { return; }
+      if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
+      if (CanSeeEnemy()) { EngageEnemy(8); }
+      else {
+        if (patrolling) { MoveToPoint(patrolPoint, 4); }
+        else { SetPatrolPoint(); }
+      }
+      pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude / 3);
       LookAtEnemy();
     }
   }

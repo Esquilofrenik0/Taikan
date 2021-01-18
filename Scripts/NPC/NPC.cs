@@ -36,22 +36,22 @@ namespace SRPG {
       }
     }
 
-    public bool WithinSight(Transform targetTransform,float fieldOfViewAngle) {
+    public bool WithinSight(Transform targetTransform, float fieldOfViewAngle) {
       Vector3 direction = targetTransform.position - transform.position;
-      if(Vector3.Distance(targetTransform.position,transform.position) < viewDistance) {
-        return Vector3.Angle(direction,transform.forward) < fieldOfViewAngle;
+      if (Vector3.Distance(targetTransform.position, transform.position) < viewDistance) {
+        return Vector3.Angle(direction, transform.forward) < fieldOfViewAngle;
       }
       else { return false; }
     }
 
-    public bool CanSeeEnemy(){
-      possibleTargets = Physics.SphereCastAll(transform.position,50,Vector3.forward,50);
-      for(int i = 0;i < possibleTargets.Length;++i) {
-        if(possibleTargets[i].transform.GetComponent<Pawn>() != null) {
+    public bool CanSeeEnemy() {
+      possibleTargets = Physics.SphereCastAll(transform.position, 50, Vector3.forward, 50);
+      for (int i = 0; i < possibleTargets.Length; ++i) {
+        if (possibleTargets[i].transform.GetComponent<Pawn>() != null) {
           Pawn target = possibleTargets[i].transform.GetComponent<Pawn>();
-          if(pawn.faction != target.faction) {
-            if(target.state != pS.Dead) {
-              if(WithinSight(target.transform,FoV)) {
+          if (pawn.faction != target.faction) {
+            if (target.state != (int)pS.Dead) {
+              if (WithinSight(target.transform, FoV)) {
                 enemy = target.transform;
                 return true;
               }
@@ -63,19 +63,30 @@ namespace SRPG {
       return false;
     }
 
-    public void EngageEnemy(int speed){
+    public void EngageEnemy(int speed) {
       agent.isStopped = false;
       agent.speed = speed;
       agent.SetDestination(enemy.position);
       MeleeAttack();
     }
 
-    public void MeleeAttack(){
-      if(agent.remainingDistance < 1){
+    public void MeleeAttack() {
+      if (agent.remainingDistance < 2) {
         agent.isStopped = true;
         pawn.Attack();
       }
     }
 
+    public void LookAtEnemy() {
+      if (enemy != null) {
+        Vector3 toLook = enemy.GetComponent<Collider>().bounds.center;
+        pawn.spineLook.transform.LookAt(toLook, Vector3.right);
+        // float rx = pawn.spineLook.transform.localEulerAngles.x;
+        float rx = 0;
+        float ry = pawn.spineLook.transform.localEulerAngles.y;
+        float rz = 0;
+        pawn.spineLook.transform.localEulerAngles = new Vector3(rx, ry, rz);
+      }
+    }
   }
 }
