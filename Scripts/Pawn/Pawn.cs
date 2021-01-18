@@ -30,9 +30,8 @@ namespace SRPG {
     [HideInInspector] public Vector3 spawnPoint;
 
     [Header("Combat")]
-    public GameObject headLook;
-    public GameObject spineLook;
-    public GameObject neckLook;
+    public GameObject head;
+    public GameObject spine;
     public float baseDamage = 1;
     public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
@@ -75,7 +74,6 @@ namespace SRPG {
       health.Value = maxHealth;
       grounded = true;
       equipment.holstered.Value = false;
-      equipment.Holster(equipment.holstered.Value);
       SetState(0);
       DisableRagdoll();
     }

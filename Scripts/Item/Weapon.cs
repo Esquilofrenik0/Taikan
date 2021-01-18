@@ -44,7 +44,7 @@ namespace SRPG {
         if (other.GetComponent<Pawn>()) {
           Pawn hitPawn = other.GetComponent<Pawn>();
           if (hitPawns.Contains(hitPawn)) { return; }
-          if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
+          else if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
           else { hitPawn.TakeDamage(pawn.damage.Value); }
           hitPawns.Add(hitPawn);
         }

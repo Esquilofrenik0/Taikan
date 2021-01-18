@@ -80,12 +80,12 @@ namespace SRPG {
     public void LookAtEnemy() {
       if (enemy != null) {
         Vector3 toLook = enemy.GetComponent<Collider>().bounds.center;
-        pawn.spineLook.transform.LookAt(toLook, Vector3.right);
+        pawn.spine.transform.LookAt(toLook, Vector3.right);
         // float rx = pawn.spineLook.transform.localEulerAngles.x;
         float rx = 0;
-        float ry = pawn.spineLook.transform.localEulerAngles.y;
+        float ry = pawn.spine.transform.localEulerAngles.y;
         float rz = 0;
-        pawn.spineLook.transform.localEulerAngles = new Vector3(rx, ry, rz);
+        pawn.spine.transform.localEulerAngles = new Vector3(rx, ry, rz);
       }
     }
   }

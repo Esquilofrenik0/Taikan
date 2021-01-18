@@ -64,9 +64,11 @@ namespace SRPG {
       Cursor.lockState = CursorLockMode.Locked;
       avatar.ClearSlots();
       if (avatar.activeRace.name == "HumanMaleDCS") {
+        avatar.GetDNA()["height"].Set(0.4f);
         avatar.SetSlot("Underwear", "MaleUnderwear");
       }
       else if (avatar.activeRace.name == "HumanFemaleDCS") {
+        avatar.GetDNA()["height"].Set(0.6f);
         avatar.SetSlot("Underwear", "FemaleUndies2");
       }
       avatar.BuildCharacter();
@@ -170,13 +172,13 @@ namespace SRPG {
         if (state != (int)pS.Climb) {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
           if (state != (int)pS.Dodge) {
-            spineLook.transform.localRotation = Quaternion.Euler(spineLook.transform.localEulerAngles.x, mouseY, spineLook.transform.localEulerAngles.z);
+            spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY, spine.transform.localEulerAngles.z);
           }
         }
       }
       if (state != (int)pS.Dodge) {
-        headLook.transform.localRotation = Quaternion.Euler(0, 0, 0);
-        camTarget.transform.position = new Vector3(headLook.transform.position.x, headLook.transform.position.y + 0.05f, headLook.transform.position.z);
+        head.transform.localRotation = Quaternion.Euler(0, 0, 0);
+        camTarget.transform.position = new Vector3(head.transform.position.x, head.transform.position.y + 0.05f, head.transform.position.z);
       }
     }
 

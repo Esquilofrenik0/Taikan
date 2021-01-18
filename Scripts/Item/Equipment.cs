@@ -12,20 +12,13 @@ namespace SRPG {
   public class Equipment: NetworkedBehaviour {
     public Human human;
     public GameObject[] equipSlot = new GameObject[9];
-    [HideInInspector] public NetworkedObject itemSpawner;
     public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
     public NetworkedList<ulong> item = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0, 0, 0, 0, 0, 0 });
 
     public override void NetworkStart() {
       base.NetworkStart();
-      itemSpawner = GameObject.Find("ItemSpawner").GetComponent<NetworkedObject>();
       bool holst = false;
-      for (int i = 0; i < item.Count; i++) {
-        if (item[i] != 0) {
-          holst = true;
-          print("Client: " + OwnerClientId + " - item[" + i + "] - " + item[i]);
-        }
-      }
+      for (int i = 0; i < item.Count; i++) { if (item[i] != 0) { holst = true; } }
       if (holst) {
         Timer.Delay(this, dHolster, 0.05f);
         Timer.Delay(this, human.RefreshStats, 0.1f);
@@ -37,7 +30,8 @@ namespace SRPG {
     }
 
     public void Holster(bool equipped) {
-      InvokeServerRpc(sHolster, equipped);
+      if (IsServer) { sHolster(equipped); }
+      else { InvokeServerRpc(sHolster, equipped); }
     }
 
     public void nHolster(bool equipped) {
@@ -70,11 +64,9 @@ namespace SRPG {
     public void EquipItem(dItem dItem) {
       int slot = GetSlot(dItem);
       ClearSlot(slot, dItem);
-      InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId);
-      if (slot == 0) {
-        dWeapon dWeapon = dItem as dWeapon;
-        human.anim.SetInteger("Weapon", (int)dWeapon.wType);
-      }
+      UpdateSlot(slot, dItem);
+      if (IsServer) { SpawnEquip(slot, dItem.name, OwnerClientId); }
+      else { InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId); }
       Timer.Delay(this, dHolster, 0.05f);
       Timer.Delay(this, human.RefreshStats, 0.1f);
     }
@@ -89,11 +81,21 @@ namespace SRPG {
           }
         }
         else if (slot == 1) {
-          if (dWeapon.wType == wT.Shield) { human.anim.SetBool("Shield", true); }
           if (item[0] != 0 && GetNetworkedObject(item[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); }
         }
       }
-      else if (slot > 1) {
+    }
+
+    public void UpdateSlot(int slot, dItem dItem) {
+      if (slot == 0) {
+        dWeapon dWeapon = dItem as dWeapon;
+        human.anim.SetInteger("Weapon", (int)dWeapon.wType);
+      }
+      else if (slot == 1) {
+        dWeapon dWeapon = dItem as dWeapon;
+        if (dWeapon.wType == wT.Shield) { human.anim.SetBool("Shield", true); }
+      }
+      else {
         dArmor armor = dItem as dArmor;
         human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
         human.avatar.BuildCharacter();
@@ -102,7 +104,7 @@ namespace SRPG {
 
     [ServerRPC(RequireOwnership = false)]
     public void SpawnEquip(int slot, string name, ulong clientID) {
-      dItem dItem = itemSpawner.GetComponent<ItemSpawner>().GetItem(name);
+      dItem dItem = GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>().GetItem(name);
       NetworkedObject spawn = Instantiate(dItem.resource, equipSlot[slot].transform).GetComponent<NetworkedObject>();
       if (slot < 2) { spawn.GetComponent<Weapon>().owner.Value = GetComponent<NetworkedObject>().NetworkId; }
       spawn.SpawnWithOwnership(clientID);
@@ -110,6 +112,7 @@ namespace SRPG {
     }
 
     public void UnequipItem(int slot) {
+      if (item[slot] == 0) { return; }
       InvokeServerRpc(sUnequipItem, slot);
     }
 

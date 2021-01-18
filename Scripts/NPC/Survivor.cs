@@ -11,12 +11,12 @@ namespace SRPG {
       base.NetworkStart();
       pawn.spawnPoint = transform.position;
       pawn.initRagdoll();
-      pawn.Respawn();
       for (int i = 0; i < equippedItems.Length; i++) {
         if (equippedItems[i] != null) {
           pawn.equipment.EquipItem(equippedItems[i]);
         }
       }
+      pawn.Respawn();
     }
 
     void Update() {

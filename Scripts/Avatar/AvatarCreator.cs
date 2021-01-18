@@ -68,7 +68,7 @@ namespace SRPG {
     void Updated(UMAData data) {
       dna = avatar.GetDNA();
       if (avatar.activeRace.name == "HumanMaleDCS") {
-        dna["height"].Set(0.5f);
+        dna["height"].Set(0.4f);
       }
       if (avatar.activeRace.name == "HumanFemaleDCS") {
         dna["height"].Set(0.6f);

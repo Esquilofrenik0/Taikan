@@ -23,8 +23,14 @@ namespace SRPG {
     #region Init
     public override void Respawn() {
       base.Respawn();
-      if (avatar.activeRace.name == "HumanMaleDCS") {avatar.SetSlot("Underwear", "MaleUnderwear");}
-      else if (avatar.activeRace.name == "HumanFemaleDCS") {avatar.SetSlot("Underwear", "FemaleUndies2");}
+      if (avatar.activeRace.name == "HumanMaleDCS") {
+        // avatar.GetDNA()["height"].Set(0.4f);
+        avatar.SetSlot("Underwear", "MaleUnderwear");
+      }
+      else if (avatar.activeRace.name == "HumanFemaleDCS") {
+        // avatar.GetDNA()["height"].Set(0.6f);
+        avatar.SetSlot("Underwear", "FemaleUndies2");
+      }
       avatar.BuildCharacter();
     }
     #endregion
