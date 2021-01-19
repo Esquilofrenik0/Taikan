@@ -12,6 +12,7 @@ namespace SRPG {
     public Hero hero;
     public InputHandler input;
     public NetworkedVarULong netID = new NetworkedVarULong(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+    [HideInInspector] public Camera cam;
     [HideInInspector] public CinemachineVirtualCamera heroCam;
     [HideInInspector] public CinemachineVirtualCamera worldCam;
     [HideInInspector] public Cinemachine3rdPersonFollow view;
@@ -32,7 +33,8 @@ namespace SRPG {
       hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
       hero.transform.Find("MinimapIcon").gameObject.SetActive(true);
       GameObject.Find("MinimapCamera").transform.SetParent(hero.transform);
-      GameObject.FindWithTag("MainCamera").transform.SetParent(hero.camTarget.transform);
+      cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
+      cam.transform.SetParent(hero.camTarget.transform);
       heroCam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
       heroCam.Follow = hero.camTarget.transform;
       view = heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();

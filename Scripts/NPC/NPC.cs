@@ -17,6 +17,7 @@ namespace SRPG {
     [HideInInspector] public Transform enemy;
     [HideInInspector] public Vector3 patrolPoint;
     [HideInInspector] public RaycastHit[] possibleTargets;
+    public dItem[] equippedItems;
 
     public void SetPatrolPoint() {
       float x = pawn.spawnPoint.x + Random.Range(-patrolDistance, patrolDistance);
@@ -71,9 +72,12 @@ namespace SRPG {
     }
 
     public void MeleeAttack() {
-      if (agent.remainingDistance < 2) {
-        agent.isStopped = true;
+      if (agent.remainingDistance < 20) {
+        transform.LookAt(enemy);
         pawn.Attack();
+        if (agent.remainingDistance < 1) {
+          agent.isStopped = true;
+        }
       }
     }
 
@@ -81,7 +85,6 @@ namespace SRPG {
       if (enemy != null) {
         Vector3 toLook = enemy.GetComponent<Collider>().bounds.center;
         pawn.spine.transform.LookAt(toLook, Vector3.right);
-        // float rx = pawn.spineLook.transform.localEulerAngles.x;
         float rx = 0;
         float ry = pawn.spine.transform.localEulerAngles.y;
         float rz = 0;

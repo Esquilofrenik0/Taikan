@@ -10,18 +10,26 @@ using MLAPI.Connection;
 
 namespace SRPG {
   public class Equipment: NetworkedBehaviour {
-    public Human human;
+    public Humanoid humanoid;
     public GameObject[] equipSlot = new GameObject[9];
     public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
     public NetworkedList<ulong> item = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0, 0, 0, 0, 0, 0 });
+    // public NetworkedList<GameObject> weapon = new NetworkedList<GameObject>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<GameObject> { null, null });
+    // public NetworkedList<int> armor = new NetworkedList<int>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<int> { null, null, null, null, null });
+    private ItemSpawner ispawner;
+
+    void Awake(){
+      ispawner = GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>();
+    }
 
     public override void NetworkStart() {
       base.NetworkStart();
+      ispawner = GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>();
       bool holst = false;
       for (int i = 0; i < item.Count; i++) { if (item[i] != 0) { holst = true; } }
       if (holst) {
         Timer.Delay(this, dHolster, 0.05f);
-        Timer.Delay(this, human.RefreshStats, 0.1f);
+        Timer.Delay(this, humanoid.RefreshStats, 0.1f);
       }
     }
 
@@ -39,11 +47,7 @@ namespace SRPG {
         if (item[i] != 0) {
           NetworkedObject equip = GetNetworkedObject(item[i]);
           equip.transform.SetParent(equipSlot[i].transform);
-          if (equip.GetComponent<Weapon>()) {
-            if (!equipped) {
-              equip.transform.SetParent(equipSlot[i + 7].transform);
-            }
-          }
+          if (equip.GetComponent<Weapon>()) { if (!equipped) { equip.transform.SetParent(equipSlot[i + 7].transform); } }
           equip.transform.localPosition = Vector3.zero;
           equip.transform.localRotation = Quaternion.identity;
         }
@@ -68,7 +72,7 @@ namespace SRPG {
       if (IsServer) { SpawnEquip(slot, dItem.name, OwnerClientId); }
       else { InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId); }
       Timer.Delay(this, dHolster, 0.05f);
-      Timer.Delay(this, human.RefreshStats, 0.1f);
+      Timer.Delay(this, humanoid.RefreshStats, 0.1f);
     }
 
     public void ClearSlot(int slot, dItem dItem) {
@@ -89,16 +93,16 @@ namespace SRPG {
     public void UpdateSlot(int slot, dItem dItem) {
       if (slot == 0) {
         dWeapon dWeapon = dItem as dWeapon;
-        human.anim.SetInteger("Weapon", (int)dWeapon.wType);
+        humanoid.anim.SetInteger("Weapon", (int)dWeapon.wType);
       }
       else if (slot == 1) {
         dWeapon dWeapon = dItem as dWeapon;
-        if (dWeapon.wType == wT.Shield) { human.anim.SetBool("Shield", true); }
+        if (dWeapon.wType == wT.Shield) { humanoid.anim.SetBool("Shield", true); }
       }
       else {
         dArmor armor = dItem as dArmor;
-        human.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
-        human.avatar.BuildCharacter();
+        humanoid.avatar.SetSlot(armor.armorSlot.ToString(), armor.Name);
+        humanoid.avatar.BuildCharacter();
       }
     }
 
@@ -120,18 +124,17 @@ namespace SRPG {
     public void sUnequipItem(int slot) {
       if (item[slot] == 0) { return; }
       NetworkedObject equip = GetNetworkedObject(item[slot]);
-      if (slot == 0) { human.anim.SetInteger("Weapon", 0); }
-      if (slot == 1) { human.anim.SetBool("Shield", false); }
+      if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
+      if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
       if (equip.GetComponent<Armor>()) {
         dArmor armor = equip.GetComponent<Armor>().dArmor;
-        human.avatar.ClearSlot(armor.armorSlot.ToString());
-        human.avatar.BuildCharacter();
+        humanoid.avatar.ClearSlot(armor.armorSlot.ToString());
       }
       if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip.GetComponent<Item>().dItem, 1); }
       equip.UnSpawn();
       Destroy(equip.gameObject);
       item[slot] = 0;
-      Timer.Delay(this, human.RefreshStats, 0.1f);
+      Timer.Delay(this, humanoid.RefreshStats, 0.1f);
     }
 
     public int WeaponSlot(int weaponSlot) {

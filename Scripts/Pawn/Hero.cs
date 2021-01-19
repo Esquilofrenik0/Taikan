@@ -30,6 +30,10 @@ namespace SRPG {
     public float sprintCost = 5;
     public float climbCost = 5;
     public float dodgeStrength = 20;
+    public float idleSpeed = 5;
+    public float crouchSpeed = 2;
+    public float sprintSpeed = 8;
+    public float jumpHeight = 2;
     [HideInInspector] public float mana = 100;
     [HideInInspector] public float stamina = 100;
     [HideInInspector] public Vector3 impact = Vector3.zero;
@@ -71,7 +75,6 @@ namespace SRPG {
         avatar.GetDNA()["height"].Set(0.6f);
         avatar.SetSlot("Underwear", "FemaleUndies2");
       }
-      avatar.BuildCharacter();
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
@@ -271,6 +274,23 @@ namespace SRPG {
         UpdateStamina(staminaRegen * Time.deltaTime);
       }
       UpdateMana(manaRegen * Time.deltaTime);
+    }
+
+    public void RefreshState() {
+      anim.SetBool("Crouching", crouching);
+      SetSpeed();
+    }
+
+    public void SetSpeed() {
+      if (aiming) { speed = crouchSpeed; }
+      else if (crouching) { speed = crouchSpeed; }
+      else if (state == (int)pS.Idle) { speed = idleSpeed; }
+      else if (state == (int)pS.Attack) { speed = idleSpeed; }
+      else if (state == (int)pS.Block) { speed = crouchSpeed; }
+      else if (state == (int)pS.Sprint) { speed = sprintSpeed; }
+      else if (state == (int)pS.Dodge) { speed = idleSpeed; }
+      else if (state == (int)pS.Climb) { speed = crouchSpeed; }
+      else if (state == (int)pS.Swim) { speed = crouchSpeed; }
     }
     #endregion
 

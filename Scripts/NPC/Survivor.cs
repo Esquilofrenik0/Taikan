@@ -4,18 +4,10 @@ using UnityEngine;
 
 namespace SRPG {
   public class Survivor: NPC {
-    [Header("Human")]
-    public dItem[] equippedItems;
-
     public override void NetworkStart() {
       base.NetworkStart();
       pawn.spawnPoint = transform.position;
       pawn.initRagdoll();
-      for (int i = 0; i < equippedItems.Length; i++) {
-        if (equippedItems[i] != null) {
-          pawn.equipment.EquipItem(equippedItems[i]);
-        }
-      }
       pawn.Respawn();
     }
 

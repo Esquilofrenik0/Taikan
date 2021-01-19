@@ -10,6 +10,7 @@ namespace SRPG {
     [HideInInspector] public InputMaster controls;
     [HideInInspector] public Vector2 movement = Vector2.zero;
     [HideInInspector] public Vector2 camvect = Vector2.zero;
+    [HideInInspector] public Vector2 mousePosition = Vector2.zero;
     [HideInInspector] public bool firstPerson = false;
     [HideInInspector] public bool jump = false;
     [HideInInspector] public bool dodge = false;
@@ -26,6 +27,7 @@ namespace SRPG {
       if (!IsLocalPlayer) { return; }
       movement = controls.Player.Movement.ReadValue<Vector2>();
       camvect = controls.Player.Camera.ReadValue<Vector2>();
+      mousePosition = controls.Player.MousePosition.ReadValue<Vector2>();
       if (controls.Player.Attack.ReadValue<float>() == 0) { attack = false; } else { attack = true; }
       if (controls.Player.Block.ReadValue<float>() == 0) { block = false; } else { block = true; }
       if (controls.Player.Sprint.ReadValue<float>() == 0) { sprint = false; } else { sprint = true; }
@@ -72,11 +74,11 @@ namespace SRPG {
 
     void OnMenu() {
       if (!IsLocalPlayer) { return; }
-      if(menu){
+      if (menu) {
         menu = false;
         player.worldCam.Priority = 8;
       }
-      else{ 
+      else {
         menu = true;
         player.worldCam.Priority = 10;
       }

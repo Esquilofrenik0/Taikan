@@ -4,6 +4,7 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
 using MLAPI.Messaging;
+using Cinemachine;
 
 namespace SRPG {
   [System.Serializable]
@@ -49,12 +50,13 @@ namespace SRPG {
     public void initRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       bonesCol = transform.GetChild(0).GetComponentsInChildren<Collider>(true);
+      DisableRagdoll();
     }
 
     public void DisableRagdoll() {
       anim.enabled = true;
       col.enabled = true;
-      for (int i = 0; i < bonesRB.Length; i++) {
+      for (int i = 0; i < bonesCol.Length; i++) {
         bonesCol[i].enabled = false;
         bonesRB[i].isKinematic = true;
       }
@@ -63,7 +65,7 @@ namespace SRPG {
     public void EnableRagdoll() {
       anim.enabled = false;
       col.enabled = false;
-      for (int i = 0; i < bonesRB.Length; i++) {
+      for (int i = 0; i < bonesCol.Length; i++) {
         bonesCol[i].enabled = true;
         bonesRB[i].isKinematic = false;
       }
@@ -73,7 +75,6 @@ namespace SRPG {
       transform.position = spawnPoint;
       health.Value = maxHealth;
       grounded = true;
-      equipment.holstered.Value = false;
       SetState(0);
       DisableRagdoll();
     }
@@ -125,13 +126,18 @@ namespace SRPG {
       weapon.fx.SetActive(true);
       RaycastHit hit;
       bool raycast = false;
-      var layerMask = (1 << 9);
-      layerMask = ~layerMask;
+      int prevLayer = gameObject.layer;
+      gameObject.layer = 2;
       if (GetComponent<Player>()) {
         Player player = GetComponent<Player>();
-        raycast = Physics.Raycast(player.heroCam.transform.position, player.heroCam.transform.forward, out hit, 100, layerMask);
+        Ray ray = new Ray(player.cam.transform.position, player.cam.transform.forward);
+        raycast = Physics.Raycast(ray, out hit, 100);
       }
-      else { raycast = Physics.Raycast(transform.position, transform.forward, out hit, 100, layerMask); }
+      else {
+        Ray ray = new Ray(col.bounds.center, transform.forward);
+        raycast = Physics.Raycast(ray, out hit, 100);
+      }
+      gameObject.layer = prevLayer;
       if (raycast && hit.collider.GetComponent<Pawn>()) { hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value); }
     }
 
@@ -159,7 +165,7 @@ namespace SRPG {
       if (health.Value > maxHealth) { health.Value = maxHealth; }
       else if (health.Value <= 0) {
         health.Value = 0f;
-        sDie();
+        Die();
       }
     }
 
@@ -182,17 +188,7 @@ namespace SRPG {
       else { return false; }
     }
 
-    public virtual void Die() {
-      InvokeServerRpc(sDie);
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void sDie() {
-      InvokeClientRpcOnEveryone(cDie);
-    }
-
-    [ClientRPC]
-    public void cDie() {
+    public void Die() {
       SetState((int)pS.Dead);
       EnableRagdoll();
       Timer.Delay(this, Respawn, 5);

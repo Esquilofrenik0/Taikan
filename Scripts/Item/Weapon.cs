@@ -19,15 +19,16 @@ namespace SRPG {
       base.NetworkStart();
       NetworkedObject nObject = GetComponent<NetworkedObject>();
       if (nObject.IsSceneObject == true) { return; }
-      if (owner.Value != 0) {
-        NetworkedObject actor = GetNetworkedObject(owner.Value);
-        pawn = actor.GetComponent<Pawn>();
-        if (nObject.GetComponent<Collider>()) {
-          nObject.GetComponent<Collider>().isTrigger = true;
+      if (nObject.GetComponent<Collider>()) {
+        nObject.GetComponent<Collider>().isTrigger = true;
+        if (owner.Value != 0) {
+          NetworkedObject actor = GetNetworkedObject(owner.Value);
+          pawn = actor.GetComponent<Pawn>();
           if (actor.GetComponent<Collider>()) {
-            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), GetNetworkedObject(owner.Value).GetComponent<Collider>());
+            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), actor.GetComponent<Collider>());
           }
         }
+        gameObject.layer = 2;
       }
     }
 
