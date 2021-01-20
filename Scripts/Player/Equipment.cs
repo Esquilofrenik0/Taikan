@@ -135,7 +135,6 @@ namespace SRPG {
     public void SpawnEquip(int slot, string name, ulong clientID) {
       dItem dItem = data.GetItem(name);
       NetworkedObject spawn = Instantiate(dItem.resource, weaponSlot[slot]).GetComponent<NetworkedObject>();
-      if (slot < 2) { spawn.GetComponent<Weapon>().owner.Value = GetComponent<NetworkedObject>().NetworkId; }
       spawn.SpawnWithOwnership(clientID);
       if (slot == 0) { weapon1.Value = GetNetworkedObject(spawn.NetworkId).gameObject; }
       else if (slot == 1) { weapon2.Value = GetNetworkedObject(spawn.NetworkId).gameObject; }

@@ -10,26 +10,17 @@ namespace SRPG {
   public class Weapon: Item {
     public GameObject fx;
     public AudioSource audioSource;
-    public NetworkedVarULong owner = new NetworkedVarULong(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
     [HideInInspector] public Pawn pawn;
     [HideInInspector] public dWeapon dWeapon;
     [HideInInspector] public List<Pawn> hitPawns;
 
     public override void NetworkStart() {
       base.NetworkStart();
-      NetworkedObject nObject = GetComponent<NetworkedObject>();
-      if (nObject.IsSceneObject == true) { return; }
-      if (nObject.GetComponent<Collider>()) {
-        nObject.GetComponent<Collider>().isTrigger = true;
-        if (owner.Value != 0) {
-          NetworkedObject actor = GetNetworkedObject(owner.Value);
-          pawn = actor.GetComponent<Pawn>();
-          if (actor.GetComponent<Collider>()) {
-            Physics.IgnoreCollision(nObject.GetComponent<Collider>(), actor.GetComponent<Collider>());
-          }
-        }
-        gameObject.layer = 2;
-      }
+      if (GetComponent<NetworkedObject>() && GetComponent<NetworkedObject>().IsSceneObject == true) { return; }
+      pawn = GetComponentInParent<Pawn>();
+      GetComponent<Collider>().isTrigger = true;
+      Physics.IgnoreCollision(GetComponent<Collider>(), pawn.GetComponent<Collider>());
+      gameObject.layer = 2;
     }
 
     void Awake() {
@@ -37,7 +28,7 @@ namespace SRPG {
     }
 
     private void OnTriggerEnter(Collider other) {
-      if (owner.Value != 0) {
+      if (pawn) {
         if (pawn.attacking) {
           if (pawn.resetAttack) {
             hitPawns.Clear();
