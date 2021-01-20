@@ -5,7 +5,7 @@ using MLAPI;
 using MLAPI.Spawning;
 
 namespace SRPG {
-  public class ItemSpawner: NetworkedBehaviour {
+  public class Database: NetworkedBehaviour {
     public List<dItem> database;
     
     public dItem GetItem(string name) {

@@ -31,8 +31,6 @@ namespace SRPG {
     void Start() {
       if (!IsLocalPlayer) { return; }
       hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
-      hero.transform.Find("MinimapIcon").gameObject.SetActive(true);
-      GameObject.Find("MinimapCamera").transform.SetParent(hero.transform);
       cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
       cam.transform.SetParent(hero.camTarget.transform);
       heroCam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
@@ -52,23 +50,17 @@ namespace SRPG {
       hero.IsGrounded();
       hero.RefreshState();
       if (hero.aiming) { heroCam.m_Lens.FieldOfView = 30; } else { heroCam.m_Lens.FieldOfView = 45; }
-      if (hero.equipment.item[0] != 0) { if (GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx != null) { GetNetworkedObject(hero.equipment.item[0]).GetComponent<Weapon>().fx.SetActive(false); } }
+      if (hero.equipment.weapon1.Value) { if (hero.equipment.weapon1.Value.GetComponent<Weapon>().fx != null) { hero.equipment.weapon1.Value.GetComponent<Weapon>().fx.SetActive(false); } }
     }
 
     void Update() {
-      if (!IsLocalPlayer) { return; }
-      if (input.inventory) { hero.ToggleInventory(); input.inventory = false; }
-      if (hero.state == (int)pS.Dead) { return; }
-      if (input.interact) { hero.Interact(); input.interact = false; }
+      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
       if (!hero.inventoryOpen) {
-        if (input.equip) { hero.Equip(); input.equip = false; }
         hero.Sprint(input.sprint);
         hero.Crouch(input.crouch);
         hero.Block(input.block);
         if (input.attack) { hero.Attack(); }
-        if (input.dodge) { hero.Dodge(input.movement.x, input.movement.y); input.dodge = false; }
       }
-      if (input.jump) { hero.Jump(); input.jump = false; }
       hero.Move(input.movement.x, input.movement.y);
       hero.ApplyGravity();
       hero.UpdateImpact();
@@ -79,6 +71,71 @@ namespace SRPG {
       if (!IsLocalPlayer) { return; }
       if (hero.state == (int)pS.Dead) { return; }
       hero.Look(input.camvect.x, input.camvect.y);
+    }
+    #endregion
+
+    #region Controls
+    void OnJump() {
+      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+      hero.Jump();
+    }
+
+    void OnDodge() {
+      if (!IsLocalPlayer || hero.state == (int)pS.Dead || hero.inventoryOpen) { return; }
+      hero.Dodge(input.movement.x, input.movement.y);
+    }
+
+    void OnEquip() {
+      if (!IsLocalPlayer || hero.state == (int)pS.Dead || hero.inventoryOpen) { return; }
+      hero.Equip();
+    }
+
+    void OnInteract() {
+      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+      hero.Interact();
+    }
+
+    void OnMenu() {
+      if (!IsLocalPlayer) { return; }
+      if (input.menu) {
+        input.menu = false;
+        worldCam.Priority = 8;
+        HideLayer(31);
+      }
+      else {
+        input.menu = true;
+        worldCam.Priority = 10;
+        ShowLayer(31);
+      }
+    }
+
+    void OnInventory() {
+      if (!IsLocalPlayer) { return; }
+      hero.ToggleInventory();
+    }
+
+    void OnChangeView() {
+      if (!IsLocalPlayer) { return; }
+      if (input.firstPerson) {
+        input.firstPerson = false;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
+      }
+      else {
+        input.firstPerson = true;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
+      }
+    }
+    #endregion
+
+    #region Camera
+    private void ShowLayer(int layer) {
+      cam.cullingMask |= 1 << layer;
+    }
+
+    private void HideLayer(int layer) {
+      cam.cullingMask &= ~(1 << layer);
     }
     #endregion
   }

@@ -8,7 +8,7 @@ using MLAPI;
 namespace SRPG {
   public class ESlot: NetworkedBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     public Transform slotIcon;
-    [HideInInspector] public Item item;
+    [HideInInspector] public dItem dItem;
     [HideInInspector] public bool empty = true;
     [HideInInspector] public Sprite background;
     [HideInInspector] public Image bgImage;
@@ -21,13 +21,13 @@ namespace SRPG {
     }
 
     public void UpdateSlot() {
-      if (hero.equipment.item[number] != 0) {
-        item = GetNetworkedObject(hero.equipment.item[number]).GetComponent<Item>();
-        slotIcon.GetComponent<Image>().sprite = item.dItem.icon;
+      if (hero.equipment.equip[number]) {
+        dItem = hero.equipment.equip[number];
+        slotIcon.GetComponent<Image>().sprite = dItem.icon;
         empty = false;
       }
       else {
-        item = null;
+        dItem = null;
         slotIcon.GetComponent<Image>().sprite = background;
         empty = true;
       }
@@ -35,17 +35,9 @@ namespace SRPG {
 
     public void OnPointerClick(PointerEventData pointerEventData) {
       if (!hero) { return; }
-      if (hero.equipment.item[number] != 0) {
-        item = GetNetworkedObject(hero.equipment.item[number]).GetComponent<Item>();
-        int slot = 0;
-        if (item.GetComponent<Weapon>()) {
-          dWeapon weapon = item.dItem as dWeapon;
-          slot = hero.equipment.WeaponSlot((int)weapon.weaponSlot);
-        }
-        else if (item.GetComponent<Armor>()) {
-          dArmor armor = item.dItem as dArmor;
-          slot = hero.equipment.ArmorSlot((int)armor.armorSlot);
-        }
+      if (hero.equipment.equip[number]) {
+        dItem = hero.equipment.equip[number];
+        int slot = hero.equipment.GetSlot(dItem);
         hero.equipment.UnequipItem(slot);
       }
       UpdateSlot();
@@ -54,9 +46,9 @@ namespace SRPG {
     public void OnPointerEnter(PointerEventData pointerEventData) {
       if (!hero) { return; }
       bgImage.color = new Vector4(255, 255, 0, 200);
-      if (hero.equipment.item[number] != 0) {
-        item = GetNetworkedObject(hero.equipment.item[number]).GetComponent<Item>();
-        hero.hud.DisplayInfo(item.dItem);
+      if (hero.equipment.equip[number]) {
+        dItem = hero.equipment.equip[number];
+        hero.hud.DisplayInfo(dItem);
       }
       UpdateSlot();
     }

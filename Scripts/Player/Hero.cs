@@ -75,6 +75,7 @@ namespace SRPG {
         avatar.GetDNA()["height"].Set(0.6f);
         avatar.SetSlot("Underwear", "FemaleUndies2");
       }
+      equipment.Dress();
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
@@ -226,21 +227,21 @@ namespace SRPG {
     #endregion
 
     #region Stats
-    public void DropInventory(Container bag) {
-      for (int i = 0; i < 7; i++) {
-        if (equipment.equipSlot[i].GetComponentInChildren<Item>()) {
-          Item item = equipment.equipSlot[i].GetComponentInChildren<Item>();
-          bag.inventory.Store(item.dItem, 1);
-          GameObject.Destroy(item.gameObject);
-        }
-      }
-      for (int i = 0; i < inventory.nSlots; i++) {
-        if (inventory.slot[i].amount > 0) {
-          bag.inventory.StoreStack(inventory.slot[i]);
-          inventory.RemoveStack(i);
-        }
-      }
-    }
+    // public void DropInventory(Container bag) {
+    //   for (int i = 0; i < 7; i++) {
+    //     if (equipment.equipSlot[i].GetComponentInChildren<Item>()) {
+    //       Item item = equipment.equipSlot[i].GetComponentInChildren<Item>();
+    //       bag.inventory.Store(item.dItem, 1);
+    //       GameObject.Destroy(item.gameObject);
+    //     }
+    //   }
+    //   for (int i = 0; i < inventory.nSlots; i++) {
+    //     if (inventory.slot[i].amount > 0) {
+    //       bag.inventory.StoreStack(inventory.slot[i]);
+    //       inventory.RemoveStack(i);
+    //     }
+    //   }
+    // }
 
     public void UpdateStamina(float amount) {
       stamina += amount;

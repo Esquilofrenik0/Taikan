@@ -6,7 +6,6 @@ using MLAPI;
 
 namespace SRPG {
   public class InputHandler: NetworkedBehaviour {
-    public Player player;
     [HideInInspector] public InputMaster controls;
     [HideInInspector] public Vector2 movement = Vector2.zero;
     [HideInInspector] public Vector2 camvect = Vector2.zero;
@@ -43,55 +42,57 @@ namespace SRPG {
       controls.Player.Disable();
     }
 
-    void OnChangeView() {
-      if (!IsLocalPlayer) { return; }
-      if (firstPerson) {
-        firstPerson = false;
-        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
-        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
-      }
-      else {
-        firstPerson = true;
-        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
-        player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
-      }
-    }
+    // void OnChangeView() {
+    //   if (!IsLocalPlayer) { return; }
+    //   if (firstPerson) {
+    //     firstPerson = false;
+    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
+    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
+    //   }
+    //   else {
+    //     firstPerson = true;
+    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
+    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
+    //   }
+    // }
 
-    void OnJump() {
-      if (!IsLocalPlayer) { return; }
-      jump = true;
-    }
+    // void OnJump() {
+    //   if (!IsLocalPlayer) { return; }
+    //   jump = true;
+    // }
 
-    void OnDodge() {
-      if (!IsLocalPlayer) { return; }
-      dodge = true;
-    }
+    // void OnDodge() {
+    //   if (!IsLocalPlayer) { return; }
+    //   dodge = true;
+    // }
 
-    void OnEquip() {
-      if (!IsLocalPlayer) { return; }
-      equip = true;
-    }
+    // void OnEquip() {
+    //   if (!IsLocalPlayer) { return; }
+    //   equip = true;
+    // }
 
-    void OnMenu() {
-      if (!IsLocalPlayer) { return; }
-      if (menu) {
-        menu = false;
-        player.worldCam.Priority = 8;
-      }
-      else {
-        menu = true;
-        player.worldCam.Priority = 10;
-      }
-    }
+    // void OnMenu() {
+    //   if (!IsLocalPlayer) { return; }
+    //   if (menu) {
+    //     menu = false;
+    //     player.worldCam.Priority = 8;
+    //     HideLayer(31);
+    //   }
+    //   else {
+    //     menu = true;
+    //     player.worldCam.Priority = 10;
+    //     ShowLayer(31);
+    //   }
+    // }
 
-    void OnInventory() {
-      if (!IsLocalPlayer) { return; }
-      inventory = true;
-    }
+    // void OnInventory() {
+    //   if (!IsLocalPlayer) { return; }
+    //   inventory = true;
+    // }
 
-    void OnInteract() {
-      if (!IsLocalPlayer) { return; }
-      interact = true;
-    }
+    // void OnInteract() {
+    //   if (!IsLocalPlayer) { return; }
+    //   interact = true;
+    // }
   }
 }

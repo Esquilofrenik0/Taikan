@@ -44,31 +44,29 @@ namespace SRPG {
 
     [Header("Ragdoll")]
     [HideInInspector] public Rigidbody[] bonesRB;
-    [HideInInspector] public Collider[] bonesCol;
 
     #region Init
     public void initRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
-      bonesCol = transform.GetChild(0).GetComponentsInChildren<Collider>(true);
       DisableRagdoll();
     }
 
     public void DisableRagdoll() {
+      for (int i = 0; i < bonesRB.Length; i++) {
+        bonesRB[i].isKinematic = true;
+        bonesRB[i].GetComponent<Collider>().enabled = false;
+      }
       anim.enabled = true;
       col.enabled = true;
-      for (int i = 0; i < bonesCol.Length; i++) {
-        bonesCol[i].enabled = false;
-        bonesRB[i].isKinematic = true;
-      }
     }
 
     public void EnableRagdoll() {
+      for (int i = 0; i < bonesRB.Length; i++) {
+        bonesRB[i].isKinematic = false;
+        bonesRB[i].GetComponent<Collider>().enabled = true;
+      }
       anim.enabled = false;
       col.enabled = false;
-      for (int i = 0; i < bonesCol.Length; i++) {
-        bonesCol[i].enabled = true;
-        bonesRB[i].isKinematic = false;
-      }
     }
 
     public virtual void Respawn() {
@@ -99,9 +97,9 @@ namespace SRPG {
     public void Attack() {
       if (state == 0 || state == (int)pS.Sprint) {
         if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-        if (equipment.item[0] == 0) { Melee(); }
-        else if (GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
-        else if (!GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) { Melee(); }
+        if (!equipment.weapon1.Value) { Melee(); }
+        else if (equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
+        else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Melee(); }
       }
     }
 
@@ -110,9 +108,9 @@ namespace SRPG {
       anim.SetTrigger("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
       combo += 1;
-      if (equipment.item[0] == 0) { combo %= 4; }
+      if (!equipment.weapon1.Value) { combo %= 4; }
       else {
-        wT wT = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.wType;
+        wT wT = equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.wType;
         if (wT == wT.Unarmed || wT == wT.Sword) { combo %= 2; }
         else if (wT == wT.WoodAxe) { combo %= 1; }
       }
@@ -121,7 +119,7 @@ namespace SRPG {
     public void Shoot() {
       SetState((int)pS.Attack);
       anim.SetTrigger("Attack");
-      Weapon weapon = GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>();
+      Weapon weapon = equipment.weapon1.Value.GetComponent<Weapon>();
       weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
       weapon.fx.SetActive(true);
       RaycastHit hit;
@@ -188,7 +186,7 @@ namespace SRPG {
       else { return false; }
     }
 
-    public void Die() {
+    public virtual void Die() {
       SetState((int)pS.Dead);
       EnableRagdoll();
       Timer.Delay(this, Respawn, 5);

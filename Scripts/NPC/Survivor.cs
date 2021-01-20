@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace SRPG {
   public class Survivor: NPC {
     public override void NetworkStart() {
       base.NetworkStart();
-      pawn.spawnPoint = transform.position;
+      pawn.spawnPoint = GetNavPoint(transform.position);
       pawn.initRagdoll();
       pawn.Respawn();
     }

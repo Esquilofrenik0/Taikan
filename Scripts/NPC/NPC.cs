@@ -17,13 +17,22 @@ namespace SRPG {
     [HideInInspector] public Transform enemy;
     [HideInInspector] public Vector3 patrolPoint;
     [HideInInspector] public RaycastHit[] possibleTargets;
-    public dItem[] equippedItems;
+
+    public Vector3 GetNavPoint(Vector3 point) {
+      Vector3 navPoint = point;
+      NavMeshHit myNavHit;
+      if (NavMesh.SamplePosition(point, out myNavHit, 100, -1)) { 
+        navPoint = myNavHit.position; 
+      }
+      return navPoint;
+    }
 
     public void SetPatrolPoint() {
       float x = pawn.spawnPoint.x + Random.Range(-patrolDistance, patrolDistance);
       float y = transform.position.y;
       float z = pawn.spawnPoint.z + Random.Range(-patrolDistance, patrolDistance);
       patrolPoint = new Vector3(x, y, z);
+      patrolPoint = GetNavPoint(patrolPoint);
       patrolling = true;
     }
 

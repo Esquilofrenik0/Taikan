@@ -2,52 +2,92 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
+using UnityEngine.AI;
 
 namespace SRPG {
   public class EnemySpawner: NetworkedBehaviour {
     public GameObject toSpawn;
     public int number = 5;
-    [HideInInspector] bool spawned = false;
     [HideInInspector] public List<NetworkedObject> enemies;
+    [HideInInspector] public Coroutine unspawnRoutine;
+    bool spawned = false;
+    bool unspawn = false;
 
     public override void NetworkStart() {
       base.NetworkStart();
       if (!IsServer) { return; }
       spawned = false;
+      unspawn = false;
     }
 
-    private void OnTriggerStay(Collider other) {
+    private void OnTriggerEnter(Collider other) {
       if (!IsServer) { return; }
       if (other.GetComponent<Player>()) {
-        if (!spawned) { SpawnEnemies(); }
-        else {
-          if (enemies.Count > 0) {
-            for (int i = 0; i < enemies.Count; i++) {
-              if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
-                enemies.RemoveAt(i);
-              }
-            }
-          }
-          else { Timer.Delay(this, ResetSpawn, 10); }
+        if (!spawned) {
+          SpawnEnemies();
         }
       }
     }
 
-    public void ResetSpawn() {
-      spawned = false;
+    private void OnTriggerStay(Collider other) {
+      if (!IsServer) { return; }
+      if (other.GetComponent<Player>()) { unspawn = false; }
+    }
+
+    void Update() {
+      if (spawned) {
+        if (enemies.Count > 0) {
+          for (int i = enemies.Count - 1; i >= 0; i--) {
+            if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
+              DestroyEnemy(i);
+            }
+          }
+        }
+        else { spawned = false; }
+      }
+    }
+
+    private void OnTriggerExit(Collider other) {
+      if (!IsServer) { return; }
+      if (other.GetComponent<Player>()) {
+        if (spawned) {
+          unspawn = true;
+          Timer.rDelay(this, UnspawnEnemies, 5, unspawnRoutine);
+        }
+      }
+    }
+
+    public void DestroyEnemy(int i) {
+      NetworkedObject[] equips = enemies[i].GetComponentsInChildren<NetworkedObject>();
+      for (int j = 0; j < equips.Length; j++) {
+        Destroy(equips[j].gameObject);
+      }
+      Destroy(enemies[i].gameObject);
+      enemies.RemoveAt(i);
+    }
+
+    public void UnspawnEnemies() {
+      if (!IsServer) { return; }
+      if (unspawn) {
+        for (int i = enemies.Count - 1; i >= 0; i--) {
+          if (enemies[i]) {
+            DestroyEnemy(i);
+          }
+        }
+      }
     }
 
     public void SpawnEnemies() {
       if (!IsServer) { return; }
       for (int i = 0; i < number; i++) {
-        NetworkedObject spawn = Instantiate(toSpawn, transform.position, Quaternion.identity).GetComponent<NetworkedObject>();
-        if (spawn.GetComponent<Human>()) {
-          if (Random.Range(0, 2) < 1) { spawn.GetComponent<Human>().avatar.ChangeRace("HumanMaleDCS"); }
-          else { spawn.GetComponent<Human>().avatar.ChangeRace("HumanFemaleDCS"); }
+        Vector3 where = transform.position;
+        NavMeshHit myNavHit;
+        if (NavMesh.SamplePosition(where, out myNavHit, 100, -1)) {
+          where = myNavHit.position;
         }
-        spawn.transform.localScale = Vector3.one;
-        spawn.Spawn();
-        enemies.Add(spawn);
+        GameObject spawn = Instantiate(toSpawn, where, Quaternion.identity);
+        spawn.GetComponent<NetworkedObject>().Spawn();
+        enemies.Add(spawn.GetComponent<NetworkedObject>());
       }
       spawned = true;
       print("Enemies Spawned");

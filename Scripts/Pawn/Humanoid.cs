@@ -20,17 +20,10 @@ namespace SRPG {
     public override void Respawn() {
       base.Respawn();
       RandomGender();
-      equipment.holstered.Value = false;
-      if (GetComponent<NPC>()) {
-        NPC npc = GetComponent<NPC>();
-        for (int i = 0; i < npc.equippedItems.Length; i++) {
-          if (npc.equippedItems[i] != null) {
-            equipment.EquipItem(npc.equippedItems[i]);
-          }
-        }
-      }
+      equipment.Dress();
+      Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
+      Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
     }
-
 
     public void RandomGender() {
       float male = Random.Range(0, 2);
@@ -54,25 +47,25 @@ namespace SRPG {
           anim.SetBool("Aiming", false);
           if (state == (int)pS.Block) { SetState(0); }
         }
-        if (equipment.item[1] != 0 && GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
-          GetNetworkedObject(equipment.item[1]).transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+        if (equipment.weapon2.Value && equipment.weapon2.Value.GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
+          equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
         }
       }
       else if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.item[0] == 0 || equipment.item[1] != 0) {
+          if (equipment.weapon1.Value == null || equipment.weapon2.Value) {
             SetState((int)pS.Block);
             anim.SetTrigger("Block");
-            if (equipment.item[1] != 0 && GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
-              GetNetworkedObject(equipment.item[1]).transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            if (equipment.weapon2.Value && equipment.weapon2.Value.GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
+              equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             }
           }
-          else if (!GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) {
+          else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
             SetState((int)pS.Block);
             anim.SetTrigger("Block");
           }
-          else if (GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.isRanged) {
+          else if (equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
@@ -111,20 +104,24 @@ namespace SRPG {
     #region Stats
     public void RefreshStats() {
       defense.Value = baseDefense;
-      if (equipment.item[2] != 0) { defense.Value += GetNetworkedObject(equipment.item[2]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[3] != 0) { defense.Value += GetNetworkedObject(equipment.item[3]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[4] != 0) { defense.Value += GetNetworkedObject(equipment.item[4]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[5] != 0) { defense.Value += GetNetworkedObject(equipment.item[5]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[6] != 0) { defense.Value += GetNetworkedObject(equipment.item[6]).GetComponent<Armor>().dArmor.defense; }
-      if (equipment.item[1] != 0) { defense.Value += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.defense; }
       damage.Value = baseDamage;
-      if (equipment.item[0] != 0) { damage.Value += GetNetworkedObject(equipment.item[0]).GetComponent<Weapon>().dWeapon.damage; }
-      if (equipment.item[1] != 0) { damage.Value += GetNetworkedObject(equipment.item[1]).GetComponent<Weapon>().dWeapon.damage; }
+      for (int i = 0; i < 2; i++) {
+        if (equipment.equip[i]) {
+          dWeapon dWeapon = equipment.equip[i] as dWeapon;
+          defense.Value += dWeapon.defense;
+          damage.Value += dWeapon.damage;
+        }
+      }
+      for (int i = 0; i < 5; i++) {
+        if (equipment.equip[i + 2]) {
+          dArmor dArmor = equipment.equip[i + 2] as dArmor;
+          defense.Value += dArmor.defense;
+        }
+      }
       if (!IsLocalPlayer) { return; }
-      if (GetComponent<Hero>()) {
-        Hero hero = GetComponent<Hero>();
-        hero.hud.Refresh();
-        hero.hud.DisplayStats();
+      if (GetComponent<HUD>()) {
+        GetComponent<HUD>().Refresh();
+        GetComponent<HUD>().DisplayStats();
       }
     }
     #endregion
