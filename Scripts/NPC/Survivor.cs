@@ -6,7 +6,7 @@ using UnityEngine.AI;
 namespace SRPG {
   public class Survivor: NPC {
     public override void NetworkStart() {
-      base.NetworkStart();
+      if(!IsServer){return;}
       pawn.spawnPoint = GetNavPoint(transform.position);
       pawn.initRagdoll();
       pawn.Respawn();

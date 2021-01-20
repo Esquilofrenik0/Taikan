@@ -14,7 +14,6 @@ namespace SRPG {
     bool unspawn = false;
 
     public override void NetworkStart() {
-      base.NetworkStart();
       if (!IsServer) { return; }
       spawned = false;
       unspawn = false;
@@ -31,19 +30,18 @@ namespace SRPG {
 
     private void OnTriggerStay(Collider other) {
       if (!IsServer) { return; }
-      if (other.GetComponent<Player>()) { unspawn = false; }
-    }
-
-    void Update() {
-      if (spawned) {
-        if (enemies.Count > 0) {
-          for (int i = enemies.Count - 1; i >= 0; i--) {
-            if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
-              DestroyEnemy(i);
+      if (other.GetComponent<Player>()) {
+        unspawn = false;
+        if (spawned) {
+          if (enemies.Count > 0) {
+            for (int i = enemies.Count - 1; i >= 0; i--) {
+              if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
+                DestroyEnemy(i);
+              }
             }
           }
+          else { spawned = false; }
         }
-        else { spawned = false; }
       }
     }
 
@@ -58,6 +56,7 @@ namespace SRPG {
     }
 
     public void DestroyEnemy(int i) {
+      if (!IsServer) { return; }
       NetworkedObject[] equips = enemies[i].GetComponentsInChildren<NetworkedObject>();
       for (int j = 0; j < equips.Length; j++) {
         Destroy(equips[j].gameObject);

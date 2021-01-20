@@ -22,7 +22,7 @@ namespace SRPG {
     [HideInInspector] public bool crouch = false;
     [HideInInspector] public bool interact = false;
 
-    void Update() {
+    void FixedUpdate() {
       if (!IsLocalPlayer) { return; }
       movement = controls.Player.Movement.ReadValue<Vector2>();
       camvect = controls.Player.Camera.ReadValue<Vector2>();

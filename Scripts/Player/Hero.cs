@@ -208,9 +208,12 @@ namespace SRPG {
         CloseInventory();
       }
       else {
-        Ray ray = new Ray(camTarget.transform.position, camTarget.transform.rotation * Vector3.forward);
+        int prevLayer = gameObject.layer;
+        gameObject.layer = 2;
         RaycastHit hit = new RaycastHit();
-        Physics.SphereCast(ray, 1, out hit, 5);
+        Ray ray = new Ray(player.cam.transform.position, player.cam.transform.forward);
+        Physics.Raycast(ray, out hit, 10);
+        gameObject.layer = prevLayer;
         if (hit.collider != null) {
           if (hit.collider.GetComponent<Item>()) {
             if (hit.collider.isTrigger == false) {
@@ -277,12 +280,7 @@ namespace SRPG {
       UpdateMana(manaRegen * Time.deltaTime);
     }
 
-    public void RefreshState() {
-      anim.SetBool("Crouching", crouching);
-      SetSpeed();
-    }
-
-    public void SetSpeed() {
+    public override void SetSpeed() {
       if (aiming) { speed = crouchSpeed; }
       else if (crouching) { speed = crouchSpeed; }
       else if (state == (int)pS.Idle) { speed = idleSpeed; }

@@ -48,13 +48,12 @@ namespace SRPG {
       hero.hud.SetBars();
       if (hero.state == (int)pS.Dead) { return; }
       hero.IsGrounded();
-      hero.RefreshState();
       if (hero.aiming) { heroCam.m_Lens.FieldOfView = 30; } else { heroCam.m_Lens.FieldOfView = 45; }
       if (hero.equipment.weapon1.Value) { if (hero.equipment.weapon1.Value.GetComponent<Weapon>().fx != null) { hero.equipment.weapon1.Value.GetComponent<Weapon>().fx.SetActive(false); } }
-      
+
       if (!hero.inventoryOpen) {
-        hero.Sprint(input.sprint);
         hero.Crouch(input.crouch);
+        hero.Sprint(input.sprint);
         hero.Block(input.block);
         if (input.attack) { hero.Attack(); }
       }
@@ -63,11 +62,6 @@ namespace SRPG {
       hero.UpdateImpact();
       hero.Regenerate();
     }
-
-    // void Update() {
-    //   // if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
-
-    // }
 
     void LateUpdate() {
       if (!IsLocalPlayer) { return; }

@@ -16,7 +16,7 @@ namespace SRPG {
       secondsPerDay = secondsPerHour * 24;
     }
 
-    void Update() {
+    void FixedUpdate() {
       SunUpdate();
     }
 

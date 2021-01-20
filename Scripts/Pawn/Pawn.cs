@@ -92,8 +92,8 @@ namespace SRPG {
       }
     }
 
-    public void PunchActive(bool active){
-      for(int i=0;i<2;i++){
+    public void PunchActive(bool active) {
+      for (int i = 0; i < 2; i++) {
         equipment.weaponSlot[i].GetComponent<Collider>().enabled = active;
       }
     }
@@ -102,24 +102,22 @@ namespace SRPG {
     #region Combat
     public void Attack() {
       if (state == 0 || state == (int)pS.Sprint) {
-        if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-        if (!equipment.weapon1.Value) { PunchActive(true); Melee(); }
-        else if (equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
-        else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { PunchActive(false); Melee(); }
+        if (!equipment.holstered.Value) {
+          equipment.holstered.Value = true;
+          equipment.Holster(equipment.holstered.Value);
+        }
+        if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
+        else { Melee(); }
       }
     }
 
     public void Melee() {
+      SetState((int)pS.Attack);
       anim.SetInteger("Combo", combo);
       anim.SetTrigger("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
       combo += 1;
-      if (!equipment.weapon1.Value) { combo %= 4; }
-      else {
-        wT wT = equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.wType;
-        if (wT == wT.Unarmed || wT == wT.Sword) { combo %= 2; }
-        else if (wT == wT.WoodAxe) { combo %= 1; }
-      }
+      combo %= 2;
     }
 
     public void Shoot() {
@@ -203,7 +201,10 @@ namespace SRPG {
     public void SetState(int pState) {
       state = pState;
       anim.SetInteger("State", state);
+      SetSpeed();
     }
+
+    public virtual void SetSpeed() { }
     #endregion
   }
 }

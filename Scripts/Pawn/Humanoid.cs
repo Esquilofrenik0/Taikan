@@ -78,6 +78,7 @@ namespace SRPG {
 
     public void Crouch(bool crouch) {
       crouching = crouch;
+      anim.SetBool("Crouching", crouch);
     }
 
     public void Sprint(bool sprint) {
