@@ -91,15 +91,21 @@ namespace SRPG {
         equipment.Holster(equipment.holstered.Value);
       }
     }
+
+    public void PunchActive(bool active){
+      for(int i=0;i<2;i++){
+        equipment.weaponSlot[i].GetComponent<Collider>().enabled = active;
+      }
+    }
     #endregion
 
     #region Combat
     public void Attack() {
       if (state == 0 || state == (int)pS.Sprint) {
         if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-        if (!equipment.weapon1.Value) { Melee(); }
+        if (!equipment.weapon1.Value) { PunchActive(true); Melee(); }
         else if (equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
-        else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Melee(); }
+        else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { PunchActive(false); Melee(); }
       }
     }
 

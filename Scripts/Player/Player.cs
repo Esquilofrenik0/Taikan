@@ -23,8 +23,8 @@ namespace SRPG {
         NetworkedObject player = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject;
         netID.Value = player.NetworkId;
       }
-      hero.initRagdoll();
       hero.LoadAvatar();
+      hero.initRagdoll();
     }
 
     #region Unity
@@ -51,10 +51,7 @@ namespace SRPG {
       hero.RefreshState();
       if (hero.aiming) { heroCam.m_Lens.FieldOfView = 30; } else { heroCam.m_Lens.FieldOfView = 45; }
       if (hero.equipment.weapon1.Value) { if (hero.equipment.weapon1.Value.GetComponent<Weapon>().fx != null) { hero.equipment.weapon1.Value.GetComponent<Weapon>().fx.SetActive(false); } }
-    }
-
-    void Update() {
-      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+      
       if (!hero.inventoryOpen) {
         hero.Sprint(input.sprint);
         hero.Crouch(input.crouch);
@@ -66,6 +63,11 @@ namespace SRPG {
       hero.UpdateImpact();
       hero.Regenerate();
     }
+
+    // void Update() {
+    //   // if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+
+    // }
 
     void LateUpdate() {
       if (!IsLocalPlayer) { return; }

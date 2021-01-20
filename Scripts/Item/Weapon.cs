@@ -18,8 +18,10 @@ namespace SRPG {
       base.NetworkStart();
       if (GetComponent<NetworkedObject>() && GetComponent<NetworkedObject>().IsSceneObject == true) { return; }
       pawn = GetComponentInParent<Pawn>();
-      GetComponent<Collider>().isTrigger = true;
-      Physics.IgnoreCollision(GetComponent<Collider>(), pawn.GetComponent<Collider>());
+      if (GetComponent<Collider>()) {
+        GetComponent<Collider>().isTrigger = true;
+        Physics.IgnoreCollision(GetComponent<Collider>(), pawn.GetComponent<Collider>());
+      }
       gameObject.layer = 2;
     }
 

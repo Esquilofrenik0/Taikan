@@ -12,7 +12,7 @@ namespace SRPG {
       pawn.Respawn();
     }
 
-    void Update() {
+    void FixedUpdate() {
       if (!IsServer) { return; }
       if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
       if (CanSeeEnemy()) { EngageEnemy(5); }
@@ -24,7 +24,7 @@ namespace SRPG {
     }
 
     void LateUpdate() {
-      if (!IsServer) { return; }
+      if (!IsServer || pawn.state == (int)pS.Dead) { return; }
       LookAtEnemy();
     }
   }
