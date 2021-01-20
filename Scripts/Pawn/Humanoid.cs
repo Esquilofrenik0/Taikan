@@ -40,38 +40,29 @@ namespace SRPG {
 
     #region Actions
     public void Block(bool block) {
-      if (!block) {
-        if (anim.GetInteger("State") == (int)pS.Block) { SetState(0); }
-        if (aiming) {
-          aiming = false;
-          anim.SetBool("Aiming", false);
-          if (state == (int)pS.Block) { SetState(0); }
-        }
-        if (equipment.weapon2.Value && equipment.weapon2.Value.GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
-          equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        }
-      }
-      else if (block) {
+      if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon1.Value == null || equipment.weapon2.Value) {
-            SetState((int)pS.Block);
-            anim.SetTrigger("Block");
-            if (equipment.weapon2.Value && equipment.weapon2.Value.GetComponent<Weapon>().dWeapon.wType == wT.Shield) {
-              equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-            }
-          }
-          else if (!equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
-            SetState((int)pS.Block);
-            anim.SetTrigger("Block");
-          }
-          else if (equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
+          if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
               anim.SetTrigger("Aim");
+              SetSpeed();
             }
           }
+          else {
+            SetState((int)pS.Block);
+            anim.SetTrigger("Block");
+          }
+        }
+      }
+      else {
+        if (anim.GetInteger("State") == (int)pS.Block) { SetState(0); }
+        if (aiming) {
+          aiming = false;
+          anim.SetBool("Aiming", false);
+          SetSpeed();
         }
       }
     }
