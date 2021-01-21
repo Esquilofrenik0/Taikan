@@ -23,7 +23,6 @@ namespace SRPG {
         NetworkedObject player = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject;
         netID.Value = player.NetworkId;
       }
-      hero.LoadAvatar();
       hero.initRagdoll();
     }
 
@@ -39,6 +38,7 @@ namespace SRPG {
       worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
       worldCam.Priority = 8;
       gameObject.layer = 9;
+      hero.LoadAvatar();
       hero.hud.initHUD();
       hero.Respawn();
     }
@@ -114,7 +114,7 @@ namespace SRPG {
       if (!IsLocalPlayer) { return; }
       if (input.firstPerson) {
         input.firstPerson = false;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.2f;
         heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
       }
       else {

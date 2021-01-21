@@ -18,8 +18,8 @@ namespace SRPG {
   public enum wS { RightHand, LeftHand, TwoHand, AnyHand };
   //equipmenSlot
   public enum eS { RightHand, LeftHand, Helmet, Chest, Hands, Legs, Feet };
-  //Factions
-  public enum Faction { Loner, Survivor, Mutant, Cyborg, Raider, Plagued, Feral, Critter};
+  //Faction
+  public enum Faction { Loner, Survivor, Inquisitor, Raider, Mutant, Cyborg, Plagued, Feral, Critter};
 
   public static class Timer {
     public static Coroutine Delay(this MonoBehaviour monoBehaviour, Action action, float time) {

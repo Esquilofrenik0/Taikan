@@ -4,9 +4,12 @@ using UnityEngine;
 using UnityEngine.AI;
 
 namespace SRPG {
-  public class Survivor: NPC {
+  public class Inquisitor: NPC {
+    public float patrolSpeed;
+    public float combatSpeed;
+    
     public override void NetworkStart() {
-      if(!IsServer){return;}
+      if (!IsServer) { return; }
       pawn.spawnPoint = GetNavPoint(transform.position);
       pawn.initRagdoll();
       pawn.Respawn();
@@ -15,9 +18,9 @@ namespace SRPG {
     void FixedUpdate() {
       if (!IsServer) { return; }
       if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
-      if (CanSeeEnemy()) { EngageEnemy(5); }
+      if (CanSeeEnemy()) { EngageEnemy(combatSpeed); }
       else {
-        if (patrolling) { MoveToPoint(patrolPoint, 2); }
+        if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
         else { SetPatrolPoint(); }
       }
       pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);

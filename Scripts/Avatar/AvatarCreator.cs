@@ -114,6 +114,16 @@ namespace SRPG {
       avatar.UpdateColors(true);
     }
 
+    public void ChangeHairColor(Color col){
+      avatar.SetColor("Hair", col);
+      avatar.UpdateColors(true);
+    }
+
+    public void ChangeEyeColor(Color col){
+      avatar.SetColor("Eyes",col);
+      avatar.UpdateColors(true);
+    }
+
     public void ChangeHair(bool plus) {
       if (avatar.activeRace.name == "HumanMaleDCS") {
         if (plus) { maleCurrentHair++; } else { maleCurrentHair--; }

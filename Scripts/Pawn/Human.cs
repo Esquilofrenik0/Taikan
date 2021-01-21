@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 namespace SRPG {
   public class Human: Humanoid {
     public override void Respawn() {

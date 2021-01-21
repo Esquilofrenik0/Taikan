@@ -21,8 +21,8 @@ namespace SRPG {
     public Vector3 GetNavPoint(Vector3 point) {
       Vector3 navPoint = point;
       NavMeshHit myNavHit;
-      if (NavMesh.SamplePosition(point, out myNavHit, 100, -1)) { 
-        navPoint = myNavHit.position; 
+      if (NavMesh.SamplePosition(point, out myNavHit, 100, -1)) {
+        navPoint = myNavHit.position;
       }
       return navPoint;
     }
@@ -73,20 +73,27 @@ namespace SRPG {
       return false;
     }
 
-    public void EngageEnemy(int speed) {
+    public void EngageEnemy(float speed) {
       agent.isStopped = false;
       agent.speed = speed;
       agent.SetDestination(enemy.position);
-      MeleeAttack();
+      if (pawn.equipment.weapon1.Value && pawn.equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
+      else { MeleeAttack(); }
     }
 
-    public void MeleeAttack() {
+    public void RangedAttack() {
       if (agent.remainingDistance < 20) {
         transform.LookAt(enemy);
         pawn.Attack();
-        if (agent.remainingDistance < 1) {
-          agent.isStopped = true;
-        }
+      }
+      if (agent.remainingDistance < 5) { agent.isStopped = true; }
+    }
+
+    public void MeleeAttack() {
+      if (agent.remainingDistance < 5) {
+        transform.LookAt(enemy);
+        pawn.Attack();
+        if (agent.remainingDistance < 1) { agent.isStopped = true; }
       }
     }
 

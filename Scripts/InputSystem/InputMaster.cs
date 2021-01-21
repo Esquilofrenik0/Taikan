@@ -542,7 +542,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""a9ef585b-c71c-4219-b34b-b60f7e57f8d3"",
-                    ""path"": ""<Gamepad>/leftTrigger"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

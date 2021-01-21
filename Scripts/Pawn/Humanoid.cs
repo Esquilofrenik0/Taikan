@@ -19,7 +19,8 @@ namespace SRPG {
     #region Init
     public override void Respawn() {
       base.Respawn();
-      RandomGender();
+      // RandomGender();
+      if (GetComponent<RandomUMA>()) { GetComponent<RandomUMA>().Randomize(avatar); }
       equipment.Dress();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
@@ -75,15 +76,11 @@ namespace SRPG {
     public void Sprint(bool sprint) {
       if (sprint) {
         if (grounded && !crouching) {
-          if (state == 0) {
-            SetState((int)pS.Sprint);
-          }
+          if (state == 0) { SetState((int)pS.Sprint); }
           else if (state == (int)pS.Sprint) {
             if (GetComponent<Hero>()) {
               Hero hero = GetComponent<Hero>();
-              if (!hero.StaminaCost(hero.sprintCost * Time.deltaTime)) {
-                SetState(0);
-              }
+              if (!hero.StaminaCost(hero.sprintCost * Time.deltaTime)) { SetState(0); }
             }
           }
         }

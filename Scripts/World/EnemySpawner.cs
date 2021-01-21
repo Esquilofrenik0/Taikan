@@ -21,17 +21,15 @@ namespace SRPG {
 
     private void OnTriggerEnter(Collider other) {
       if (!IsServer) { return; }
-      if (other.GetComponent<Player>()) {
-        if (!spawned) {
-          SpawnEnemies();
-        }
+      if (other.tag == "Player") {
+        unspawn = false;
+        if (!spawned) { SpawnEnemies(); }
       }
     }
 
     private void OnTriggerStay(Collider other) {
       if (!IsServer) { return; }
-      if (other.GetComponent<Player>()) {
-        unspawn = false;
+      if (other.tag == "Player") {
         if (spawned) {
           if (enemies.Count > 0) {
             for (int i = enemies.Count - 1; i >= 0; i--) {
@@ -47,10 +45,10 @@ namespace SRPG {
 
     private void OnTriggerExit(Collider other) {
       if (!IsServer) { return; }
-      if (other.GetComponent<Player>()) {
+      if (other.tag == "Player") {
         if (spawned) {
           unspawn = true;
-          Timer.rDelay(this, UnspawnEnemies, 5, unspawnRoutine);
+          Timer.rDelay(this, UnspawnEnemies, 10, unspawnRoutine);
         }
       }
     }
@@ -73,6 +71,7 @@ namespace SRPG {
             DestroyEnemy(i);
           }
         }
+        print("Enemies Unspawned!");
       }
     }
 
@@ -81,15 +80,13 @@ namespace SRPG {
       for (int i = 0; i < number; i++) {
         Vector3 where = transform.position;
         NavMeshHit myNavHit;
-        if (NavMesh.SamplePosition(where, out myNavHit, 100, -1)) {
-          where = myNavHit.position;
-        }
+        if (NavMesh.SamplePosition(where, out myNavHit, 100, -1)) { where = myNavHit.position; }
         GameObject spawn = Instantiate(toSpawn, where, Quaternion.identity);
         spawn.GetComponent<NetworkedObject>().Spawn();
         enemies.Add(spawn.GetComponent<NetworkedObject>());
       }
       spawned = true;
-      print("Enemies Spawned");
+      print("Enemies Spawned!");
     }
   }
 }

@@ -204,7 +204,7 @@ namespace SRPG {
       SetSpeed();
     }
 
-    public virtual void SetSpeed() { }
+    public virtual void SetSpeed() {}
     #endregion
   }
 }
