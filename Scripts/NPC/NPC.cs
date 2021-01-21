@@ -54,7 +54,10 @@ namespace SRPG {
       else { return false; }
     }
 
-    public bool CanSeeEnemy() {
+    bool enemyLost = false;
+
+    public void LookForEnemy() {
+      bool prevEnemyLost = enemyLost;
       possibleTargets = Physics.SphereCastAll(transform.position, 50, Vector3.forward, 50);
       for (int i = 0; i < possibleTargets.Length; ++i) {
         if (possibleTargets[i].transform.GetComponent<Pawn>() != null) {
@@ -62,15 +65,20 @@ namespace SRPG {
           if (pawn.faction != target.faction) {
             if (target.state != (int)pS.Dead) {
               if (WithinSight(target.transform, FoV)) {
+                enemyLost = false;
                 enemy = target.transform;
-                return true;
+                return;
               }
             }
           }
         }
       }
-      enemy = null;
-      return false;
+      enemyLost = true;
+      if (enemyLost != prevEnemyLost) { Timer.Delay(this, LoseEnemy, 1); }
+    }
+
+    public void LoseEnemy() {
+      if (enemyLost) { enemy = null; }
     }
 
     public void EngageEnemy(float speed) {

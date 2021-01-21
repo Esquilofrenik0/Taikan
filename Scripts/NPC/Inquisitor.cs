@@ -7,7 +7,7 @@ namespace SRPG {
   public class Inquisitor: NPC {
     public float patrolSpeed;
     public float combatSpeed;
-    
+
     public override void NetworkStart() {
       if (!IsServer) { return; }
       pawn.spawnPoint = GetNavPoint(transform.position);
@@ -18,7 +18,8 @@ namespace SRPG {
     void FixedUpdate() {
       if (!IsServer) { return; }
       if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
-      if (CanSeeEnemy()) { EngageEnemy(combatSpeed); }
+      LookForEnemy();
+      if (enemy != null) { EngageEnemy(combatSpeed); }
       else {
         if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
         else { SetPatrolPoint(); }

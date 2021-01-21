@@ -193,7 +193,7 @@ namespace SRPG {
     public virtual void Die() {
       SetState((int)pS.Dead);
       EnableRagdoll();
-      Timer.Delay(this, Respawn, 5);
+      Timer.Delay(this, Respawn, 15);
     }
     #endregion
 

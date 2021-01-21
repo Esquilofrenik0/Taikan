@@ -7,7 +7,7 @@ using UMA.CharacterSystem;
 using System.IO;
 
 namespace SRPG {
-  public class AvatarCreator : MonoBehaviour {
+  public class AvatarCreator: MonoBehaviour {
     public InputHandler input;
     public InputField iLoadName;
     public InputField iSaveName;
@@ -17,13 +17,11 @@ namespace SRPG {
     public Slider heightSlider;
     public Slider bellySlider;
     private Coroutine getDna;
-    public List<string> maleHairModels = new List<string>();
-    private int maleCurrentHair;
-    public List<string> femaleHairModels = new List<string>();
-    private int femaleCurrentHair;
-    public string characterName = "";
-    public string loadName = "";
-    public string myRecipe;
+    public List<string> hairModels = new List<string>();
+    private int currentHair;
+    [HideInInspector] public string characterName = "";
+    [HideInInspector] public string loadName = "";
+    [HideInInspector] public string myRecipe;
 
     void OnEnable() {
       avatar.CharacterUpdated.AddListener(Updated);
@@ -40,9 +38,9 @@ namespace SRPG {
     void Start() {
       ChangeName("Avatar");
       Timer.Delay(this, SwitchFemale, 0f);
-      Timer.Delay(this, SwitchMale, 0.2f);
-      Timer.Delay(this, SwitchFemale, 0.4f);
-      Timer.Delay(this, SwitchMale, 0.6f);
+      Timer.Delay(this, SwitchMale, 0.1f);
+      Timer.Delay(this, SwitchFemale, 0.2f);
+      Timer.Delay(this, SwitchMale, 0.3f);
     }
 
     float mouseX = 0;
@@ -55,7 +53,8 @@ namespace SRPG {
       }
       if (input.firstPerson) {
         cam.position = new Vector3(0, 1.5f, -1f);
-      } else {
+      }
+      else {
         cam.position = new Vector3(0, 1f, -2f);
       }
 
@@ -67,12 +66,6 @@ namespace SRPG {
 
     void Updated(UMAData data) {
       dna = avatar.GetDNA();
-      if (avatar.activeRace.name == "HumanMaleDCS") {
-        dna["height"].Set(0.4f);
-      }
-      if (avatar.activeRace.name == "HumanFemaleDCS") {
-        dna["height"].Set(0.6f);
-      }
       heightSlider.value = dna["height"].Get();
       bellySlider.value = dna["belly"].Get();
       avatar.BuildCharacter();
@@ -90,11 +83,13 @@ namespace SRPG {
       if (male && avatar.activeRace.name != "HumanMaleDCS") {
         avatar.ChangeRace("HumanMaleDCS");
         avatar.SetSlot("Underwear", "MaleUnderwear");
+        avatar.GetDNA()["height"].Set(0.4f);
         avatar.BuildCharacter();
       }
       if (!male && avatar.activeRace.name != "HumanFemaleDCS") {
         avatar.ChangeRace("HumanFemaleDCS");
         avatar.SetSlot("Underwear", "FemaleUndies2");
+        avatar.GetDNA()["height"].Set(0.6f);
         avatar.BuildCharacter();
       }
     }
@@ -114,26 +109,22 @@ namespace SRPG {
       avatar.UpdateColors(true);
     }
 
-    public void ChangeHairColor(Color col){
+    public void ChangeHairColor(Color col) {
       avatar.SetColor("Hair", col);
       avatar.UpdateColors(true);
     }
 
-    public void ChangeEyeColor(Color col){
-      avatar.SetColor("Eyes",col);
+    public void ChangeEyeColor(Color col) {
+      avatar.SetColor("Eyes", col);
       avatar.UpdateColors(true);
     }
 
     public void ChangeHair(bool plus) {
-      if (avatar.activeRace.name == "HumanMaleDCS") {
-        if (plus) { maleCurrentHair++; } else { maleCurrentHair--; }
-        maleCurrentHair = Mathf.Clamp(maleCurrentHair, 0, maleHairModels.Count - 1);
-        if (maleHairModels[maleCurrentHair] == "None") { avatar.ClearSlot("Hair"); } else { avatar.SetSlot("Hair", maleHairModels[maleCurrentHair]); }
-      } else if (avatar.activeRace.name == "HumanFemaleDCS") {
-        if (plus) { femaleCurrentHair++; } else { femaleCurrentHair--; }
-        femaleCurrentHair = Mathf.Clamp(femaleCurrentHair, 0, femaleHairModels.Count - 1);
-        if (femaleHairModels[femaleCurrentHair] == "None") { avatar.ClearSlot("Hair"); } else { avatar.SetSlot("Hair", femaleHairModels[femaleCurrentHair]); }
-      }
+      if (plus) { currentHair++; }
+      else { currentHair--; }
+      currentHair = Mathf.Clamp(currentHair, 0, hairModels.Count - 1);
+      if (hairModels[currentHair] == "None") { avatar.ClearSlot("Hair"); }
+      else { avatar.SetSlot("Hair", hairModels[currentHair]); }
       avatar.BuildCharacter();
     }
 
