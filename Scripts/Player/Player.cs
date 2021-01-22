@@ -33,6 +33,7 @@ namespace SRPG {
       cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
       cam.transform.SetParent(hero.camTarget.transform);
       heroCam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
+      heroCam.transform.SetParent(hero.camTarget.transform);
       heroCam.Follow = hero.camTarget.transform;
       view = heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
       worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
@@ -48,19 +49,19 @@ namespace SRPG {
       hero.hud.SetBars();
       if (hero.state == (int)pS.Dead) { return; }
       hero.IsGrounded();
-      if (hero.aiming) { heroCam.m_Lens.FieldOfView = 30; } else { heroCam.m_Lens.FieldOfView = 45; }
-      if (hero.equipment.weapon1.Value) { if (hero.equipment.weapon1.Value.GetComponent<Weapon>().fx != null) { hero.equipment.weapon1.Value.GetComponent<Weapon>().fx.SetActive(false); } }
+      hero.Move(input.movement.x, input.movement.y);
+      hero.Regenerate();
+    }
 
+    void Update() {
+      if (!IsLocalPlayer) { return; }
+      if (hero.state == (int)pS.Dead) { return; }
       if (!hero.inventoryOpen) {
         hero.Crouch(input.crouch);
         hero.Sprint(input.sprint);
         hero.Block(input.block);
         if (input.attack) { hero.Attack(); }
       }
-      hero.Move(input.movement.x, input.movement.y);
-      hero.ApplyGravity();
-      hero.UpdateImpact();
-      hero.Regenerate();
     }
 
     void LateUpdate() {

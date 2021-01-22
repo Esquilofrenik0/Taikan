@@ -11,9 +11,10 @@ namespace SRPG {
   public class Pawn: NetworkedBehaviour {
     [Header("Components")]
     public Animator anim;
-    public GameObject floatingHealthBar;
+    public Rigidbody rb;
     public Collider col;
     public Equipment equipment;
+    public GameObject floatingHealthBar;
 
     [Header("Stats")]
     public float maxHealth = 100;
@@ -58,6 +59,7 @@ namespace SRPG {
       }
       anim.enabled = true;
       col.enabled = true;
+      rb.isKinematic = false;
     }
 
     public void EnableRagdoll() {
@@ -67,6 +69,7 @@ namespace SRPG {
       }
       anim.enabled = false;
       col.enabled = false;
+      rb.isKinematic = true;
     }
 
     public virtual void Respawn() {
@@ -193,7 +196,7 @@ namespace SRPG {
     public virtual void Die() {
       SetState((int)pS.Dead);
       EnableRagdoll();
-      Timer.Delay(this, Respawn, 15);
+      Timer.Delay(this, Respawn, 30);
     }
     #endregion
 
@@ -204,7 +207,7 @@ namespace SRPG {
       SetSpeed();
     }
 
-    public virtual void SetSpeed() {}
+    public virtual void SetSpeed() { }
     #endregion
   }
 }

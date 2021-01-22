@@ -40,10 +40,7 @@ namespace SRPG {
       agent.isStopped = false;
       agent.speed = speed;
       agent.SetDestination(destination);
-      if (agent.remainingDistance < 5) {
-        patrolling = false;
-        SetPatrolPoint();
-      }
+      if (agent.remainingDistance < 2) { patrolling = false; }
     }
 
     public bool WithinSight(Transform targetTransform, float fieldOfViewAngle) {
@@ -54,47 +51,41 @@ namespace SRPG {
       else { return false; }
     }
 
-    bool enemyLost = false;
-
-    public void LookForEnemy() {
-      bool prevEnemyLost = enemyLost;
-      possibleTargets = Physics.SphereCastAll(transform.position, 50, Vector3.forward, 50);
-      for (int i = 0; i < possibleTargets.Length; ++i) {
-        if (possibleTargets[i].transform.GetComponent<Pawn>() != null) {
-          Pawn target = possibleTargets[i].transform.GetComponent<Pawn>();
+    public bool LookForEnemy() {
+      RaycastHit hit;
+      if (Physics.SphereCast(pawn.col.bounds.center, FoV / 16, transform.forward, out hit, viewDistance)) {
+        if (hit.collider.GetComponent<Pawn>()) {
+          Pawn target = hit.collider.GetComponent<Pawn>();
           if (pawn.faction != target.faction) {
             if (target.state != (int)pS.Dead) {
               if (WithinSight(target.transform, FoV)) {
-                enemyLost = false;
                 enemy = target.transform;
-                return;
+                return true;
               }
             }
           }
         }
       }
-      enemyLost = true;
-      if (enemyLost != prevEnemyLost) { Timer.Delay(this, LoseEnemy, 1); }
-    }
-
-    public void LoseEnemy() {
-      if (enemyLost) { enemy = null; }
+      return false;
     }
 
     public void EngageEnemy(float speed) {
-      agent.isStopped = false;
-      agent.speed = speed;
-      agent.SetDestination(enemy.position);
-      if (pawn.equipment.weapon1.Value && pawn.equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
-      else { MeleeAttack(); }
+      if (enemy.GetComponent<Pawn>().state != (int)pS.Dead && WithinSight(enemy, FoV)) {
+        agent.isStopped = false;
+        agent.speed = speed;
+        agent.SetDestination(enemy.transform.position);
+        if (pawn.equipment.weapon1.Value && pawn.equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
+        else { MeleeAttack(); }
+      }
+      else { enemy = null; }
     }
 
     public void RangedAttack() {
       if (agent.remainingDistance < 20) {
         transform.LookAt(enemy);
         pawn.Attack();
+        if (agent.remainingDistance < 5) { agent.isStopped = true; }
       }
-      if (agent.remainingDistance < 5) { agent.isStopped = true; }
     }
 
     public void MeleeAttack() {

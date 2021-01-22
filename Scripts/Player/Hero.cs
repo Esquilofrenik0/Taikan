@@ -9,7 +9,6 @@ namespace SRPG {
     [Header("Components")]
     public Player player;
     public HUD hud;
-    public CharacterController cc;
     [HideInInspector] public string recipeAvatar;
 
     [Header("Camera")]
@@ -29,11 +28,11 @@ namespace SRPG {
     public float attackCost = 5;
     public float sprintCost = 5;
     public float climbCost = 5;
-    public float dodgeStrength = 20;
+    public float dodgeStrength = 8;
     public float idleSpeed = 5;
     public float crouchSpeed = 2;
     public float sprintSpeed = 8;
-    public float jumpHeight = 2;
+    public float jumpHeight = 4;
     [HideInInspector] public float mana = 100;
     [HideInInspector] public float stamina = 100;
     [HideInInspector] public Vector3 impact = Vector3.zero;
@@ -56,11 +55,7 @@ namespace SRPG {
       }
     }
 
-    public void Teleport(Vector3 pos) {
-      cc.enabled = false;
-      transform.position = pos;
-      cc.enabled = true;
-    }
+    public void Teleport(Vector3 pos) { transform.position = pos; }
 
     public override void Respawn() {
       Teleport(spawnPoint);
@@ -87,42 +82,19 @@ namespace SRPG {
     #endregion
 
     #region Actions
-    public void AddImpact(Vector3 dir, float force) {
-      dir.Normalize();
-      if (dir.y < 0) dir.y = -dir.y;
-      impact += dir.normalized * force;
-    }
-
-    public void UpdateImpact() {
-      if (impact.magnitude > 1) { cc.Move(impact * Time.deltaTime); }
-      impact = Vector3.Lerp(impact, Vector3.zero, 5 * Time.deltaTime);
-    }
-
-    public void ApplyGravity() {
-      if (grounded && velocity.y < 0 || state == (int)pS.Climb) { velocity.y = 0f; }
-      else { velocity.y += gravity * Time.deltaTime; }
-      cc.Move(velocity * Time.deltaTime);
-      if (containerOpen) {
-        if (Vector3.Distance(transform.position, container.transform.position) > 5) {
-          CloseInventory();
-        }
-      }
-    }
-
     public void Jump() {
-      if (state == (int)pS.Climb) { SetState(0); }
+      if (state == (int)pS.Climb) { SetState(0); rb.isKinematic = false; }
       else if (grounded) {
         if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
-          velocity.y += Mathf.Sqrt(jumpHeight * -gravity);
+          rb.velocity += jumpHeight * Vector3.up;
           anim.SetTrigger("Jump");
         }
       }
-      else if (StaminaCost(climbCost * Time.deltaTime)) {
-        if (HitWall()) {
-          SetState((int)pS.Climb);
-          anim.SetTrigger("Climb");
-        }
+      else if (HitWall()) {
+        SetState((int)pS.Climb);
+        anim.SetTrigger("Climb");
+        rb.isKinematic = true;
       }
     }
 
@@ -148,17 +120,30 @@ namespace SRPG {
       if (inventoryOpen) { xIn = 0f; yIn = 0f; }
       anim.SetFloat("Horizontal", xIn * speed);
       anim.SetFloat("Vertical", yIn * speed);
-      if (xIn != 0 || yIn != 0) {
-        if (state == (int)pS.Climb) {
+      if (state == (int)pS.Dodge) { return; }
+      if (state == (int)pS.Climb) {
+        if (xIn != 0 || yIn != 0) {
           if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
             ClimbLedge();
             SetState(0);
+            rb.isKinematic = false;
           }
-          else { direction = new Vector3(xIn, yIn, 0f); }
+          else {
+            direction = new Vector3(xIn, yIn, 0f);
+            direction = transform.TransformDirection(direction) * speed;
+            transform.position = transform.position + (direction * Time.deltaTime);
+          }
         }
-        else { direction = new Vector3(xIn, 0f, yIn); }
-        direction = transform.rotation * direction * speed;
-        cc.Move(direction * Time.deltaTime);
+      }
+      else {
+        direction = new Vector3(xIn, 0f, yIn);
+        direction = transform.TransformDirection(direction) * speed;
+        Vector3 velocityChange = (direction - rb.velocity);
+        velocityChange.x = Mathf.Clamp(velocityChange.x, -10, 10);
+        velocityChange.z = Mathf.Clamp(velocityChange.z, -10, 10);
+        velocityChange.y = 0;
+        if (!grounded) { rb.AddForce(velocityChange*3, ForceMode.Impulse); }
+        else { rb.AddForce(velocityChange, ForceMode.VelocityChange); }
       }
     }
 
@@ -194,11 +179,11 @@ namespace SRPG {
             if (!hero.StaminaCost(hero.dodgeCost)) { return; }
           }
           SetState((int)pS.Dodge);
-          if (yIn < 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); AddImpact(-transform.forward, dodgeStrength); }
-          else if (yIn > 0) { anim.SetInteger("DodgeDirection", 1); anim.SetTrigger("Dodge"); AddImpact(transform.forward, dodgeStrength); }
-          else if (xIn < 0) { anim.SetInteger("DodgeDirection", 2); anim.SetTrigger("Dodge"); AddImpact(-transform.right, dodgeStrength); }
-          else if (xIn > 0) { anim.SetInteger("DodgeDirection", 3); anim.SetTrigger("Dodge"); AddImpact(transform.right, dodgeStrength); }
-          else if (yIn == 0) { anim.SetInteger("DodgeDirection", 0); anim.SetTrigger("Dodge"); AddImpact(-transform.forward, dodgeStrength); }
+          if (yIn < 0) { anim.SetTrigger("Dodge"); rb.velocity += -transform.forward * dodgeStrength; }
+          else if (yIn > 0) { anim.SetTrigger("Dodge"); rb.velocity += transform.forward * dodgeStrength; }
+          else if (xIn < 0) { anim.SetTrigger("Dodge"); rb.velocity += -transform.right * dodgeStrength; }
+          else if (xIn > 0) { anim.SetTrigger("Dodge"); rb.velocity += transform.right * dodgeStrength; }
+          else if (yIn == 0) { anim.SetTrigger("Dodge"); rb.velocity += -transform.forward * dodgeStrength; }
         }
       }
     }
@@ -230,21 +215,26 @@ namespace SRPG {
     #endregion
 
     #region Stats
-    // public void DropInventory(Container bag) {
-    //   for (int i = 0; i < 7; i++) {
-    //     if (equipment.equipSlot[i].GetComponentInChildren<Item>()) {
-    //       Item item = equipment.equipSlot[i].GetComponentInChildren<Item>();
-    //       bag.inventory.Store(item.dItem, 1);
-    //       GameObject.Destroy(item.gameObject);
-    //     }
-    //   }
-    //   for (int i = 0; i < inventory.nSlots; i++) {
-    //     if (inventory.slot[i].amount > 0) {
-    //       bag.inventory.StoreStack(inventory.slot[i]);
-    //       inventory.RemoveStack(i);
-    //     }
-    //   }
-    // }
+    public override void Die() {
+      SetState((int)pS.Dead);
+      EnableRagdoll();
+      Timer.Delay(this, Respawn, 5);
+    }
+
+    public void DropInventory(Container bag) {
+      for (int i = 0; i < 7; i++) {
+        if (equipment.equip[i]) {
+          bag.inventory.Store(equipment.equip[i], 1);
+          GameObject.Destroy(equipment.equip[i]);
+        }
+      }
+      for (int i = 0; i < inventory.nSlots; i++) {
+        if (inventory.slot[i].amount > 0) {
+          bag.inventory.StoreStack(inventory.slot[i]);
+          inventory.RemoveStack(i);
+        }
+      }
+    }
 
     public void UpdateStamina(float amount) {
       stamina += amount;
@@ -295,7 +285,8 @@ namespace SRPG {
 
     #region Inventory
     public void ToggleInventory() {
-      if (inventoryOpen) { CloseInventory(); } else if (!inventoryOpen) { OpenInventory(); }
+      if (inventoryOpen) { CloseInventory(); }
+      else if (!inventoryOpen) { OpenInventory(); }
     }
 
     public void OpenInventory() {

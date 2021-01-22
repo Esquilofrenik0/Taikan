@@ -27,22 +27,6 @@ namespace SRPG {
       }
     }
 
-    // private void OnTriggerStay(Collider other) {
-    //   if (!IsServer) { return; }
-    //   if (other.tag == "Player") {
-    //     if (spawned) {
-    //       if (enemies.Count > 0) {
-    //         for (int i = enemies.Count - 1; i >= 0; i--) {
-    //           if (enemies[i].GetComponent<Pawn>().state == (int)pS.Dead) {
-    //             DestroyEnemy(i);
-    //           }
-    //         }
-    //       }
-    //       else { spawned = false; }
-    //     }
-    //   }
-    // }
-
     private void OnTriggerExit(Collider other) {
       if (!IsServer) { return; }
       if (other.tag == "Player") {
@@ -71,6 +55,7 @@ namespace SRPG {
             DestroyEnemy(i);
           }
         }
+        spawned = false;
         print("Enemies Unspawned!");
       }
     }
@@ -83,6 +68,9 @@ namespace SRPG {
         if (NavMesh.SamplePosition(where, out myNavHit, 100, -1)) { where = myNavHit.position; }
         GameObject spawn = Instantiate(toSpawn, where, Quaternion.identity);
         spawn.GetComponent<NetworkedObject>().Spawn();
+        Pawn pawn = spawn.GetComponent<Pawn>();
+        pawn.initRagdoll();
+        pawn.Respawn();
         enemies.Add(spawn.GetComponent<NetworkedObject>());
       }
       spawned = true;

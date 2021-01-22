@@ -14,25 +14,46 @@ namespace SRPG {
     public Transform cam;
     public DynamicCharacterAvatar avatar;
     public Dictionary<string, DnaSetter> dna;
-    public Slider heightSlider;
-    public Slider bellySlider;
-    private Coroutine getDna;
+    public Slider earSlider;
+    public Slider chinSlider;
+    public Slider jawSlider;
+    public Slider eyeSizeSlider;
+    public Slider eyeRotationSlider;
     public List<string> hairModels = new List<string>();
     private int currentHair;
+    private float mouseX = 0;
+    private Coroutine getDna;
     [HideInInspector] public string characterName = "";
     [HideInInspector] public string loadName = "";
     [HideInInspector] public string myRecipe;
 
     void OnEnable() {
       avatar.CharacterUpdated.AddListener(Updated);
-      heightSlider.onValueChanged.AddListener(HeightChange);
-      bellySlider.onValueChanged.AddListener(BellyChange);
+      earSlider.onValueChanged.AddListener(EarChange);
+      chinSlider.onValueChanged.AddListener(ChinChange);
+      jawSlider.onValueChanged.AddListener(JawChange);
+      eyeSizeSlider.onValueChanged.AddListener(EyeSizeChange);
+      eyeRotationSlider.onValueChanged.AddListener(EyeRotationChange);
     }
 
     void OnDisable() {
       avatar.CharacterUpdated.RemoveListener(Updated);
-      heightSlider.onValueChanged.RemoveListener(HeightChange);
-      bellySlider.onValueChanged.RemoveListener(BellyChange);
+      earSlider.onValueChanged.RemoveListener(EarChange);
+      chinSlider.onValueChanged.RemoveListener(ChinChange);
+      jawSlider.onValueChanged.RemoveListener(JawChange);
+      eyeSizeSlider.onValueChanged.RemoveListener(EyeSizeChange);
+      eyeRotationSlider.onValueChanged.RemoveListener(EyeRotationChange);
+    }
+
+    void OnChangeView() {
+      if (input.firstPerson) {
+        input.firstPerson = false;
+        cam.position = new Vector3(0, 1f, -2f);
+      }
+      else {
+        input.firstPerson = true;
+        cam.position = new Vector3(0, 1.5f, -1f);
+      }
     }
 
     void Start() {
@@ -43,21 +64,11 @@ namespace SRPG {
       Timer.Delay(this, SwitchMale, 0.3f);
     }
 
-    float mouseX = 0;
-
-    void Update() {
+    void FixedUpdate() {
       if (input.attack) {
         mouseX -= input.camvect.x * 5;
         transform.rotation = Quaternion.Euler(0, 180 + mouseX, 0);
-
       }
-      if (input.firstPerson) {
-        cam.position = new Vector3(0, 1.5f, -1f);
-      }
-      else {
-        cam.position = new Vector3(0, 1f, -2f);
-      }
-
     }
 
     void getDNA() {
@@ -66,8 +77,11 @@ namespace SRPG {
 
     void Updated(UMAData data) {
       dna = avatar.GetDNA();
-      heightSlider.value = dna["height"].Get();
-      bellySlider.value = dna["belly"].Get();
+      earSlider.value = dna["earsSize"].Get();
+      chinSlider.value = dna["chinPronounced"].Get();
+      jawSlider.value = dna["jawsSize"].Get();
+      eyeSizeSlider.value = dna["eyeSize"].Get();
+      eyeRotationSlider.value = dna["eyeRotation"].Get();
       avatar.BuildCharacter();
     }
 
@@ -94,13 +108,28 @@ namespace SRPG {
       }
     }
 
-    public void HeightChange(float val) {
-      dna["height"].Set(val);
+    public void EarChange(float val) {
+      dna["earsSize"].Set(val);
       avatar.BuildCharacter();
     }
 
-    public void BellyChange(float val) {
-      dna["belly"].Set(val);
+    public void ChinChange(float val) {
+      dna["chinPronounced"].Set(val);
+      avatar.BuildCharacter();
+    }
+
+    public void JawChange(float val) {
+      dna["jawsSize"].Set(val);
+      avatar.BuildCharacter();
+    }
+
+    public void EyeSizeChange(float val) {
+      dna["eyeSize"].Set(val);
+      avatar.BuildCharacter();
+    }
+
+    public void EyeRotationChange(float val) {
+      dna["eyeRotation"].Set(val);
       avatar.BuildCharacter();
     }
 

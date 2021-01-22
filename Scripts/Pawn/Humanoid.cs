@@ -19,8 +19,8 @@ namespace SRPG {
     #region Init
     public override void Respawn() {
       base.Respawn();
-      // RandomGender();
       if (GetComponent<RandomUMA>()) { GetComponent<RandomUMA>().Randomize(avatar); }
+      else { RandomGender(); }
       equipment.Dress();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
@@ -30,6 +30,7 @@ namespace SRPG {
       float male = Random.Range(0, 2);
       if (male < 1) { avatar.ChangeRace("HumanMaleDCS"); }
       else { avatar.ChangeRace("HumanFemaleDCS"); }
+      avatar.BuildCharacter();
     }
 
     public void SetHeight(float height) {
@@ -50,20 +51,26 @@ namespace SRPG {
               anim.SetBool("Aiming", true);
               anim.SetTrigger("Aim");
               SetSpeed();
+              if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 30; }
             }
           }
           else {
             SetState((int)pS.Block);
             anim.SetTrigger("Block");
+            if (equipment.weapon2.Value) { equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f); }
           }
         }
       }
       else {
-        if (anim.GetInteger("State") == (int)pS.Block) { SetState(0); }
+        if (anim.GetInteger("State") == (int)pS.Block) {
+          SetState(0);
+          if (equipment.weapon2.Value) { equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f); }
+        }
         if (aiming) {
           aiming = false;
           anim.SetBool("Aiming", false);
           SetSpeed();
+          if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 45; }
         }
       }
     }

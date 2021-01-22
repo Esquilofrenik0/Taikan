@@ -30,25 +30,21 @@ namespace SRPG {
     }
 
     private void OnTriggerEnter(Collider other) {
-      if (pawn) {
-        if (pawn.attacking) {
-          if (pawn.resetAttack) {
-            hitPawns.Clear();
-            pawn.resetAttack = false;
-          }
-          if (other.GetComponent<Pawn>()) {
-            Pawn hitPawn = other.GetComponent<Pawn>();
-            if (hitPawns.Contains(hitPawn)) { return; }
-            else if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
-            else { hitPawn.TakeDamage(pawn.damage.Value); }
-            hitPawns.Add(hitPawn);
-          }
-          else if (pawn.GetComponent<Hero>()) {
-            Hero hero = pawn.GetComponent<Hero>();
-            if (other.GetComponent<Node>()) {
-              other.GetComponent<Node>().TakeDamage(hero);
-            }
-          }
+      if (dWeapon.wType != wT.Shield && pawn && pawn.attacking) {
+        if (pawn.resetAttack) {
+          hitPawns.Clear();
+          pawn.resetAttack = false;
+        }
+        if (other.GetComponent<Pawn>()) {
+          Pawn hitPawn = other.GetComponent<Pawn>();
+          if (hitPawns.Contains(hitPawn)) { return; }
+          else if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
+          else { hitPawn.TakeDamage(pawn.damage.Value); }
+          hitPawns.Add(hitPawn);
+        }
+        else if (pawn.GetComponent<Hero>()) {
+          Hero hero = pawn.GetComponent<Hero>();
+          if (other.GetComponent<Node>()) { other.GetComponent<Node>().TakeDamage(hero); }
         }
       }
     }

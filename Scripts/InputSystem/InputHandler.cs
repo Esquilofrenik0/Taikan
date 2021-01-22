@@ -10,25 +10,25 @@ namespace SRPG {
     [HideInInspector] public Vector2 movement = Vector2.zero;
     [HideInInspector] public Vector2 camvect = Vector2.zero;
     [HideInInspector] public Vector2 mousePosition = Vector2.zero;
-    [HideInInspector] public bool firstPerson = false;
     [HideInInspector] public bool jump = false;
     [HideInInspector] public bool dodge = false;
     [HideInInspector] public bool attack = false;
     [HideInInspector] public bool block = false;
     [HideInInspector] public bool menu = false;
-    [HideInInspector] public bool inventory = false;
     [HideInInspector] public bool sprint = false;
     [HideInInspector] public bool equip = false;
     [HideInInspector] public bool crouch = false;
     [HideInInspector] public bool interact = false;
+    [HideInInspector] public bool inventory = false;
+    [HideInInspector] public bool firstPerson = false;
 
-    void FixedUpdate() {
+    void Update() {
       if (!IsLocalPlayer) { return; }
       movement = controls.Player.Movement.ReadValue<Vector2>();
       camvect = controls.Player.Camera.ReadValue<Vector2>();
       mousePosition = controls.Player.MousePosition.ReadValue<Vector2>();
-      if (controls.Player.Attack.ReadValue<float>() == 0) { attack = false; } else { attack = true; }
       if (controls.Player.Block.ReadValue<float>() == 0) { block = false; } else { block = true; }
+      if (controls.Player.Attack.ReadValue<float>() == 0) { attack = false; } else { attack = true; }
       if (controls.Player.Sprint.ReadValue<float>() == 0) { sprint = false; } else { sprint = true; }
       if (controls.Player.Crouch.ReadValue<float>() == 0) { crouch = false; } else { crouch = true; }
     }
@@ -41,58 +41,5 @@ namespace SRPG {
     public void OnDisable() {
       controls.Player.Disable();
     }
-
-    // void OnChangeView() {
-    //   if (!IsLocalPlayer) { return; }
-    //   if (firstPerson) {
-    //     firstPerson = false;
-    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.25f;
-    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
-    //   }
-    //   else {
-    //     firstPerson = true;
-    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
-    //     player.heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
-    //   }
-    // }
-
-    // void OnJump() {
-    //   if (!IsLocalPlayer) { return; }
-    //   jump = true;
-    // }
-
-    // void OnDodge() {
-    //   if (!IsLocalPlayer) { return; }
-    //   dodge = true;
-    // }
-
-    // void OnEquip() {
-    //   if (!IsLocalPlayer) { return; }
-    //   equip = true;
-    // }
-
-    // void OnMenu() {
-    //   if (!IsLocalPlayer) { return; }
-    //   if (menu) {
-    //     menu = false;
-    //     player.worldCam.Priority = 8;
-    //     HideLayer(31);
-    //   }
-    //   else {
-    //     menu = true;
-    //     player.worldCam.Priority = 10;
-    //     ShowLayer(31);
-    //   }
-    // }
-
-    // void OnInventory() {
-    //   if (!IsLocalPlayer) { return; }
-    //   inventory = true;
-    // }
-
-    // void OnInteract() {
-    //   if (!IsLocalPlayer) { return; }
-    //   interact = true;
-    // }
   }
 }

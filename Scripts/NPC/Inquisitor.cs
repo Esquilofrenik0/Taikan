@@ -15,15 +15,16 @@ namespace SRPG {
       pawn.Respawn();
     }
 
-    void FixedUpdate() {
+    void Update() {
       if (!IsServer) { return; }
       if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
-      LookForEnemy();
-      if (enemy != null) { EngageEnemy(combatSpeed); }
-      else {
-        if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
-        else { SetPatrolPoint(); }
+      if (!enemy) {
+        if (!LookForEnemy()) {
+          if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
+          else { SetPatrolPoint(); }
+        }
       }
+      else { EngageEnemy(combatSpeed); }
       pawn.anim.SetFloat("Vertical", agent.desiredVelocity.magnitude);
     }
 
