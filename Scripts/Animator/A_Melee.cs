@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class A_Melee: StateMachineBehaviour {
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
       Pawn pawn = animator.GetComponent<Pawn>();

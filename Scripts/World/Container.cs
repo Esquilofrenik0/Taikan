@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Container: MonoBehaviour {
     public Inventory inventory;

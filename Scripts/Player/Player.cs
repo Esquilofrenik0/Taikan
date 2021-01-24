@@ -5,7 +5,7 @@ using Cinemachine;
 using MLAPI;
 using MLAPI.NetworkedVar;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Player: NetworkedBehaviour {
     [Header("Components")]

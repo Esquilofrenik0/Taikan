@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class NPC: NetworkedBehaviour {
     [Header("Components")]
     public Pawn pawn;

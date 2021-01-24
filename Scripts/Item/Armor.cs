@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Armor : Item {
     [HideInInspector] public dArmor dArmor;

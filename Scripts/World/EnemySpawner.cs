@@ -4,7 +4,7 @@ using UnityEngine;
 using MLAPI;
 using UnityEngine.AI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class EnemySpawner: NetworkedBehaviour {
     public GameObject toSpawn;
     public int number = 5;

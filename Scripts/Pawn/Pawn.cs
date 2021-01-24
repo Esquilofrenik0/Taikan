@@ -6,7 +6,7 @@ using MLAPI.NetworkedVar;
 using MLAPI.Messaging;
 using Cinemachine;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Pawn: NetworkedBehaviour {
     [Header("Components")]
@@ -28,7 +28,6 @@ namespace SRPG {
     [Header("Movement")]
     [HideInInspector] public float speed = 5;
     [HideInInspector] public bool grounded = true;
-    [HideInInspector] public float gravity = -9.81f;
     [HideInInspector] public Vector3 spawnPoint;
 
     [Header("Combat")]
@@ -59,7 +58,7 @@ namespace SRPG {
       }
       anim.enabled = true;
       col.enabled = true;
-      rb.isKinematic = false;
+      if (rb) { rb.isKinematic = false; }
     }
 
     public void EnableRagdoll() {
@@ -69,7 +68,7 @@ namespace SRPG {
       }
       anim.enabled = false;
       col.enabled = false;
-      rb.isKinematic = true;
+      if (rb) { rb.isKinematic = true; }
     }
 
     public virtual void Respawn() {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   [CreateAssetMenu(fileName = "Scrap", menuName = "SRPG/Item/Scrap")]
   [System.Serializable]
   public class dScrap : dItem {

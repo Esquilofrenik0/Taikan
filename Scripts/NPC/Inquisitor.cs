@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class Inquisitor: NPC {
     public float patrolSpeed;
     public float combatSpeed;

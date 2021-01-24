@@ -9,7 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
-namespace SRPG {
+namespace Postcarbon {
   public class ImageColorPicker : MonoBehaviour, IPointerClickHandler {
     public Color selectedColor;
 

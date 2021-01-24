@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   public class A_RotateUpperBody : StateMachineBehaviour {
     public Vector3 hipsRotation;
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class UI_Bar: NetworkedBehaviour {
     public Text txt;
     public Slider slider;

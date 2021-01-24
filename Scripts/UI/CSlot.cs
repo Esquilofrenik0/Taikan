@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class CSlot: NetworkedBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     [HideInInspector] public Hero hero;
     [HideInInspector] public int number;

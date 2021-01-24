@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   public class InfluenceArea: MonoBehaviour {
     public Collider area;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Hero: Human {
     [Header("Components")]
@@ -28,11 +28,11 @@ namespace SRPG {
     public float attackCost = 5;
     public float sprintCost = 5;
     public float climbCost = 5;
-    public float dodgeStrength = 8;
+    public float dodgeStrength = 10;
+    public float jumpHeight = 4;
     public float idleSpeed = 5;
     public float crouchSpeed = 2;
     public float sprintSpeed = 8;
-    public float jumpHeight = 4;
     [HideInInspector] public float mana = 100;
     [HideInInspector] public float stamina = 100;
     [HideInInspector] public Vector3 impact = Vector3.zero;
@@ -120,7 +120,6 @@ namespace SRPG {
       if (inventoryOpen) { xIn = 0f; yIn = 0f; }
       anim.SetFloat("Horizontal", xIn * speed);
       anim.SetFloat("Vertical", yIn * speed);
-      if (state == (int)pS.Dodge) { return; }
       if (state == (int)pS.Climb) {
         if (xIn != 0 || yIn != 0) {
           if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
@@ -142,7 +141,7 @@ namespace SRPG {
         velocityChange.x = Mathf.Clamp(velocityChange.x, -10, 10);
         velocityChange.z = Mathf.Clamp(velocityChange.z, -10, 10);
         velocityChange.y = 0;
-        if (!grounded) { rb.AddForce(velocityChange*3, ForceMode.Impulse); }
+        if (!grounded || state == (int)pS.Dodge) { rb.AddForce(velocityChange*3, ForceMode.Impulse); }
         else { rb.AddForce(velocityChange, ForceMode.VelocityChange); }
       }
     }
@@ -173,7 +172,7 @@ namespace SRPG {
 
     public void Dodge(float xIn, float yIn) {
       if (grounded) {
-        if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
+        if (state == 0 || state == (int)pS.Sprint) {
           if (GetComponent<Hero>()) {
             Hero hero = GetComponent<Hero>();
             if (!hero.StaminaCost(hero.dodgeCost)) { return; }
@@ -208,6 +207,9 @@ namespace SRPG {
           else if (hit.collider.GetComponent<Container>()) {
             if (!hit.collider.GetComponent<Container>().open)
               OpenContainer(hit.collider.GetComponent<Container>());
+          }
+          else if (hit.collider.GetComponent<Stone>()){
+            hit.collider.GetComponent<Stone>().Pickup(this);
           }
         }
       }

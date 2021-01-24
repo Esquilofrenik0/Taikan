@@ -8,7 +8,7 @@ using MLAPI.NetworkedVar.Collections;
 using MLAPI.Connection;
 using System.IO;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Item: NetworkedBehaviour {
     public dItem dItem;

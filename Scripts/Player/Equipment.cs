@@ -8,7 +8,7 @@ using MLAPI.NetworkedVar.Collections;
 using MLAPI.Spawning;
 using MLAPI.Connection;
 
-namespace SRPG {
+namespace Postcarbon {
   public class Equipment: NetworkedBehaviour {
 
     public Humanoid humanoid;

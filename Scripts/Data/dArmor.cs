@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SRPG {
+namespace Postcarbon {
   [CreateAssetMenu(fileName = "Armor", menuName = "SRPG/Item/Armor")]
   [System.Serializable]
   public class dArmor : dItem {

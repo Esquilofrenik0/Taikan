@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class A_Shoot: StateMachineBehaviour {
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
       Pawn pawn = animator.GetComponent<Pawn>();

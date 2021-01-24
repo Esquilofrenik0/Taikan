@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 452e347bcffc5214d8df898a49881a7c, type: 3}
   m_Name: Shield
   m_EditorClassIdentifier: 
-  resource: {fileID: 3754091197357405519, guid: 68a3bf40e779f4b4c80a31bfbfc325db,
+  resource: {fileID: 8485075674712312136, guid: 68a3bf40e779f4b4c80a31bfbfc325db,
     type: 3}
   type: 2
   Name: Shield

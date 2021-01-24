@@ -6,7 +6,7 @@ using UMA;
 using UMA.CharacterSystem;
 using System.IO;
 
-namespace SRPG {
+namespace Postcarbon {
   public class AvatarCreator: MonoBehaviour {
     public InputHandler input;
     public InputField iLoadName;

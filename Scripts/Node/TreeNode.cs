@@ -4,13 +4,13 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
 
-namespace SRPG {
-  public class Node: NetworkedBehaviour {
+namespace Postcarbon {
+  public class TreeNode: NetworkedBehaviour {
     public Rigidbody rb;
     public Collider col;
     public dItem resource;
     public int maxHealth = 5;
-    public int unspawnTime = 20;
+    public int unspawnTime = 110;
     public int respawnTime = 10;
     [HideInInspector] public int health;
     [HideInInspector] public Vector3 pos;
@@ -33,17 +33,13 @@ namespace SRPG {
         health -= 1;
         hero.inventory.Store(resource, 1);
         if (health <= 0) {
+          transform.position += hero.transform.forward;
           rb.isKinematic = false;
-          rb.useGravity = true;
-          Vector3 force = hero.transform.forward * 100 * rb.mass;
-          rb.AddForce(force, ForceMode.Force);
-          ResetNode();
+          rb.velocity += hero.transform.forward.normalized;
+          rb.velocity += Vector3.down;
+          StartCoroutine(Respawn());
         }
       }
-    }
-
-    public void ResetNode() {
-      StartCoroutine(Respawn());
     }
 
     IEnumerator Respawn() {
@@ -61,7 +57,6 @@ namespace SRPG {
       rb.transform.position = new Vector3(pos.x, pos.y, pos.z);
       rb.transform.rotation = Quaternion.Euler(rot.x, rot.y, rot.z);
       rb.isKinematic = true;
-      rb.useGravity = false;
       health = maxHealth;
       rb.gameObject.SetActive(true);
     }

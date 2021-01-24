@@ -4,7 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class InputHandler: NetworkedBehaviour {
     [HideInInspector] public InputMaster controls;
     [HideInInspector] public Vector2 movement = Vector2.zero;

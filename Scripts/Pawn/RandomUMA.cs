@@ -4,7 +4,7 @@ using UnityEngine;
 using UMA;
 using UMA.CharacterSystem;
 
-namespace SRPG {
+namespace Postcarbon {
   public class RandomUMA: MonoBehaviour {
 
     public List<UMARandomizer> Randomizers;

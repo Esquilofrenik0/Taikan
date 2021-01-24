@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class HUD: NetworkedBehaviour {
     [HideInInspector] public Hero hero;
     [HideInInspector] private UI_Bar healthBar;

@@ -4,15 +4,14 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
 
-
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Weapon: Item {
     public GameObject fx;
     public AudioSource audioSource;
     [HideInInspector] public Pawn pawn;
     [HideInInspector] public dWeapon dWeapon;
-    [HideInInspector] public List<Pawn> hitPawns;
+    [HideInInspector] public List<Collider> hits;
 
     public override void NetworkStart() {
       base.NetworkStart();
@@ -25,26 +24,28 @@ namespace SRPG {
       gameObject.layer = 2;
     }
 
-    void Awake() {
-      dWeapon = dItem as dWeapon;
-    }
+    void Awake() { dWeapon = dItem as dWeapon; }
 
     private void OnTriggerEnter(Collider other) {
-      if (dWeapon.wType != wT.Shield && pawn && pawn.attacking) {
-        if (pawn.resetAttack) {
-          hitPawns.Clear();
-          pawn.resetAttack = false;
-        }
-        if (other.GetComponent<Pawn>()) {
-          Pawn hitPawn = other.GetComponent<Pawn>();
-          if (hitPawns.Contains(hitPawn)) { return; }
-          else if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
-          else { hitPawn.TakeDamage(pawn.damage.Value); }
-          hitPawns.Add(hitPawn);
-        }
-        else if (pawn.GetComponent<Hero>()) {
-          Hero hero = pawn.GetComponent<Hero>();
-          if (other.GetComponent<Node>()) { other.GetComponent<Node>().TakeDamage(hero); }
+      if (dWeapon.wType != wT.Shield) {
+        if (pawn && pawn.attacking) {
+          if (pawn.resetAttack) {
+            hits.Clear();
+            pawn.resetAttack = false;
+          }
+          if (hits.Contains(other)) { return; }
+          if (other.GetComponent<Pawn>()) {
+            Pawn hitPawn = other.GetComponent<Pawn>();
+            if (hitPawn.state == (int)pS.Block) { pawn.anim.SetTrigger("Impact"); }
+            else { hitPawn.TakeDamage(pawn.damage.Value); }
+          }
+          else if (pawn.GetComponent<Hero>()) {
+            Hero hero = pawn.GetComponent<Hero>();
+            if (other.GetComponent<Stone>()) { other.GetComponent<Stone>().Pickup(hero); }
+            else if (other.GetComponent<Node>()) { other.GetComponent<Node>().TakeDamage(hero); }
+            else if (other.GetComponent<TreeNode>()) { other.GetComponent<TreeNode>().TakeDamage(hero); }
+          }
+          hits.Add(other);
         }
       }
     }

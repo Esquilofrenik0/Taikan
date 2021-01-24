@@ -5,7 +5,7 @@ using UMA;
 using UMA.CharacterSystem;
 
 
-namespace SRPG {
+namespace Postcarbon {
   public class Human: Humanoid {
     public override void Respawn() {
       base.Respawn();

@@ -4,7 +4,7 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.SceneManagement;
 
-namespace SRPG {
+namespace Postcarbon {
   public class LobbyMenu: NetworkedBehaviour {
     public GameObject HUD;
     public GameObject menuPanel;

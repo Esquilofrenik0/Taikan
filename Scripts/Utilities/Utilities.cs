@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-namespace SRPG {
+namespace Postcarbon {
   //pawnState
   public enum pS { Idle, Attack, Block, Sprint, Dodge, Climb, Swim, Dead };
   //itemType

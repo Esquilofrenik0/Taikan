@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   public class ESlot: NetworkedBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler {
     public Transform slotIcon;
     [HideInInspector] public dItem dItem;

@@ -5,7 +5,7 @@ using UMA;
 using UMA.CharacterSystem;
 
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class Humanoid: Pawn {
     [Header("Components")]
@@ -45,7 +45,7 @@ namespace SRPG {
       if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) {
+          if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged && !equipment.weapon2.Value) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
@@ -57,14 +57,20 @@ namespace SRPG {
           else {
             SetState((int)pS.Block);
             anim.SetTrigger("Block");
-            if (equipment.weapon2.Value) { equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f); }
+            if (equipment.weapon2.Value) {
+              // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = false;
+              equipment.weapon2.Value.transform.localScale = new Vector3(1f, 1.5f, 0.001f);
+            }
           }
         }
       }
       else {
         if (anim.GetInteger("State") == (int)pS.Block) {
           SetState(0);
-          if (equipment.weapon2.Value) { equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f); }
+          if (equipment.weapon2.Value) {
+            // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = true;
+            equipment.weapon2.Value.transform.localScale = new Vector3(0.25f, 0.25f, 0.001f);
+          }
         }
         if (aiming) {
           aiming = false;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public class SunRotation: NetworkedBehaviour {
     public float secondsPerMinute = 1;

@@ -6,7 +6,7 @@ using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
 using MLAPI.Serialization;
 
-namespace SRPG {
+namespace Postcarbon {
   [System.Serializable]
   public struct Slot {
     public dItem dItem;
