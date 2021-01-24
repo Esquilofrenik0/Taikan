@@ -10,7 +10,7 @@ namespace Postcarbon {
   [System.Serializable]
   public struct Slot {
     public dItem dItem;
-    public int amount;
+    [Range(1, 999)] public int amount;
   }
 
   [System.Serializable]
@@ -37,7 +37,7 @@ namespace Postcarbon {
 
     public int FreeSlot() {
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].amount == 0) {
+        if (slot[i].dItem == null) {
           return i;
         }
       }
@@ -55,7 +55,7 @@ namespace Postcarbon {
         }
       }
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].amount == 0) {
+        if (slot[i].dItem == null) {
           slot[i].dItem = dItem;
           slot[i].amount = storeAmount;
           return;
@@ -74,7 +74,7 @@ namespace Postcarbon {
         }
       }
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].amount == 0) {
+        if (slot[i].dItem == null) {
           slot[i].dItem = toStore.dItem;
           slot[i].amount = toStore.amount;
           return;
@@ -84,7 +84,7 @@ namespace Postcarbon {
 
     public int SearchItem(dItem dItem) {
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].amount > 0) {
+        if (slot[i].dItem) {
           if (slot[i].dItem == dItem) {
             return i;
           }

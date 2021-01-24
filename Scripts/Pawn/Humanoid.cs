@@ -59,7 +59,7 @@ namespace Postcarbon {
             anim.SetTrigger("Block");
             if (equipment.weapon2.Value) {
               // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = false;
-              equipment.weapon2.Value.transform.localScale = new Vector3(1f, 1.5f, 0.001f);
+              equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             }
           }
         }
@@ -69,7 +69,7 @@ namespace Postcarbon {
           SetState(0);
           if (equipment.weapon2.Value) {
             // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = true;
-            equipment.weapon2.Value.transform.localScale = new Vector3(0.25f, 0.25f, 0.001f);
+            equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
           }
         }
         if (aiming) {

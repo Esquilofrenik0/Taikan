@@ -10,14 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f0047293bea148e45b893b31ec661685, type: 3}
-  m_Name: Wood
+  m_Name: Leaf
   m_EditorClassIdentifier: 
-  resource: {fileID: 3878300646211823214, guid: 99d9ec255f8551f469201903d418a9d2,
-    type: 3}
+  resource: {fileID: 0}
   type: 0
-  Name: Wood
-  description: Can be gathered from trees.
-  icon: {fileID: 21300000, guid: 02965bb096d1ff24897cfbedbc22f1a7, type: 3}
+  Name: Leaf
+  description: Gathered from bushes.
+  icon: {fileID: 21300000, guid: b2afa56667af6a249ba292fc371eb496, type: 3}
   value: 0.01
   weight: 0.01
   stack: 100
