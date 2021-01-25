@@ -9,16 +9,12 @@ namespace Postcarbon {
     public GameObject HUD;
     public GameObject menuPanel;
 
-#if UNITY_SERVER
-    void Awake(){
-      NetworkingManager.Singleton.StartServer();
-    }
-#endif
-
     void Start() {
       HUD.SetActive(false);
       menuPanel.SetActive(true);
-      // Host();
+#if UNITY_SERVER
+      Server();
+#endif
     }
 
     public void Host() {
@@ -28,6 +24,8 @@ namespace Postcarbon {
     }
 
     public void Server() {
+      Destroy(GameObject.Find("WorldCam"));
+      Destroy(GameObject.Find("HeroCam"));
       menuPanel.SetActive(false);
       HUD.SetActive(false);
       NetworkingManager.Singleton.StartServer();

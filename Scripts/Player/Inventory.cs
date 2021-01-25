@@ -9,9 +9,9 @@ using MLAPI.Serialization;
 
 namespace Postcarbon {
   [System.Serializable]
-  public class Slot {
-    public dItem dItem;
-    [Range(1, 999)] public int amount;
+  public class Slot: AutoBitWritable {
+    [SerializeField] public dItem dItem;
+    [SerializeField] [Range(1, 999)] public int amount;
   }
 
   [System.Serializable]
@@ -21,6 +21,29 @@ namespace Postcarbon {
     public NetworkedList<int> amount = new NetworkedList<int>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<int>());
     public NetworkedList<string> item = new NetworkedList<string>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<string>());
     [HideInInspector] public Database data;
+
+    void inventoryItemChanged(NetworkedListEvent<string> changeEvent) {
+      if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
+        GetComponent<HUD>().Refresh();
+      }
+      else if (GetComponent<Container>() && GetComponent<Container>().interactingHero) {
+        if (GetComponent<Container>().interactingHero.IsLocalPlayer) {
+          GetComponent<Container>().interactingHero.hud.Refresh();
+        }
+      }
+    }
+
+    void inventoryAmountChanged(NetworkedListEvent<int> changeEvent) {
+      if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
+        GetComponent<HUD>().Refresh();
+      }
+      else if (GetComponent<Container>() && GetComponent<Container>().interactingHero) {
+        if (GetComponent<Container>().interactingHero.IsLocalPlayer) {
+          GetComponent<Container>().interactingHero.hud.Refresh();
+        }
+      }
+    }
+
 
     public override void NetworkStart() {
       data = GameObject.Find("Database").GetComponent<Database>();
@@ -35,6 +58,8 @@ namespace Postcarbon {
           }
         }
       }
+      item.OnListChanged += inventoryItemChanged;
+      amount.OnListChanged += inventoryAmountChanged;
     }
 
     public int FreeSlot() {

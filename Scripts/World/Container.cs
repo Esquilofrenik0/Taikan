@@ -32,12 +32,12 @@ namespace Postcarbon {
       hero.inventory.RemoveStack(iSlotNumber);
     }
 
-    public void Retrieve(Hero hero, int cSlotNUmber) {
+    public void Retrieve(Hero hero, int cSlotNumber) {
       Slot slot = new Slot();
-      slot.amount = inventory.amount[cSlotNUmber];
-      slot.dItem = inventory.data.GetItem(inventory.item[cSlotNUmber]);
+      slot.amount = inventory.amount[cSlotNumber];
+      slot.dItem = inventory.data.GetItem(inventory.item[cSlotNumber]);
       hero.inventory.StoreStack(slot);
-      inventory.RemoveStack(cSlotNUmber);
+      inventory.RemoveStack(cSlotNumber);
     }
   }
 }

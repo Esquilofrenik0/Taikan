@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
+using MLAPI.Spawning;
 using MLAPI.NetworkedVar;
 
 namespace Postcarbon {
@@ -17,7 +18,7 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       if (GetComponent<NetworkedObject>() && GetComponent<NetworkedObject>().IsSceneObject == true) { return; }
-      if (IsServer) { owner.Value = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.NetworkId; }
+      if (IsServer) { owner.Value = SpawnManager.GetPlayerObject(OwnerClientId).NetworkId; }
       if (owner.Value != 0) {
         pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>();
         if (GetComponent<Collider>()) {

@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using MLAPI;
 using MLAPI.NetworkedVar;
+using MLAPI.NetworkedVar.Collections;
 
 namespace Postcarbon {
   [System.Serializable]

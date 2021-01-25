@@ -47,8 +47,8 @@ namespace Postcarbon {
         int freeSlot = hero.inventory.FreeSlot();
         if (freeSlot >= 0) {
           hero.container.Retrieve(hero, number);
-          Timer.Delay(this, UpdateSlot, 0.1f);
-          Timer.Delay(this, hero.hud.iSlot[freeSlot].UpdateSlot, 0.1f);
+          // Timer.Delay(this, UpdateSlot, 0.1f);
+          // Timer.Delay(this, hero.hud.iSlot[freeSlot].UpdateSlot, 0.1f);
         }
       }
     }

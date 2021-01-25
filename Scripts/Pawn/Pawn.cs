@@ -108,7 +108,7 @@ namespace Postcarbon {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
         }
-        if (equipment.weapon1.Value != 0 && GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
+        if (equipment.weapon[0] != 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
         else { Melee(); }
       }
     }
@@ -116,7 +116,8 @@ namespace Postcarbon {
     public void Melee() {
       SetState((int)pS.Attack);
       anim.SetInteger("Combo", combo);
-      anim.SetTrigger("Attack");
+      // anim.SetTrigger("Attack");
+      AniTrig("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
       combo += 1;
       combo %= 2;
@@ -124,8 +125,9 @@ namespace Postcarbon {
 
     public void Shoot() {
       SetState((int)pS.Attack);
-      anim.SetTrigger("Attack");
-      Weapon weapon = GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>();
+      // anim.SetTrigger("Attack");
+      AniTrig("Attack");
+      Weapon weapon = GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>();
       weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
       weapon.fx.SetActive(true);
       RaycastHit hit;
@@ -207,6 +209,18 @@ namespace Postcarbon {
     }
 
     public virtual void SetSpeed() {}
+
+    [ServerRPC(RequireOwnership = false)]
+    public void AniTrig(string name) {
+      anim.SetTrigger(name);
+      if (IsServer) { InvokeClientRpcOnEveryone(sAniTrig, name); }
+      else { InvokeServerRpc(AniTrig, name); }
+
+    }
+    [ClientRPC]
+    public void sAniTrig(string name) {
+      anim.SetTrigger(name);
+    }
     #endregion
   }
 }

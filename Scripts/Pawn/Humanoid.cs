@@ -45,33 +45,23 @@ namespace Postcarbon {
       if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon1.Value != 0 && equipment.weapon2.Value == 0 && GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>().dWeapon.isRanged) {
+          if (equipment.weapon[0] != 0 && equipment.weapon[1] == 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon.isRanged) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
-              anim.SetTrigger("Aim");
+              AniTrig("Aim");
               SetSpeed();
               if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 30; }
             }
           }
           else {
             SetState((int)pS.Block);
-            anim.SetTrigger("Block");
-            if (equipment.weapon2.Value != 0) {
-              // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = false;
-              GetNetworkedObject(equipment.weapon2.Value).transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-            }
+            AniTrig("Block");
           }
         }
       }
       else {
-        if (anim.GetInteger("State") == (int)pS.Block) {
-          SetState(0);
-          if (equipment.weapon2.Value != 0) {
-            // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = true;
-            GetNetworkedObject(equipment.weapon2.Value).transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-          }
-        }
+        if (anim.GetInteger("State") == (int)pS.Block) { SetState(0); }
         if (aiming) {
           aiming = false;
           anim.SetBool("Aiming", false);
@@ -120,11 +110,6 @@ namespace Postcarbon {
           dArmor dArmor = equipment.data.GetItem(equipment.equip[i + 2]) as dArmor;
           defense.Value += dArmor.defense;
         }
-      }
-      if (!IsLocalPlayer) { return; }
-      if (GetComponent<HUD>()) {
-        GetComponent<HUD>().Refresh();
-        GetComponent<HUD>().DisplayStats();
       }
     }
     #endregion

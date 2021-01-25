@@ -28,9 +28,10 @@ namespace Postcarbon {
       // slot = hero.inventory.slot[number];
       slot.amount = hero.inventory.amount[number];
       slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
-      if (slot.amount > 0) {
+      if (slot.dItem) {
         textAmount.text = slot.amount.ToString();
-        if (slot.amount == 1) { textAmount.gameObject.SetActive(false); } else { textAmount.gameObject.SetActive(true); }
+        if (slot.amount == 1) { textAmount.gameObject.SetActive(false); } 
+        else { textAmount.gameObject.SetActive(true); }
         slotIcon.GetComponent<Image>().sprite = slot.dItem.icon;
       }
       else {
@@ -44,12 +45,12 @@ namespace Postcarbon {
       // slot = hero.inventory.slot[number];
       slot.amount = hero.inventory.amount[number];
       slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
-      if (slot.amount > 0) {
+      if (slot.dItem) {
         if (hero.containerOpen) {
           int freeSlot = hero.container.inventory.FreeSlot();
           if (freeSlot >= 0) {
             hero.container.Store(hero, number);
-            Timer.Delay(this,hero.hud.cSlot[freeSlot].UpdateSlot,0.1f);
+            // Timer.Delay(this,hero.hud.cSlot[freeSlot].UpdateSlot,0.1f);
           }
         }
         else {
@@ -58,7 +59,7 @@ namespace Postcarbon {
             hero.inventory.RemoveStack(number);
           }
         }
-        Timer.Delay(this,UpdateSlot,0.1f);
+        // Timer.Delay(this,UpdateSlot,0.1f);
       }
     }
 
@@ -67,7 +68,7 @@ namespace Postcarbon {
       slot.amount = hero.inventory.amount[number];
       slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
       bgImage.color = new Vector4(255, 255, 0, 200);
-      if (slot.amount > 0) { hero.hud.DisplayInfo(slot.dItem); }
+      if (slot.dItem) { hero.hud.DisplayInfo(slot.dItem); }
     }
 
     public void OnPointerExit(PointerEventData pointerEventData) {

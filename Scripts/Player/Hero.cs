@@ -344,21 +344,6 @@ namespace Postcarbon {
         hud.Refresh();
       }
     }
-
-    public void ClickItem(dItem dItem, int number) {
-      if (containerOpen) {
-        int freeSlot = container.inventory.FreeSlot();
-        if (freeSlot >= 0) { container.Store(this, number); }
-      }
-      else {
-        if (dItem.type == iT.Armor || dItem.type == iT.Weapon) {
-          equipment.EquipItem(dItem);
-          inventory.RemoveStack(number);
-        }
-      }
-      Timer.Delay(this, hud.Refresh, 0.1f);
-      Timer.Delay(this, hud.DisplayStats, 0.1f);
-    }
     #endregion
   }
 }
