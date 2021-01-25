@@ -11,7 +11,6 @@ namespace Postcarbon {
     [Header("Components")]
     public Hero hero;
     public InputHandler input;
-    public NetworkedVarULong netID = new NetworkedVarULong(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
     [HideInInspector] public Camera cam;
     [HideInInspector] public CinemachineVirtualCamera heroCam;
     [HideInInspector] public CinemachineVirtualCamera worldCam;
@@ -19,14 +18,10 @@ namespace Postcarbon {
 
     public override void NetworkStart() {
       base.NetworkStart();
-      if (IsServer) {
-        NetworkedObject player = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject;
-        netID.Value = player.NetworkId;
-      }
       hero.initRagdoll();
+      // if(hero.recipeAvatar != null){hero.LoadAvatar(hero.recipeAvatar);}
     }
 
-    #region Unity
     void Start() {
       if (!IsLocalPlayer) { return; }
       hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
@@ -39,7 +34,7 @@ namespace Postcarbon {
       worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
       worldCam.Priority = 8;
       gameObject.layer = 9;
-      hero.LoadAvatar();
+      hero.LoadAvatar(hero.GetAvatar());
       hero.hud.initHUD();
       hero.Respawn();
     }
@@ -69,7 +64,6 @@ namespace Postcarbon {
       if (hero.state == (int)pS.Dead) { return; }
       hero.Look(input.camvect.x, input.camvect.y);
     }
-    #endregion
 
     #region Controls
     void OnJump() {

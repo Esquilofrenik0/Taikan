@@ -18,7 +18,7 @@ namespace Postcarbon {
     void Start() {
       HUD.SetActive(false);
       menuPanel.SetActive(true);
-      Host();
+      // Host();
     }
 
     public void Host() {

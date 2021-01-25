@@ -25,7 +25,9 @@ namespace Postcarbon {
     }
 
     public void UpdateSlot() {
-      slot = hero.inventory.slot[number];
+      // slot = hero.inventory.slot[number];
+      slot.amount = hero.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
       if (slot.amount > 0) {
         textAmount.text = slot.amount.ToString();
         if (slot.amount == 1) { textAmount.gameObject.SetActive(false); } else { textAmount.gameObject.SetActive(true); }
@@ -39,15 +41,31 @@ namespace Postcarbon {
     }
 
     public void OnPointerClick(PointerEventData pointerEventData) {
-      slot = hero.inventory.slot[number];
+      // slot = hero.inventory.slot[number];
+      slot.amount = hero.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
       if (slot.amount > 0) {
-        hero.ClickItem(slot.dItem, number);
-        UpdateSlot();
+        if (hero.containerOpen) {
+          int freeSlot = hero.container.inventory.FreeSlot();
+          if (freeSlot >= 0) {
+            hero.container.Store(hero, number);
+            Timer.Delay(this,hero.hud.cSlot[freeSlot].UpdateSlot,0.1f);
+          }
+        }
+        else {
+          if (slot.dItem.type == iT.Armor || slot.dItem.type == iT.Weapon) {
+            hero.equipment.EquipItem(slot.dItem);
+            hero.inventory.RemoveStack(number);
+          }
+        }
+        Timer.Delay(this,UpdateSlot,0.1f);
       }
     }
 
     public void OnPointerEnter(PointerEventData pointerEventData) {
-      slot = hero.inventory.slot[number];
+      // slot = hero.inventory.slot[number];
+      slot.amount = hero.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
       bgImage.color = new Vector4(255, 255, 0, 200);
       if (slot.amount > 0) { hero.hud.DisplayInfo(slot.dItem); }
     }

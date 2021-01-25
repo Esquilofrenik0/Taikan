@@ -5,7 +5,6 @@ using UnityEngine;
 namespace Postcarbon {
   [System.Serializable]
   public class dItem : ScriptableObject {
-    public GameObject resource = null;
     public iT type = iT.Scrap;
     public string Name = null;
     public string description = null;

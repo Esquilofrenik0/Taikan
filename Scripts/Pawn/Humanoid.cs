@@ -21,7 +21,7 @@ namespace Postcarbon {
       base.Respawn();
       if (GetComponent<RandomUMA>()) { GetComponent<RandomUMA>().Randomize(avatar); }
       else { RandomGender(); }
-      equipment.Dress();
+      equipment.init();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
     }
@@ -45,7 +45,7 @@ namespace Postcarbon {
       if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged && !equipment.weapon2.Value) {
+          if (equipment.weapon1.Value != 0 && equipment.weapon2.Value == 0 && GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>().dWeapon.isRanged) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
@@ -57,9 +57,9 @@ namespace Postcarbon {
           else {
             SetState((int)pS.Block);
             anim.SetTrigger("Block");
-            if (equipment.weapon2.Value) {
+            if (equipment.weapon2.Value != 0) {
               // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = false;
-              equipment.weapon2.Value.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+              GetNetworkedObject(equipment.weapon2.Value).transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             }
           }
         }
@@ -67,9 +67,9 @@ namespace Postcarbon {
       else {
         if (anim.GetInteger("State") == (int)pS.Block) {
           SetState(0);
-          if (equipment.weapon2.Value) {
+          if (equipment.weapon2.Value != 0) {
             // equipment.weapon2.Value.GetComponent<Collider>().isTrigger = true;
-            equipment.weapon2.Value.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+            GetNetworkedObject(equipment.weapon2.Value).transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
           }
         }
         if (aiming) {
@@ -109,15 +109,15 @@ namespace Postcarbon {
       defense.Value = baseDefense;
       damage.Value = baseDamage;
       for (int i = 0; i < 2; i++) {
-        if (equipment.equip[i]) {
-          dWeapon dWeapon = equipment.equip[i] as dWeapon;
+        if (equipment.equip[i] != null) {
+          dWeapon dWeapon = equipment.data.GetItem(equipment.equip[i]) as dWeapon;
           defense.Value += dWeapon.defense;
           damage.Value += dWeapon.damage;
         }
       }
       for (int i = 0; i < 5; i++) {
-        if (equipment.equip[i + 2]) {
-          dArmor dArmor = equipment.equip[i + 2] as dArmor;
+        if (equipment.equip[i + 2] != null) {
+          dArmor dArmor = equipment.data.GetItem(equipment.equip[i + 2]) as dArmor;
           defense.Value += dArmor.defense;
         }
       }

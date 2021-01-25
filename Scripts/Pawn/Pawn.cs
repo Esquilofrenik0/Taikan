@@ -108,7 +108,7 @@ namespace Postcarbon {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
         }
-        if (equipment.weapon1.Value && equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
+        if (equipment.weapon1.Value != 0 && GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
         else { Melee(); }
       }
     }
@@ -125,7 +125,7 @@ namespace Postcarbon {
     public void Shoot() {
       SetState((int)pS.Attack);
       anim.SetTrigger("Attack");
-      Weapon weapon = equipment.weapon1.Value.GetComponent<Weapon>();
+      Weapon weapon = GetNetworkedObject(equipment.weapon1.Value).GetComponent<Weapon>();
       weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
       weapon.fx.SetActive(true);
       RaycastHit hit;
@@ -206,7 +206,7 @@ namespace Postcarbon {
       SetSpeed();
     }
 
-    public virtual void SetSpeed() { }
+    public virtual void SetSpeed() {}
     #endregion
   }
 }

@@ -10,16 +10,20 @@ namespace Postcarbon {
     public GameObject fx;
     public AudioSource audioSource;
     [HideInInspector] public Pawn pawn;
+    [HideInInspector] public NetworkedVar<ulong> owner = new NetworkedVar<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
     [HideInInspector] public dWeapon dWeapon;
     [HideInInspector] public List<Collider> hits;
 
     public override void NetworkStart() {
       base.NetworkStart();
       if (GetComponent<NetworkedObject>() && GetComponent<NetworkedObject>().IsSceneObject == true) { return; }
-      pawn = GetComponentInParent<Pawn>();
-      if (GetComponent<Collider>()) {
-        GetComponent<Collider>().isTrigger = true;
-        Physics.IgnoreCollision(GetComponent<Collider>(), pawn.GetComponent<Collider>());
+      if (IsServer) { owner.Value = NetworkingManager.Singleton.ConnectedClients[OwnerClientId].PlayerObject.NetworkId; }
+      if (owner.Value != 0) {
+        pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>();
+        if (GetComponent<Collider>()) {
+          GetComponent<Collider>().isTrigger = true;
+          Physics.IgnoreCollision(GetComponent<Collider>(), pawn.GetComponent<Collider>());
+        }
       }
       gameObject.layer = 2;
     }

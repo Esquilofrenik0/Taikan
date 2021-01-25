@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using MLAPI;
+using MLAPI.NetworkedVar;
+using MLAPI.Messaging;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -9,7 +12,7 @@ namespace Postcarbon {
     [Header("Components")]
     public Player player;
     public HUD hud;
-    [HideInInspector] public string recipeAvatar;
+    public string recipeAvatar;
 
     [Header("Camera")]
     public GameObject camTarget;
@@ -45,15 +48,21 @@ namespace Postcarbon {
     [HideInInspector] public GameObject[] iSlot;
 
     #region Init
-    public void LoadAvatar() {
+    public string GetAvatar() {
       if (File.Exists(Application.persistentDataPath + "/Avatar.txt")) {
         recipeAvatar = File.ReadAllText(Application.persistentDataPath + "/Avatar.txt");
-        avatar.ClearSlots();
-        avatar.LoadFromRecipeString(recipeAvatar);
-        avatar.name = "Player";
-        avatar.BuildCharacter();
+        return recipeAvatar;
       }
+      return null;
     }
+
+    public void LoadAvatar(string recipe) {
+      avatar.ClearSlots();
+      avatar.LoadFromRecipeString(recipe);
+      avatar.name = "Player";
+      avatar.BuildCharacter();
+    }
+
 
     public void Teleport(Vector3 pos) { transform.position = pos; }
 
@@ -70,7 +79,7 @@ namespace Postcarbon {
         avatar.GetDNA()["height"].Set(0.6f);
         avatar.SetSlot("Underwear", "FemaleUndies2");
       }
-      equipment.Dress();
+      equipment.init();
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
@@ -141,7 +150,7 @@ namespace Postcarbon {
         velocityChange.x = Mathf.Clamp(velocityChange.x, -10, 10);
         velocityChange.z = Mathf.Clamp(velocityChange.z, -10, 10);
         velocityChange.y = 0;
-        if (!grounded || state == (int)pS.Dodge) { rb.AddForce(velocityChange*3, ForceMode.Impulse); }
+        if (!grounded || state == (int)pS.Dodge) { rb.AddForce(velocityChange * 3, ForceMode.Impulse); }
         else { rb.AddForce(velocityChange, ForceMode.VelocityChange); }
       }
     }
@@ -208,7 +217,7 @@ namespace Postcarbon {
             if (!hit.collider.GetComponent<Container>().open)
               OpenContainer(hit.collider.GetComponent<Container>());
           }
-          else if (hit.collider.GetComponent<Stone>()){
+          else if (hit.collider.GetComponent<Stone>()) {
             hit.collider.GetComponent<Stone>().Pickup(this);
           }
         }
@@ -224,15 +233,12 @@ namespace Postcarbon {
     }
 
     public void DropInventory(Container bag) {
-      for (int i = 0; i < 7; i++) {
-        if (equipment.equip[i]) {
-          bag.inventory.Store(equipment.equip[i], 1);
-          GameObject.Destroy(equipment.equip[i]);
-        }
-      }
       for (int i = 0; i < inventory.nSlots; i++) {
-        if (inventory.slot[i].amount > 0) {
-          bag.inventory.StoreStack(inventory.slot[i]);
+        if (inventory.amount[i] > 0) {
+          Slot slot = new Slot();
+          slot.amount = inventory.amount[i];
+          slot.dItem = inventory.data.GetItem(inventory.item[i]);
+          bag.inventory.StoreStack(slot);
           inventory.RemoveStack(i);
         }
       }
@@ -323,7 +329,8 @@ namespace Postcarbon {
       for (int i = 0; i < container.inventory.nSlots; i++) {
         hud.cSlot[i].number = i;
         hud.cSlot[i].hero = this;
-        hud.cSlot[i].slot = container.inventory.slot[i];
+        hud.cSlot[i].slot.amount = container.inventory.amount[i];
+        hud.cSlot[i].slot.dItem = inventory.data.GetItem(container.inventory.item[i]);
         hud.cSlot[i].UpdateSlot();
       }
       hud.cSlots(container.inventory.nSlots);
@@ -341,7 +348,7 @@ namespace Postcarbon {
     public void ClickItem(dItem dItem, int number) {
       if (containerOpen) {
         int freeSlot = container.inventory.FreeSlot();
-        if (freeSlot >= 0) { container.Store(number); }
+        if (freeSlot >= 0) { container.Store(this, number); }
       }
       else {
         if (dItem.type == iT.Armor || dItem.type == iT.Weapon) {
@@ -349,8 +356,8 @@ namespace Postcarbon {
           inventory.RemoveStack(number);
         }
       }
-      hud.Refresh();
-      hud.DisplayStats();
+      Timer.Delay(this, hud.Refresh, 0.1f);
+      Timer.Delay(this, hud.DisplayStats, 0.1f);
     }
     #endregion
   }

@@ -21,8 +21,8 @@ namespace Postcarbon {
     }
 
     public void UpdateSlot() {
-      if (hero.equipment.equip[number]) {
-        dItem = hero.equipment.equip[number];
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.data.GetItem(hero.equipment.equip[number]);
         slotIcon.GetComponent<Image>().sprite = dItem.icon;
         empty = false;
       }
@@ -35,8 +35,8 @@ namespace Postcarbon {
 
     public void OnPointerClick(PointerEventData pointerEventData) {
       if (!hero) { return; }
-      if (hero.equipment.equip[number]) {
-        dItem = hero.equipment.equip[number];
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.data.GetItem(hero.equipment.equip[number]);
         int slot = hero.equipment.GetSlot(dItem);
         hero.equipment.UnequipItem(slot);
       }
@@ -46,8 +46,8 @@ namespace Postcarbon {
     public void OnPointerEnter(PointerEventData pointerEventData) {
       if (!hero) { return; }
       bgImage.color = new Vector4(255, 255, 0, 200);
-      if (hero.equipment.equip[number]) {
-        dItem = hero.equipment.equip[number];
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.data.GetItem(hero.equipment.equip[number]);
         hero.hud.DisplayInfo(dItem);
       }
       UpdateSlot();

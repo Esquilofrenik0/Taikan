@@ -23,7 +23,9 @@ namespace Postcarbon {
     }
 
     public void UpdateSlot() {
-      slot = hero.container.inventory.slot[number];
+      // slot = hero.container.inventory.slot[number];
+      slot.amount = hero.container.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
       if (slot.amount > 0) {
         textAmount.text = slot.amount.ToString();
         if (slot.amount == 1) { textAmount.gameObject.SetActive(false); }
@@ -38,20 +40,24 @@ namespace Postcarbon {
     }
 
     public void OnPointerClick(PointerEventData pointerEventData) {
-      slot = hero.container.inventory.slot[number];
+      // slot = hero.container.inventory.slot[number];
+      slot.amount = hero.container.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
       if (slot.amount > 0) {
         int freeSlot = hero.inventory.FreeSlot();
         if (freeSlot >= 0) {
-          hero.container.Retrieve(number);
-          hero.hud.iSlot[freeSlot].UpdateSlot();
-          UpdateSlot();
+          hero.container.Retrieve(hero, number);
+          Timer.Delay(this, UpdateSlot, 0.1f);
+          Timer.Delay(this, hero.hud.iSlot[freeSlot].UpdateSlot, 0.1f);
         }
       }
     }
 
     public void OnPointerEnter(PointerEventData pointerEventData) {
       bgImage.color = new Vector4(255, 255, 0, 200);
-      slot = hero.container.inventory.slot[number];
+      // slot = hero.container.inventory.slot[number];
+      slot.amount = hero.container.inventory.amount[number];
+      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
       if (slot.amount > 0) { hero.hud.DisplayInfo(slot.dItem); }
     }
 

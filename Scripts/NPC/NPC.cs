@@ -74,7 +74,7 @@ namespace Postcarbon {
         agent.isStopped = false;
         agent.speed = speed;
         agent.SetDestination(enemy.transform.position);
-        if (pawn.equipment.weapon1.Value && pawn.equipment.weapon1.Value.GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
+        if (pawn.equipment.weapon1.Value != 0 && GetNetworkedObject(pawn.equipment.weapon1.Value).GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
         else { MeleeAttack(); }
       }
       else { enemy = null; }

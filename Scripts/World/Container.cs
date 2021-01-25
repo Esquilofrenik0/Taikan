@@ -24,13 +24,19 @@ namespace Postcarbon {
       interactingHero = null;
     }
 
-    public void Store(int iSlotNumber) {
-      inventory.StoreStack(interactingHero.inventory.slot[iSlotNumber]);
-      interactingHero.inventory.RemoveStack(iSlotNumber);
+    public void Store(Hero hero, int iSlotNumber) {
+      Slot slot = new Slot();
+      slot.amount = interactingHero.inventory.amount[iSlotNumber];
+      slot.dItem = interactingHero.inventory.data.GetItem(interactingHero.inventory.item[iSlotNumber]);
+      inventory.StoreStack(slot);
+      hero.inventory.RemoveStack(iSlotNumber);
     }
 
-    public void Retrieve(int cSlotNUmber) {
-      interactingHero.inventory.StoreStack(inventory.slot[cSlotNUmber]);
+    public void Retrieve(Hero hero, int cSlotNUmber) {
+      Slot slot = new Slot();
+      slot.amount = inventory.amount[cSlotNUmber];
+      slot.dItem = inventory.data.GetItem(inventory.item[cSlotNUmber]);
+      hero.inventory.StoreStack(slot);
       inventory.RemoveStack(cSlotNUmber);
     }
   }

@@ -10,93 +10,129 @@ using MLAPI.Connection;
 
 namespace Postcarbon {
   public class Equipment: NetworkedBehaviour {
-
     public Humanoid humanoid;
-    private Database data;
-    public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
-    public NetworkedVar<GameObject> weapon1 = new NetworkedVar<GameObject>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, null);
-    public NetworkedVar<GameObject> weapon2 = new NetworkedVar<GameObject>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, null);
     public List<Transform> weaponSlot = new List<Transform>() { null, null, null, null };
-    public List<dItem> equip = new List<dItem>() { null, null, null, null, null, null, null };
+    public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
+    public NetworkedVar<ulong> weapon1 = new NetworkedVar<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+    public NetworkedVar<ulong> weapon2 = new NetworkedVar<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+    public NetworkedList<string> equip = new NetworkedList<string>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<string> { null, null, null, null, null, null, null });
+    [HideInInspector] public Database data;
     [HideInInspector] public Coroutine holsterRoutine;
     [HideInInspector] public Coroutine refreshRoutine;
-    // public NetworkedList<ulong> item = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0, 0, 0, 0, 0, 0 });
-    // public NetworkedList<string> item = new NetworkedList<string>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<string> { null, null, null, null, null, null, null });
 
-
-    void Awake() {
-      data = GameObject.Find("Database").GetComponent<Database>();
-    }
+    void Awake() { data = GameObject.Find("Database").GetComponent<Database>(); }
 
     public override void NetworkStart() {
       base.NetworkStart();
       Awake();
-      Dress();
+      init();
       Timer.rDelay(this, dHolster, 0.05f, holsterRoutine);
       Timer.rDelay(this, humanoid.RefreshStats, 0.1f, refreshRoutine);
     }
 
-    public void dHolster() {
-      Holster(holstered.Value);
-    }
-
-    public void Holster(bool equipped) {
-      nHolster(equipped);
-    }
-
-    public void nHolster(bool equipped) {
-      if (equipped) {
-        if (weapon1.Value) {
-          weapon1.Value.transform.SetParent(weaponSlot[0]);
-          weapon1.Value.transform.localPosition = Vector3.zero;
-          weapon1.Value.transform.localRotation = Quaternion.identity;
-        }
-        if (weapon2.Value) {
-          weapon2.Value.transform.SetParent(weaponSlot[1]);
-          weapon2.Value.transform.localPosition = Vector3.zero;
-          weapon2.Value.transform.localRotation = Quaternion.identity;
-        }
-      }
-      else {
-        if (weapon1.Value) {
-          weapon1.Value.transform.SetParent(weaponSlot[2]);
-          weapon1.Value.transform.localPosition = Vector3.zero;
-          weapon1.Value.transform.localRotation = Quaternion.identity;
-        }
-        if (weapon2.Value) {
-          weapon2.Value.transform.SetParent(weaponSlot[3]);
-          weapon2.Value.transform.localPosition = Vector3.zero;
-          weapon2.Value.transform.localRotation = Quaternion.identity;
-        }
-      }
-    }
-
-    public void Dress() {
-      bool build = false;
+    public void init() {
       for (int i = 0; i < 7; i++) {
-        if (i == 0) { if (equip[0] && weapon1.Value == null) { EquipItem(equip[0]); } }
-        else if (i == 1) { if (equip[1] && weapon2.Value == null) { EquipItem(equip[1]); } }
-        else if (i > 1) {
-          if (equip[i]) {
-            dArmor dArmor = equip[i] as dArmor;
-            humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.Name);
-            build = true;
-          }
+        if (i > 1) { if (equip[i] != null) { DressUp(equip[i]); } }
+        else if (i == 0) { if (equip[0] != null && weapon1.Value == 0) { EquipItem(data.GetItem(equip[0])); } }
+        else if (i == 1) { if (equip[1] != null && weapon2.Value == 0) { EquipItem(data.GetItem(equip[1])); } }
+      }
+    }
+
+    public void dHolster() { Holster(holstered.Value); }
+
+    [ServerRPC(RequireOwnership = false)]
+    public void Holster(bool equipped) {
+      if (IsServer) {
+        nHolster(equipped);
+        InvokeClientRpcOnEveryone(nHolster, equipped);
+      }
+      else { InvokeServerRpc(Holster, equipped); }
+    }
+
+    [ClientRPC]
+    public void nHolster(bool equipped) {
+      if (weapon1.Value != 0) {
+        NetworkedObject w1 = GetNetworkedObject(weapon1.Value);
+        if (equipped) {
+          w1.transform.SetParent(weaponSlot[0]);
+          w1.transform.localPosition = Vector3.zero;
+          w1.transform.localRotation = Quaternion.identity;
+        }
+        else {
+          w1.transform.SetParent(weaponSlot[2]);
+          w1.transform.localPosition = Vector3.zero;
+          w1.transform.localRotation = Quaternion.identity;
         }
       }
-      if (build) { humanoid.avatar.BuildCharacter(); }
+      if (weapon2.Value != 0) {
+        NetworkedObject w2 = GetNetworkedObject(weapon2.Value);
+        if (equipped) {
+          w2.transform.SetParent(weaponSlot[1]);
+          w2.transform.localPosition = Vector3.zero;
+          w2.transform.localRotation = Quaternion.identity;
+        }
+        else {
+          w2.transform.SetParent(weaponSlot[3]);
+          w2.transform.localPosition = Vector3.zero;
+          w2.transform.localRotation = Quaternion.identity;
+        }
+      }
     }
 
     public void EquipItem(dItem dItem) {
       int slot = GetSlot(dItem);
       ClearSlot(slot, dItem);
-      UpdateSlot(slot, dItem);
       if (slot < 2) {
-        if (IsServer) { SpawnEquip(slot, dItem.name, OwnerClientId); }
-        else { InvokeServerRpc(SpawnEquip, slot, dItem.name, OwnerClientId); }
+        if (slot == 0) {
+          dWeapon dWeapon = dItem as dWeapon;
+          humanoid.anim.SetInteger("Weapon", (int)dWeapon.wType);
+        }
+        else if (slot == 1) {
+          dWeapon dWeapon = dItem as dWeapon;
+          if (dWeapon.wType == wT.Shield) { humanoid.anim.SetBool("Shield", true); }
+        }
+        if (IsServer) { SpawnWeapon(slot, dItem.name, OwnerClientId); }
+        else { InvokeServerRpc(SpawnWeapon, slot, dItem.name, OwnerClientId); }
       }
+      else { DressUp(dItem.name); }
+      equip[slot] = dItem.name;
       Timer.rDelay(this, dHolster, 0.05f, holsterRoutine);
       Timer.rDelay(this, humanoid.RefreshStats, 0.1f, refreshRoutine);
+    }
+
+    [ServerRPC(RequireOwnership = false)]
+    public void SpawnWeapon(int slot, string name, ulong clientID) {
+      dWeapon dWeapon = data.GetItem(name) as dWeapon;
+      NetworkedObject spawn = Instantiate(dWeapon.resource, weaponSlot[slot]).GetComponent<NetworkedObject>();
+      spawn.SpawnWithOwnership(clientID);
+      if (slot == 0) { weapon1.Value = spawn.NetworkId; }
+      else if (slot == 1) { weapon2.Value = spawn.NetworkId; }
+    }
+
+    [ServerRPC(RequireOwnership = false)]
+    public void DressUp(string name) {
+      if (IsServer) { InvokeClientRpcOnEveryone(nDressUp, name); }
+      else { InvokeServerRpc(DressUp, name); }
+    }
+
+    [ClientRPC]
+    public void nDressUp(string name) {
+      dArmor dArmor = data.GetItem(name) as dArmor;
+      humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.Name);
+      humanoid.avatar.BuildCharacter();
+    }
+
+    [ServerRPC(RequireOwnership = false)]
+    public void Undress(int slot) {
+      if (IsServer) { InvokeClientRpcOnEveryone(nUndress, slot); }
+      else { InvokeServerRpc(Undress, slot); }
+    }
+
+    [ClientRPC]
+    public void nUndress(int slot) {
+      aS armorSlot = (aS)(slot - 2);
+      humanoid.avatar.ClearSlot(armorSlot.ToString());
+      humanoid.avatar.BuildCharacter();
     }
 
     public void ClearSlot(int slot, dItem dItem) {
@@ -104,68 +140,39 @@ namespace Postcarbon {
       if (slot < 2) {
         dWeapon dWeapon = dItem as dWeapon;
         if (slot == 0) {
-          if (dWeapon.weaponSlot == wS.TwoHand) {
-            UnequipItem(WeaponSlot(1));
-          }
+          if (dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(1)); }
         }
         else if (slot == 1) {
-          if (weapon1.Value != null && weapon1.Value.GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); }
+          if (weapon1.Value != 0 && GetNetworkedObject(weapon1.Value).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); }
         }
       }
-    }
-
-    public void UpdateSlot(int slot, dItem dItem) {
-      if (slot == 0) {
-        dWeapon dWeapon = dItem as dWeapon;
-        humanoid.anim.SetInteger("Weapon", (int)dWeapon.wType);
-      }
-      else if (slot == 1) {
-        dWeapon dWeapon = dItem as dWeapon;
-        if (dWeapon.wType == wT.Shield) { humanoid.anim.SetBool("Shield", true); }
-      }
-      else {
-        dArmor dArmor = dItem as dArmor;
-        humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.Name);
-        humanoid.avatar.BuildCharacter();
-      }
-      equip[slot] = dItem;
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void SpawnEquip(int slot, string name, ulong clientID) {
-      dItem dItem = data.GetItem(name);
-      NetworkedObject spawn = Instantiate(dItem.resource, weaponSlot[slot]).GetComponent<NetworkedObject>();
-      spawn.SpawnWithOwnership(clientID);
-      if (slot == 0) { weapon1.Value = GetNetworkedObject(spawn.NetworkId).gameObject; }
-      else if (slot == 1) { weapon2.Value = GetNetworkedObject(spawn.NetworkId).gameObject; }
     }
 
     public void UnequipItem(int slot) {
-      if (!equip[slot]) { return; }
+      if (equip[slot] == null) { return; }
       InvokeServerRpc(sUnequipItem, slot);
     }
 
     [ServerRPC(RequireOwnership = false)]
     public void sUnequipItem(int slot) {
-      if (!equip[slot]) { return; }
-      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip[slot], 1); }
-      if (slot > 1) {
-        dArmor dArmor = equip[slot] as dArmor;
-        humanoid.avatar.ClearSlot(dArmor.armorSlot.ToString());
-        humanoid.avatar.BuildCharacter();
-      }
+      if (equip[slot] == null) { return; }
+      dItem dItem = data.GetItem(equip[slot]);
+      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(dItem, 1); }
+      if (slot > 1) { Undress(slot); }
       else {
-        if (slot == 0 && weapon1.Value) {
+        if (slot == 0 && weapon1.Value != 0) {
           humanoid.anim.SetInteger("Weapon", 0);
-          weapon1.Value.GetComponent<NetworkedObject>().UnSpawn();
-          Destroy(weapon1.Value);
-          weapon1.Value = null;
+          GameObject toDestroy = GetNetworkedObject(weapon1.Value).gameObject;
+          toDestroy.GetComponent<NetworkedObject>().UnSpawn();
+          Destroy(toDestroy);
+          weapon1.Value = 0;
         }
-        else if (slot == 1 && weapon2.Value) {
+        else if (slot == 1 && weapon2.Value != 0) {
           humanoid.anim.SetBool("Shield", false);
-          weapon2.Value.GetComponent<NetworkedObject>().UnSpawn();
-          Destroy(weapon2.Value);
-          weapon2.Value = null;
+          GameObject toDestroy = GetNetworkedObject(weapon2.Value).gameObject;
+          toDestroy.GetComponent<NetworkedObject>().UnSpawn();
+          Destroy(toDestroy);
+          weapon2.Value = 0;
         }
       }
       equip[slot] = null;

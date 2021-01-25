@@ -4,11 +4,12 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
+using MLAPI.NetworkedVar.Collections;
 using MLAPI.Serialization;
 
 namespace Postcarbon {
   [System.Serializable]
-  public struct Slot {
+  public class Slot {
     public dItem dItem;
     [Range(1, 999)] public int amount;
   }
@@ -16,28 +17,29 @@ namespace Postcarbon {
   [System.Serializable]
   public class Inventory: NetworkedBehaviour {
     public int nSlots = 16;
-    public Slot[] slot;
+    public List<Slot> initItems;
+    public NetworkedList<int> amount = new NetworkedList<int>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<int>());
+    public NetworkedList<string> item = new NetworkedList<string>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<string>());
+    [HideInInspector] public Database data;
 
-    public void Awake() {
-      Slot[] _slot = new Slot[nSlots];
-      for (int i = 0; i < nSlots; i++) {
-        if (i < slot.Length) {
-          _slot[i] = slot[i];
-        }
-        else {
-          Slot spawn = new Slot();
-          spawn.amount = 0;
-          spawn.dItem = null;
-          _slot[i].amount = 0;
-          _slot[i].dItem = null;
+    public override void NetworkStart() {
+      data = GameObject.Find("Database").GetComponent<Database>();
+      if (IsServer || IsLocalPlayer) {
+        for (int i = 0; i < nSlots; i++) {
+          item.Add(null);
+          amount.Add(0);
+          if (initItems.Count > i) {
+            item[i] = initItems[i].dItem.name;
+            if (initItems[i].amount > initItems[i].dItem.stack) { initItems[i].amount = initItems[i].dItem.stack; }
+            amount[i] = initItems[i].amount;
+          }
         }
       }
-      slot = _slot;
     }
 
     public int FreeSlot() {
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].dItem == null) {
+        if (item[i] == null) {
           return i;
         }
       }
@@ -48,16 +50,16 @@ namespace Postcarbon {
       if (dItem.stack > 1) {
         int number = SearchItem(dItem);
         if (number >= 0) {
-          if (slot[number].amount + storeAmount <= dItem.stack) {
-            slot[number].amount += storeAmount;
+          if (amount[number] + storeAmount <= dItem.stack) {
+            amount[number] += storeAmount;
             return;
           }
         }
       }
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].dItem == null) {
-          slot[i].dItem = dItem;
-          slot[i].amount = storeAmount;
+        if (item[i] == null) {
+          item[i] = dItem.name;
+          amount[i] = storeAmount;
           return;
         }
       }
@@ -67,16 +69,16 @@ namespace Postcarbon {
       if (toStore.dItem.stack > 1) {
         int number = SearchItem(toStore.dItem);
         if (number >= 0) {
-          if (slot[number].amount + toStore.amount <= toStore.dItem.stack) {
-            slot[number].amount += toStore.amount;
+          if (amount[number] + toStore.amount <= toStore.dItem.stack) {
+            amount[number] += toStore.amount;
             return;
           }
         }
       }
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].dItem == null) {
-          slot[i].dItem = toStore.dItem;
-          slot[i].amount = toStore.amount;
+        if (item[i] == null) {
+          item[i] = toStore.dItem.name;
+          amount[i] = toStore.amount;
           return;
         }
       }
@@ -84,8 +86,8 @@ namespace Postcarbon {
 
     public int SearchItem(dItem dItem) {
       for (int i = 0; i < nSlots; i++) {
-        if (slot[i].dItem) {
-          if (slot[i].dItem == dItem) {
+        if (item[i] != null) {
+          if (item[i] == dItem.name) {
             return i;
           }
         }
@@ -93,16 +95,16 @@ namespace Postcarbon {
       return -1;
     }
 
-    public void Remove(int number, int amount) {
-      slot[number].amount -= amount;
-      if (slot[number].amount <= 0) {
+    public void Remove(int number, int removeAmount) {
+      amount[number] -= removeAmount;
+      if (amount[number] <= 0) {
         RemoveStack(number);
       }
     }
 
     public void RemoveStack(int number) {
-      slot[number].amount = 0;
-      slot[number].dItem = null;
+      amount[number] = 0;
+      item[number] = null;
     }
   }
 }
