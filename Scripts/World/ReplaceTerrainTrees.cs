@@ -7,7 +7,7 @@ namespace Postcarbon {
     public GameObject[] node;
 
     void Start() {
-      Terrain[] world = GameObject.Find("MapMagic").GetComponentsInChildren<Terrain>();
+      Terrain[] world = GameObject.Find("World/Terrain/Main").GetComponentsInChildren<Terrain>();
       GameObject parent = GameObject.Find("Vegetation");
       for (int i = 0; i < world.Length; i++) {
         foreach (TreeInstance tree in world[i].terrainData.treeInstances) {

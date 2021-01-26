@@ -7,6 +7,8 @@ using MLAPI.NetworkedVar;
 using MLAPI.NetworkedVar.Collections;
 using MLAPI.Spawning;
 using MLAPI.Connection;
+using MLAPI.Serialization;
+using System.IO;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -55,10 +57,7 @@ namespace Postcarbon {
 
     [ServerRPC(RequireOwnership = false)]
     public void Holster(bool equipped) {
-      if (IsServer) {
-        nHolster(equipped);
-        InvokeClientRpcOnEveryone(nHolster, equipped);
-      }
+      if (IsServer) { InvokeClientRpcOnEveryone(nHolster, equipped); }
       else { InvokeServerRpc(Holster, equipped); }
     }
 
@@ -79,8 +78,8 @@ namespace Postcarbon {
       UnequipItem(slot);
       if (slot < 2) {
         dWeapon dWeapon = dItem as dWeapon;
-        if (slot == 0) { if (dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(1)); } }
-        else if (slot == 1) { if (weapon[0] != 0 && GetNetworkedObject(weapon[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(WeaponSlot(0)); } }
+        if (slot == 0) { if (dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(1); } }
+        else if (slot == 1) { if (weapon[0] != 0 && GetNetworkedObject(weapon[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(0); } }
       }
     }
 
@@ -100,18 +99,23 @@ namespace Postcarbon {
       ClearSlot(slot, dItem);
       UpdateSlot(slot, dItem);
       if (slot < 2) {
-        if (IsServer) { SpawnWeapon(slot, dItem.name, OwnerClientId); }
-        else { InvokeServerRpc(SpawnWeapon, slot, dItem.name, OwnerClientId); }
+        if (IsServer) { SpawnWeapon(slot, dItem.name); }
+        else { InvokeServerRpc(SpawnWeapon, slot, dItem.name); }
       }
       equip[slot] = dItem.name;
     }
 
     [ServerRPC(RequireOwnership = false)]
-    public void SpawnWeapon(int slot, string name, ulong clientID) {
+    public void SpawnWeapon(int slot, string name) {
       dWeapon dWeapon = data.GetItem(name) as dWeapon;
-      NetworkedObject spawn = Instantiate(dWeapon.resource, weaponSlot[slot]).GetComponent<NetworkedObject>();
-      spawn.SpawnWithOwnership(clientID);
+      Vector3 pos = new Vector3(NetworkId, NetworkId, NetworkId);
+      NetworkedObject spawn = Instantiate(dWeapon.resource, pos, Quaternion.identity, weaponSlot[slot]).GetComponent<NetworkedObject>();
+      spawn.SpawnWithOwnership(OwnerClientId);
       weapon[slot] = spawn.NetworkId;
+      spawn.GetComponent<Weapon>().pawn = humanoid;
+      if (spawn.GetComponent<Collider>()) {
+        Physics.IgnoreCollision(spawn.GetComponent<Collider>(), humanoid.col);
+      }
     }
 
     public void UnequipItem(int slot) {
@@ -124,14 +128,12 @@ namespace Postcarbon {
       if (equip[slot] == null) { return; }
       dItem dItem = data.GetItem(equip[slot]);
       if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(dItem, 1); }
-      if (slot < 1) {
-        if (weapon[slot] != 0) {
-          if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
-          else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
-          GameObject toDestroy = GetNetworkedObject(weapon[slot]).gameObject;
-          Destroy(toDestroy);
-          weapon[slot] = 0;
-        }
+      if (slot < 2 && weapon[slot] != 0) {
+        if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
+        else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
+        GameObject toDestroy = GetNetworkedObject(weapon[slot]).gameObject;
+        Destroy(toDestroy);
+        weapon[slot] = 0;
       }
       equip[slot] = null;
     }

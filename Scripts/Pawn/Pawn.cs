@@ -43,6 +43,7 @@ namespace Postcarbon {
     [HideInInspector] public Coroutine disableHealthBar;
 
     [Header("Ragdoll")]
+    public int respawnTime = 30;
     [HideInInspector] public Rigidbody[] bonesRB;
 
     #region Init
@@ -51,7 +52,15 @@ namespace Postcarbon {
       DisableRagdoll();
     }
 
+    // [ServerRPC(RequireOwnership = false)]
+    // public void DisableRagdoll() {
+    // if (IsServer) { InvokeClientRpcOnEveryone(nDisableRagdoll); }
+    // else { InvokeServerRpc(DisableRagdoll); }
+    // }
+
+    // [ClientRPC]
     public void DisableRagdoll() {
+      bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       for (int i = 0; i < bonesRB.Length; i++) {
         bonesRB[i].isKinematic = true;
         bonesRB[i].GetComponent<Collider>().enabled = false;
@@ -61,7 +70,15 @@ namespace Postcarbon {
       if (rb) { rb.isKinematic = false; }
     }
 
+    // [ServerRPC(RequireOwnership = false)]
+    // public void EnableRagdoll() {
+    // if (IsServer) { InvokeClientRpcOnEveryone(nEnableRagdoll); }
+    // else { InvokeServerRpc(EnableRagdoll); }
+    // }
+
+    // [ClientRPC]
     public void EnableRagdoll() {
+      bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       for (int i = 0; i < bonesRB.Length; i++) {
         bonesRB[i].isKinematic = false;
         bonesRB[i].GetComponent<Collider>().enabled = true;
@@ -115,6 +132,8 @@ namespace Postcarbon {
 
     public void Melee() {
       SetState((int)pS.Attack);
+      attacking = true;
+      resetAttack = true;
       anim.SetInteger("Combo", combo);
       // anim.SetTrigger("Attack");
       AniTrig("Attack");
@@ -194,10 +213,10 @@ namespace Postcarbon {
       else { return false; }
     }
 
-    public virtual void Die() {
+    public void Die() {
       SetState((int)pS.Dead);
       EnableRagdoll();
-      Timer.Delay(this, Respawn, 30);
+      Timer.Delay(this, Respawn, respawnTime);
     }
     #endregion
 
@@ -208,19 +227,19 @@ namespace Postcarbon {
       SetSpeed();
     }
 
-    public virtual void SetSpeed() {}
+    public virtual void SetSpeed() { }
     #endregion
 
     #region Animator
+
     [ServerRPC(RequireOwnership = false)]
     public void AniTrig(string name) {
-      anim.SetTrigger(name);
-      if (IsServer) { InvokeClientRpcOnEveryone(sAniTrig, name); }
+      if (IsServer) { InvokeClientRpcOnEveryone(nAniTrig, name); }
       else { InvokeServerRpc(AniTrig, name); }
 
     }
     [ClientRPC]
-    public void sAniTrig(string name) {
+    public void nAniTrig(string name) {
       anim.SetTrigger(name);
     }
     #endregion

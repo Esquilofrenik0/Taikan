@@ -226,12 +226,6 @@ namespace Postcarbon {
     #endregion
 
     #region Stats
-    public override void Die() {
-      SetState((int)pS.Dead);
-      EnableRagdoll();
-      Timer.Delay(this, Respawn, 5);
-    }
-
     public void DropInventory(Container bag) {
       for (int i = 0; i < inventory.nSlots; i++) {
         if (inventory.amount[i] > 0) {
