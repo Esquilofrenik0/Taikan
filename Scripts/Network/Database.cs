@@ -7,6 +7,7 @@ using MLAPI.Spawning;
 namespace Postcarbon {
   public class Database: NetworkedBehaviour {
     public List<dItem> database;
+    public List<dRecipe> recipes;
     
     public dItem GetItem(string name) {
       dItem dItem = null;

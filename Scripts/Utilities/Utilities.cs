@@ -7,7 +7,7 @@ namespace Postcarbon {
   //pawnState
   public enum pS { Idle, Attack, Block, Sprint, Dodge, Climb, Swim, Dead };
   //itemType
-  public enum iT { Scrap, Consumable, Weapon, Armor };
+  public enum iT { Scrap, Consumable, Weapon, Armor, Recipe };
   //armorType
   public enum aT { Light, Medium, Heavy }
   //weaponType

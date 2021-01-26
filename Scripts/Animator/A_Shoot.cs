@@ -7,7 +7,10 @@ namespace Postcarbon {
   public class A_Shoot: StateMachineBehaviour {
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
       Pawn pawn = animator.GetComponent<Pawn>();
-      // if (pawn.equipment.weapon1.Value != 0) { if pawn.equipment.weapon1.Value.GetComponent<Weapon>().fx != null) { pawn.equipment.weapon1.Value.GetComponent<Weapon>().fx.SetActive(false); } }
+      if (pawn.equipment.weaponSlot[0].GetChild(0).GetComponent<Weapon>()) {
+        Weapon gun = pawn.equipment.weaponSlot[0].GetChild(0).GetComponent<Weapon>();
+        if (gun.fx != null) { gun.fx.SetActive(false); }
+      }
     }
   }
 }

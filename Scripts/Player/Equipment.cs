@@ -24,8 +24,8 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       data = GameObject.Find("Database").GetComponent<Database>();
-      if (IsServer) { for (int i = 0; i < initItems.Count; i++) { EquipItem(initItems[i]); } }
       equip.OnListChanged += equipChanged;
+      if (IsServer) { for (int i = 0; i < initItems.Count; i++) { EquipItem(initItems[i]); } }
       init();
     }
 

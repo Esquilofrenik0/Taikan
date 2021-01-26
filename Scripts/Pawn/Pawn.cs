@@ -209,7 +209,9 @@ namespace Postcarbon {
     }
 
     public virtual void SetSpeed() {}
+    #endregion
 
+    #region Animator
     [ServerRPC(RequireOwnership = false)]
     public void AniTrig(string name) {
       anim.SetTrigger(name);

@@ -13,11 +13,15 @@ namespace Postcarbon {
     [HideInInspector] public CSlot[] cSlot;
     [HideInInspector] public ESlot[] eSlot;
     [HideInInspector] public ISlot[] iSlot;
+    [HideInInspector] public RSlot[] rSlot;
+    [HideInInspector] public Text[] recipeInfo;
     [HideInInspector] public Text[] info;
     [HideInInspector] public Text[] stats;
     [HideInInspector] public GameObject inventoryUI;
     [HideInInspector] public GameObject containerUI;
+    [HideInInspector] public GameObject craftingUI;
     [HideInInspector] public int maxSlots = 64;
+    [HideInInspector] public Database data;
 
     public void Refresh() {
       if (!IsLocalPlayer) { return; }
@@ -49,6 +53,7 @@ namespace Postcarbon {
 
     public void initHUD() {
       if (!IsLocalPlayer) { return; }
+      data = GameObject.Find("Database").GetComponent<Database>();
       maxSlots = 64;
       hero = gameObject.GetComponent<Hero>();
       GameObject.Find("Canvas").transform.Find("HUD").gameObject.SetActive(true);
@@ -57,18 +62,35 @@ namespace Postcarbon {
       initBars();
       initBag();
       initEquipment();
+      initRecipe();
       containerUI = GameObject.Find("HUD/InventoryUI/ContainerUI");
       containerUI.SetActive(true);
       initContainer();
+      recipeInfo = new Text[8];
       info = new Text[8];
       stats = new Text[5];
       for (int i = 0; i < info.Length; i++) {
+        recipeInfo[i] = GameObject.Find("HUD/InventoryUI/RecipeUI/RecipeInfo").transform.GetChild(i).GetComponent<Text>();
         info[i] = GameObject.Find("HUD/InventoryUI/BagUI/Info").transform.GetChild(i).GetComponent<Text>();
       }
       for (int i = 0; i < stats.Length; i++) {
         stats[i] = GameObject.Find("HUD/InventoryUI/EquipmentUI/Stats").transform.GetChild(i).GetComponent<Text>();
       }
       inventoryUI.SetActive(false);
+    }
+
+    public void initRecipe() {
+      if (!IsLocalPlayer) { return; }
+      rSlot = new RSlot[maxSlots];
+      for (int i = 0; i < maxSlots; i++) {
+        rSlot[i] = GameObject.Find("HUD/InventoryUI/RecipeUI").transform.GetChild(i).GetComponent<RSlot>();
+        rSlot[i].gameObject.SetActive(true);
+        rSlot[i].number = i;
+        rSlot[i].hero = hero;
+        rSlot[i].textAmount.gameObject.SetActive(false);
+        if (i < data.recipes.Count) { rSlot[i].UpdateSlot(); }
+        else { rSlot[i].gameObject.SetActive(false); }
+      }
     }
 
     public void cSlots(int cSlots) {
@@ -163,6 +185,21 @@ namespace Postcarbon {
       stats[2].text = "Mana: " + hero.maxMana + " (+" + hero.manaRegen + "/s)";
       stats[3].text = "Damage: " + hero.damage.Value;
       stats[4].text = "Defense: " + hero.defense.Value;
+    }
+
+    public void DisplayRecipeInfo(dRecipe recipe) {
+      if (!IsLocalPlayer) { return; }
+      recipeInfo[0].text = recipe.result.dItem.Name;
+      for (int i = 0; i < recipe.cost.Count; i++) {
+        recipeInfo[i + 1].text = recipe.cost[i].amount + " x " + recipe.cost[i].dItem.Name;
+      }
+    }
+
+    public void ResetRecipeInfo() {
+      if (!IsLocalPlayer) { return; }
+      for (int i = 0; i < recipeInfo.Length; i++) {
+        recipeInfo[i].text = "";
+      }
     }
 
     public void DisplayInfo(dItem dItem) {
