@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
-  m_Name: (Recipe) Inquisitor Robe
+  m_Name: (Recipe) Survivor Pants
   m_EditorClassIdentifier: 
   type: 4
-  Name: (Recipe) Inquisitor Robe
-  description: Teaches how to craft Inquisitor Robe.
+  Name: (Recipe) Survivor Pants
+  description: Teaches how to craft Survivor Pants.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   result:
-    dItem: {fileID: 11400000, guid: 83eaa60fefb135d49b46df9ceb264400, type: 2}
+    dItem: {fileID: 11400000, guid: 9f1a4f487ee162c448e6f0e0bc118efc, type: 2}
     amount: 1
   cost:
   - dItem: {fileID: 11400000, guid: bb573fb1db03ff34fae346323d1e3528, type: 2}

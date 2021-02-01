@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
-  m_Name: (Recipe) Inquisitor Hood
+  m_Name: (Recipe) Plague Mask
   m_EditorClassIdentifier: 
   type: 4
-  Name: (Recipe) Inquisitor Hood
-  description: Teaches how to craft Inquisitor Hood.
+  Name: (Recipe) Plague Mask
+  description: Teaches how to craft Plague Mask.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   result:
-    dItem: {fileID: 11400000, guid: dc00a6547ccdf7b4391b95b6e65bd757, type: 2}
+    dItem: {fileID: 11400000, guid: bdfa7314603c21f4ca8134f82bf815dc, type: 2}
     amount: 1
   cost:
   - dItem: {fileID: 11400000, guid: bb573fb1db03ff34fae346323d1e3528, type: 2}

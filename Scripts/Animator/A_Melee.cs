@@ -6,22 +6,19 @@ using MLAPI;
 namespace Postcarbon {
   public class A_Melee: StateMachineBehaviour {
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+      // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
       pawn.SetState((int)pS.Attack);
-      pawn.attacking = true;
       pawn.resetAttack = true;
+      pawn.attacking = true;
     }
 
-    // public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-    //   if (stateInfo.normalizedTime > 0.1 && stateInfo.normalizedTime < 0.9) { pawn.attacking = true; }
-    //   else { pawn.attacking = false; }
-    // }
-
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+      // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
       pawn.SetState(0);
+      // pawn.resetAttack = true;
       pawn.attacking = false;
-      pawn.resetAttack = true;
     }
   }
 }

@@ -112,9 +112,7 @@ namespace Postcarbon {
     }
 
     public void PunchActive(bool active) {
-      for (int i = 0; i < 2; i++) {
-        equipment.weaponSlot[i].GetComponent<Collider>().enabled = active;
-      }
+      for (int i = 0; i < 2; i++) { equipment.weaponSlot[i].GetComponent<Collider>().enabled = active; }
     }
     #endregion
 
@@ -132,10 +130,7 @@ namespace Postcarbon {
 
     public void Melee() {
       SetState((int)pS.Attack);
-      attacking = true;
-      resetAttack = true;
       anim.SetInteger("Combo", combo);
-      // anim.SetTrigger("Attack");
       AniTrig("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
       combo += 1;
@@ -144,7 +139,6 @@ namespace Postcarbon {
 
     public void Shoot() {
       SetState((int)pS.Attack);
-      // anim.SetTrigger("Attack");
       AniTrig("Attack");
       Weapon weapon = GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>();
       weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
@@ -234,9 +228,9 @@ namespace Postcarbon {
 
     [ServerRPC(RequireOwnership = false)]
     public void AniTrig(string name) {
+      anim.SetTrigger(name);
       if (IsServer) { InvokeClientRpcOnEveryone(nAniTrig, name); }
       else { InvokeServerRpc(AniTrig, name); }
-
     }
     [ClientRPC]
     public void nAniTrig(string name) {

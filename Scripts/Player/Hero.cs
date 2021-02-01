@@ -71,20 +71,11 @@ namespace Postcarbon {
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
       avatar.ClearSlots();
-      if (avatar.activeRace.name == "HumanMaleDCS") {
-        avatar.GetDNA()["height"].Set(0.4f);
-        avatar.SetSlot("Underwear", "MaleUnderwear");
-      }
-      else if (avatar.activeRace.name == "HumanFemaleDCS") {
-        avatar.GetDNA()["height"].Set(0.6f);
-        avatar.SetSlot("Underwear", "FemaleUndies2");
-      }
+      avatar.LoadDefaultWardrobe();
       equipment.init();
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
-      grounded = true;
-      crouching = false;
       SetState(0);
       DisableRagdoll();
     }
@@ -169,7 +160,8 @@ namespace Postcarbon {
         if (state != (int)pS.Climb) {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
           if (state != (int)pS.Dodge) {
-            spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY, spine.transform.localEulerAngles.z);
+            spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY-10, spine.transform.localEulerAngles.z);
+            // spine1.transform.localRotation = Quaternion.Euler(mouseY/2, spine1.transform.localEulerAngles.y, spine1.transform.localEulerAngles.z);
           }
         }
       }

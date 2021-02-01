@@ -17,7 +17,7 @@ namespace Postcarbon {
     public Slider earSlider;
     public Slider chinSlider;
     public Slider jawSlider;
-    public Slider eyeSizeSlider;
+    public Slider ageSlider;
     public Slider eyeRotationSlider;
     public List<string> hairModels = new List<string>();
     private int currentHair;
@@ -32,7 +32,7 @@ namespace Postcarbon {
       earSlider.onValueChanged.AddListener(EarChange);
       chinSlider.onValueChanged.AddListener(ChinChange);
       jawSlider.onValueChanged.AddListener(JawChange);
-      eyeSizeSlider.onValueChanged.AddListener(EyeSizeChange);
+      ageSlider.onValueChanged.AddListener(AgeChanged);
       eyeRotationSlider.onValueChanged.AddListener(EyeRotationChange);
     }
 
@@ -41,7 +41,7 @@ namespace Postcarbon {
       earSlider.onValueChanged.RemoveListener(EarChange);
       chinSlider.onValueChanged.RemoveListener(ChinChange);
       jawSlider.onValueChanged.RemoveListener(JawChange);
-      eyeSizeSlider.onValueChanged.RemoveListener(EyeSizeChange);
+      ageSlider.onValueChanged.RemoveListener(AgeChanged);
       eyeRotationSlider.onValueChanged.RemoveListener(EyeRotationChange);
     }
 
@@ -80,7 +80,7 @@ namespace Postcarbon {
       earSlider.value = dna["earsSize"].Get();
       chinSlider.value = dna["chinPronounced"].Get();
       jawSlider.value = dna["jawsSize"].Get();
-      eyeSizeSlider.value = dna["eyeSize"].Get();
+      ageSlider.value = dna["ageBase"].Get();
       eyeRotationSlider.value = dna["eyeRotation"].Get();
       avatar.BuildCharacter();
     }
@@ -94,18 +94,9 @@ namespace Postcarbon {
     }
 
     public void SwitchGender(bool male) {
-      if (male && avatar.activeRace.name != "HumanMaleDCS") {
-        avatar.ChangeRace("HumanMaleDCS");
-        avatar.SetSlot("Underwear", "MaleUnderwear");
-        avatar.GetDNA()["height"].Set(0.4f);
-        avatar.BuildCharacter();
-      }
-      if (!male && avatar.activeRace.name != "HumanFemaleDCS") {
-        avatar.ChangeRace("HumanFemaleDCS");
-        avatar.SetSlot("Underwear", "FemaleUndies2");
-        avatar.GetDNA()["height"].Set(0.6f);
-        avatar.BuildCharacter();
-      }
+      if (male) {avatar.ChangeRace("o3n Stunner John");}
+      else {avatar.ChangeRace("o3n Stunner Jane");}
+      avatar.BuildCharacter();
     }
 
     public void EarChange(float val) {
@@ -123,8 +114,8 @@ namespace Postcarbon {
       avatar.BuildCharacter();
     }
 
-    public void EyeSizeChange(float val) {
-      dna["eyeSize"].Set(val);
+    public void AgeChanged(float val) {
+      dna["ageBase"].Set(val);
       avatar.BuildCharacter();
     }
 

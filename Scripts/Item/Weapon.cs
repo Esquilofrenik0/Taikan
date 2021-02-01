@@ -12,9 +12,11 @@ namespace Postcarbon {
     public GameObject fx;
     public AudioSource audioSource;
     [HideInInspector] public Pawn pawn;
-    // [HideInInspector] public NetworkedVar<ulong> owner = new NetworkedVar<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
     [HideInInspector] public dWeapon dWeapon;
     [HideInInspector] public List<Collider> hits;
+    [HideInInspector] public ulong ownerID;
+    [HideInInspector] public NetworkedVar<ulong> owner = new NetworkedVar<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+
 
     public override void NetworkStart() {
       base.NetworkStart();
@@ -22,6 +24,13 @@ namespace Postcarbon {
         GetComponent<Collider>().isTrigger = false;
         return;
       }
+      if (IsServer) { owner.Value = ownerID; }
+      if (owner.Value != 0) { pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>(); }
+      else if (GetComponentInParent<Pawn>()) { 
+        pawn = GetComponentInParent<Pawn>(); 
+        owner.Value = pawn.NetworkId;
+      }
+      if (GetComponent<Collider>() && pawn) { Physics.IgnoreCollision(GetComponent<Collider>(), pawn.col); }
       gameObject.layer = 2;
     }
 

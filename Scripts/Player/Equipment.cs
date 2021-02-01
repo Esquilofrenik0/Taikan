@@ -108,14 +108,10 @@ namespace Postcarbon {
     [ServerRPC(RequireOwnership = false)]
     public void SpawnWeapon(int slot, string name) {
       dWeapon dWeapon = data.GetItem(name) as dWeapon;
-      Vector3 pos = new Vector3(NetworkId, NetworkId, NetworkId);
-      NetworkedObject spawn = Instantiate(dWeapon.resource, pos, Quaternion.identity, weaponSlot[slot]).GetComponent<NetworkedObject>();
+      NetworkedObject spawn = Instantiate(dWeapon.resource).GetComponent<NetworkedObject>();
+      spawn.GetComponent<Weapon>().ownerID = NetworkId;
       spawn.SpawnWithOwnership(OwnerClientId);
       weapon[slot] = spawn.NetworkId;
-      spawn.GetComponent<Weapon>().pawn = humanoid;
-      if (spawn.GetComponent<Collider>()) {
-        Physics.IgnoreCollision(spawn.GetComponent<Collider>(), humanoid.col);
-      }
     }
 
     public void UnequipItem(int slot) {

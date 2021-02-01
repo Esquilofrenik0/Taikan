@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
-  m_Name: (Recipe) Inquisitor Shoes
+  m_Name: (Recipe) Survivor Backpack
   m_EditorClassIdentifier: 
   type: 4
-  Name: (Recipe) Inquisitor Shoes
-  description: Teaches how to craft Inquisitor Shoes.
+  Name: (Recipe) Survivor Backpack
+  description: Teaches how to craft Survivor Backpack.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   result:
-    dItem: {fileID: 11400000, guid: 55fafbe415640ca4fa63340ab5bbac33, type: 2}
+    dItem: {fileID: 11400000, guid: 1eea8d21417e36e40bca9a44e8bf2856, type: 2}
     amount: 1
   cost:
   - dItem: {fileID: 11400000, guid: bb573fb1db03ff34fae346323d1e3528, type: 2}

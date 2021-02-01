@@ -21,6 +21,7 @@ namespace Postcarbon {
       base.Respawn();
       if (GetComponent<RandomUMA>()) { GetComponent<RandomUMA>().Randomize(avatar); }
       else { RandomGender(); }
+      avatar.LoadDefaultWardrobe();
       equipment.init();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
@@ -28,8 +29,14 @@ namespace Postcarbon {
 
     public void RandomGender() {
       float male = Random.Range(0, 2);
-      if (male < 1) { avatar.ChangeRace("HumanMaleDCS"); }
-      else { avatar.ChangeRace("HumanFemaleDCS"); }
+      if (male < 1) {
+        if (avatar.activeRace.name == "HumanMale") { avatar.ChangeRace("HumanFemale"); }
+        else if (avatar.activeRace.name == "o3n Male") { avatar.ChangeRace("o3n Female"); }
+      }
+      else {
+        if (avatar.activeRace.name == "HumanFemale") { avatar.ChangeRace("HumanMale"); }
+        else if (avatar.activeRace.name == "o3n Female") { avatar.ChangeRace("o3n Male"); }
+      }
       avatar.BuildCharacter();
     }
 
@@ -51,7 +58,7 @@ namespace Postcarbon {
               anim.SetBool("Aiming", true);
               AniTrig("Aim");
               SetSpeed();
-              if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 30; }
+              if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 45; }
             }
           }
           else {
@@ -66,7 +73,7 @@ namespace Postcarbon {
           aiming = false;
           anim.SetBool("Aiming", false);
           SetSpeed();
-          if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 45; }
+          if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 60; }
         }
       }
     }

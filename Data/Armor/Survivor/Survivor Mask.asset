@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0efbba2be2aadcc41b9bd69b76646ada, type: 3}
-  m_Name: Inquisitor Shoes
+  m_Name: Survivor Mask
   m_EditorClassIdentifier: 
-  resource: {fileID: 7760246465309506288, guid: 077f4013d6a59c14eb1f22d99c037c09, type: 3}
   type: 3
-  Name: Inquisitor Shoes
-  description: Shoes worn by the inquisition.
-  icon: {fileID: 21300000, guid: 6d69fcb0c38b021438f770d17f5b3e27, type: 3}
+  Name: Survivor Mask
+  description: Mask worn by human survivors.
+  icon: {fileID: 21300000, guid: fe58bbacc4ff23341aa38d74eae3a5c8, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   aType: 0
-  armorSlot: 4
-  defense: 1
+  armorSlot: 0
+  defense: 5
   durability: 100

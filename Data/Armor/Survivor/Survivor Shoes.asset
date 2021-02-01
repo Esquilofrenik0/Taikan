@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0efbba2be2aadcc41b9bd69b76646ada, type: 3}
-  m_Name: Inquisitor Hood
+  m_Name: Survivor Shoes
   m_EditorClassIdentifier: 
-  resource: {fileID: 7760246465309506288, guid: dd210e884451c854ca56b9d8f6c2b6cc, type: 3}
   type: 3
-  Name: Inquisitor Hood
-  description: Hood  worn by scholars and mystics.
-  icon: {fileID: 21300000, guid: 010cc5c225314734aafd2aa1bdfef2f6, type: 3}
+  Name: Survivor Shoes
+  description: Shoes worn by human survivors.
+  icon: {fileID: 21300000, guid: 535e4f5ee8d31f549a94de37e8ba249a, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   aType: 0
-  armorSlot: 0
-  defense: 1
+  armorSlot: 4
+  defense: 5
   durability: 100

@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0efbba2be2aadcc41b9bd69b76646ada, type: 3}
-  m_Name: Inquisitor Gloves
+  m_Name: Survivor Pants
   m_EditorClassIdentifier: 
-  resource: {fileID: 7760246465309506288, guid: f2d4131dbf25bf344a5f56ef27196cc3, type: 3}
   type: 3
-  Name: Inquisitor Gloves
-  description: Gloves worn by the inquisition.
-  icon: {fileID: 21300000, guid: d77107a58dd33844ba34aaef28b5c2a8, type: 3}
+  Name: Survivor Pants
+  description: Pants worn by human survivors.
+  icon: {fileID: 21300000, guid: d9defba3ef1d3dd439b7dfb34ce323a1, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   aType: 0
-  armorSlot: 2
-  defense: 1
+  armorSlot: 3
+  defense: 5
   durability: 100

@@ -35,7 +35,7 @@ namespace Postcarbon {
       worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
       worldCam.Priority = 8;
       gameObject.layer = 9;
-      hero.LoadAvatar(hero.GetAvatar());
+      // hero.LoadAvatar(hero.GetAvatar());
       hero.hud.initHUD();
       hero.Respawn();
     }
@@ -111,7 +111,7 @@ namespace Postcarbon {
       if (input.firstPerson) {
         input.firstPerson = false;
         heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.2f;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 4;
+        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 3;
       }
       else {
         input.firstPerson = true;
