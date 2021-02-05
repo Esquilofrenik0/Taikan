@@ -14,7 +14,7 @@ namespace Postcarbon {
     }
 
     override public void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-      if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
+      // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
       pawn.state.Value = 0;
     }

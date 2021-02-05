@@ -17,17 +17,15 @@ namespace Postcarbon {
     public List<dItem> initItems;
     public List<Transform> weaponSlot = new List<Transform>() { null, null, null, null };
     public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
-    public NetworkedList<ulong> weapon = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0 });
+    // public NetworkedList<ulong> weapon = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0 });
+    public List<Weapon> weapon = new List<Weapon> { null, null };
     public NetworkedList<dItem> equip = new NetworkedList<dItem>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<dItem> { null, null, null, null, null, null, null });
     [HideInInspector] public Coroutine holsterRoutine;
     [HideInInspector] public Coroutine refreshRoutine;
 
     void equipChanged(NetworkedListEvent<dItem> changeEvent) {
-      if (changeEvent.index < 2) { Holster(holstered.Value); }
-      else {
-        if (equip[changeEvent.index] == null) { Undress(changeEvent.index); }
-        else { DressUp(equip[changeEvent.index]); }
-      }
+      if (equip[changeEvent.index] == null) { Undress(changeEvent.index); }
+      else { Dress(equip[changeEvent.index]); }
       humanoid.RefreshStats();
       if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
         GetComponent<HUD>().Refresh();
@@ -43,10 +41,7 @@ namespace Postcarbon {
     }
 
     public void init() {
-      for (int i = 0; i < 7; i++) {
-        if (i < 2) { if (equip[i] != null && weapon[i] == 0) { EquipItem(equip[i]); } }
-        else { if (equip[i] != null) { DressUp(equip[i]); } }
-      }
+      for (int i = 0; i < 7; i++) { if (equip[i]) { Dress(equip[i]); } }
       Timer.rDelay(this, dHolster, 0.05f, holsterRoutine);
       Timer.rDelay(this, humanoid.RefreshStats, 0.1f, refreshRoutine);
     }
@@ -62,12 +57,11 @@ namespace Postcarbon {
     [ClientRPC]
     public void nHolster(bool equipped) {
       for (int i = 0; i < weapon.Count; i++) {
-        if (weapon[i] != 0) {
-          NetworkedObject w = GetNetworkedObject(weapon[i]);
-          if (equipped) { w.transform.SetParent(weaponSlot[i]); }
-          else { w.transform.SetParent(weaponSlot[i + 2]); }
-          w.transform.localPosition = Vector3.zero;
-          w.transform.localRotation = Quaternion.identity;
+        if (weapon[i]) {
+          if (equipped) { weapon[i].transform.SetParent(weaponSlot[i]); }
+          else { weapon[i].transform.SetParent(weaponSlot[i + 2]); }
+          weapon[i].transform.localPosition = Vector3.zero;
+          weapon[i].transform.localRotation = Quaternion.identity;
         }
       }
     }
@@ -77,7 +71,7 @@ namespace Postcarbon {
       if (slot < 2) {
         dWeapon dWeapon = dItem as dWeapon;
         if (slot == 0) { if (dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(1); } }
-        else if (slot == 1) { if (weapon[0] != 0 && GetNetworkedObject(weapon[0]).GetComponent<Weapon>().dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(0); } }
+        else if (slot == 1) { if (weapon[0] && weapon[0].dWeapon.weaponSlot == wS.TwoHand) { UnequipItem(0); } }
       }
     }
 
@@ -96,53 +90,46 @@ namespace Postcarbon {
       int slot = GetSlot(dItem);
       ClearSlot(slot, dItem);
       UpdateSlot(slot, dItem);
-      if (slot < 2) {
-        if (IsServer) { SpawnWeapon(slot, dItem); }
-        else { InvokeServerRpc(SpawnWeapon, slot, dItem); }
-      }
       equip[slot] = dItem;
     }
 
-    [ServerRPC(RequireOwnership = false)]
     public void SpawnWeapon(int slot, dItem dItem) {
       dWeapon dWeapon = dItem as dWeapon;
-      NetworkedObject spawn = Instantiate(dWeapon.resource).GetComponent<NetworkedObject>();
-      spawn.GetComponent<Weapon>().ownerID = NetworkId;
-      spawn.SpawnWithOwnership(OwnerClientId);
-      weapon[slot] = spawn.NetworkId;
+      GameObject spawn = Instantiate(dWeapon.resource, weaponSlot[EquipSlot(slot)]);
+      weapon[slot] = spawn.GetComponent<Weapon>();
     }
 
     public void UnequipItem(int slot) {
       if (equip[slot] == null) { return; }
-      InvokeServerRpc(sUnequipItem, slot);
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void sUnequipItem(int slot) {
-      if (equip[slot] == null) { return; }
-      dItem dItem = equip[slot];
-      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(dItem, 1); }
-      if (slot < 2 && weapon[slot] != 0) {
-        if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
-        else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
-        GameObject toDestroy = GetNetworkedObject(weapon[slot]).gameObject;
-        Destroy(toDestroy);
-        weapon[slot] = 0;
-      }
+      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip[slot], 1); }
       equip[slot] = null;
     }
 
+    public void DestroyWeapon(int slot) {
+      if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
+      else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
+      Destroy(weapon[slot].gameObject);
+      weapon[slot] = null;
+    }
+
     [ServerRPC(RequireOwnership = false)]
-    public void DressUp(dItem dItem) {
-      if (IsServer) { InvokeClientRpcOnEveryone(nDressUp, dItem); }
-      else { InvokeServerRpc(DressUp, dItem); }
+    public void Dress(dItem dItem) {
+      if (IsServer) { InvokeClientRpcOnEveryone(nDress, dItem); }
+      else { InvokeServerRpc(Dress, dItem); }
     }
 
     [ClientRPC]
-    public void nDressUp(dItem dItem) {
-      dArmor dArmor = dItem as dArmor;
-      humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.name);
-      humanoid.avatar.BuildCharacter();
+    public void nDress(dItem dItem) {
+      if (dItem is dArmor) {
+        dArmor dArmor = dItem as dArmor;
+        humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.name);
+        humanoid.avatar.BuildCharacter();
+      }
+      else if (dItem is dWeapon) {
+        if (weapon[GetSlot(dItem)] == null) {
+          SpawnWeapon(GetSlot(dItem), dItem);
+        }
+      }
     }
 
     [ServerRPC(RequireOwnership = false)]
@@ -153,9 +140,21 @@ namespace Postcarbon {
 
     [ClientRPC]
     public void nUndress(int slot) {
-      aS armorSlot = (aS)(slot - 2);
-      humanoid.avatar.ClearSlot(armorSlot.ToString());
-      humanoid.avatar.BuildCharacter();
+      if (slot > 1) {
+        aS armorSlot = (aS)(slot - 2);
+        humanoid.avatar.ClearSlot(armorSlot.ToString());
+        humanoid.avatar.BuildCharacter();
+      }
+      else {
+        if (weapon[slot] != null) {
+          DestroyWeapon(slot);
+        }
+      }
+    }
+
+    public int EquipSlot(int slot) {
+      if (holstered.Value == false) { slot += 2; }
+      return slot;
     }
 
     public int WeaponSlot(int weaponSlot) {

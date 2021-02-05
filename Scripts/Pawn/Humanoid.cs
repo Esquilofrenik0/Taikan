@@ -19,7 +19,8 @@ namespace Postcarbon {
     [HideInInspector] public Vector3 direction = Vector3.zero;
 
     #region Init
-    public void recipeAvatarChanged(string oldRecipe, string newRecipe){
+    public void recipeAvatarChanged(string oldRecipe, string newRecipe) {
+      if (oldRecipe == newRecipe) { return; }
       LoadAvatar();
     }
 
@@ -31,9 +32,9 @@ namespace Postcarbon {
       }
     }
 
-    public override void NetworkStart(){
+    public override void NetworkStart() {
       base.NetworkStart();
-      recipeAvatar.OnValueChanged += recipeAvatarChanged;    
+      recipeAvatar.OnValueChanged += recipeAvatarChanged;
     }
 
     public override void Respawn() {
@@ -69,12 +70,11 @@ namespace Postcarbon {
       if (block) {
         if (state.Value == 0 || state.Value == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon[0] != 0 && equipment.weapon[1] == 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) {
+          if (equipment.weapon[0] && equipment.weapon[1] == null && equipment.weapon[0].dWeapon is dGun) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
               AniTrig("Aim");
-              SetSpeed();
               if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
             }
           }
@@ -89,7 +89,6 @@ namespace Postcarbon {
         if (aiming) {
           aiming = false;
           anim.SetBool("Aiming", false);
-          SetSpeed();
           if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
         }
       }
@@ -98,7 +97,6 @@ namespace Postcarbon {
     public void Crouch(bool crouch) {
       crouching = crouch;
       anim.SetBool("Crouching", crouch);
-      SetSpeed();
     }
 
     public void Sprint(bool sprint) {

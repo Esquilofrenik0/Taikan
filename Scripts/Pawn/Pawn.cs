@@ -119,7 +119,7 @@ namespace Postcarbon {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
         }
-        if (equipment.weapon[0] != 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) { Shoot(); }
+        if (equipment.weapon[0] && equipment.weapon[0].dWeapon is dGun) { Shoot(); }
         else { Melee(); }
       }
     }
@@ -136,9 +136,6 @@ namespace Postcarbon {
     public void Shoot() {
       state.Value = (int)pS.Attack;
       AniTrig("Attack");
-      Gun gun = GetNetworkedObject(equipment.weapon[0]).GetComponent<Gun>();
-      gun.audioSource.PlayOneShot(gun.dGun.audioClip[0]);
-      gun.fx.SetActive(true);
       Ray ray;
       RaycastHit hit;
       bool raycast = false;
