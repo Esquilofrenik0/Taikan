@@ -1,10 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using MLAPI;
-using MLAPI.Spawning;
-using MLAPI.NetworkedVar;
-using System.IO;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -18,7 +14,7 @@ namespace Postcarbon {
     }
 
     private void OnTriggerEnter(Collider other) {
-      if (pawn && pawn.attacking && pawn.state != (int)pS.Dead) {
+      if (pawn && pawn.attacking && pawn.state.Value == (int)pS.Attack) {
         if (pawn.resetAttack) {
           hits.Clear();
           pawn.resetAttack = false;
@@ -26,7 +22,7 @@ namespace Postcarbon {
         if (hits.Contains(other)) { return; }
         if (other.GetComponent<Pawn>()) {
           Pawn hitPawn = other.GetComponent<Pawn>();
-          if (hitPawn.state == (int)pS.Block) { pawn.AniTrig("Impact"); }
+          if (hitPawn.state.Value == (int)pS.Block) { pawn.AniTrig("Impact"); }
           else {
             hitPawn.TakeDamage(pawn.damage.Value);
             hitPawn.AniTrig("Impact");
@@ -36,8 +32,8 @@ namespace Postcarbon {
             }
           }
         }
-        else if (pawn.GetComponent<Hero>()) {
-          Hero hero = pawn.GetComponent<Hero>();
+        else if (pawn is Hero) {
+          Hero hero = pawn as Hero;
           if (other.GetComponent<Stone>()) { other.GetComponent<Stone>().Pickup(hero); }
           else if (other.GetComponent<Node>()) { other.GetComponent<Node>().TakeDamage(hero); }
           else if (other.GetComponent<TreeNode>()) { other.GetComponent<TreeNode>().TakeDamage(hero); }

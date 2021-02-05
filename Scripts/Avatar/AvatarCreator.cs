@@ -41,7 +41,7 @@ namespace Postcarbon {
       earSlider.onValueChanged.RemoveListener(EarChange);
       chinSlider.onValueChanged.RemoveListener(ChinChange);
       jawSlider.onValueChanged.RemoveListener(JawChange);
-      ageSlider.onValueChanged.RemoveListener(AgeChanged);
+      // ageSlider.onValueChanged.RemoveListener(AgeChanged);
       eyeRotationSlider.onValueChanged.RemoveListener(EyeRotationChange);
     }
 
@@ -80,7 +80,7 @@ namespace Postcarbon {
       earSlider.value = dna["earsSize"].Get();
       chinSlider.value = dna["chinPronounced"].Get();
       jawSlider.value = dna["jawsSize"].Get();
-      ageSlider.value = dna["ageBase"].Get();
+      // ageSlider.value = dna["ageBase"].Get();
       eyeRotationSlider.value = dna["eyeRotation"].Get();
       avatar.BuildCharacter();
     }
@@ -94,8 +94,8 @@ namespace Postcarbon {
     }
 
     public void SwitchGender(bool male) {
-      if (male) {avatar.ChangeRace("o3n Stunner John");}
-      else {avatar.ChangeRace("o3n Stunner Jane");}
+      if (male) {avatar.ChangeRace("o3n Male");}
+      else {avatar.ChangeRace("o3n Female");}
       avatar.BuildCharacter();
     }
 
@@ -115,8 +115,8 @@ namespace Postcarbon {
     }
 
     public void AgeChanged(float val) {
-      dna["ageBase"].Set(val);
-      avatar.BuildCharacter();
+      // dna["ageBase"].Set(val);
+      // avatar.BuildCharacter();
     }
 
     public void EyeRotationChange(float val) {

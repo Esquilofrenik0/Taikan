@@ -9,9 +9,24 @@ using MLAPI.NetworkedVar.Collections;
 namespace Postcarbon {
   [System.Serializable]
   public class Player: NetworkedBehaviour {
+    [Header("Inputs")]
+    [HideInInspector] public InputMaster controls;
+    [HideInInspector] public Vector2 movement = Vector2.zero;
+    [HideInInspector] public Vector2 camvect = Vector2.zero;
+    [HideInInspector] public bool jump = false;
+    [HideInInspector] public bool dodge = false;
+    [HideInInspector] public bool attack = false;
+    [HideInInspector] public bool block = false;
+    [HideInInspector] public bool menu = false;
+    [HideInInspector] public bool sprint = false;
+    [HideInInspector] public bool equip = false;
+    [HideInInspector] public bool crouch = false;
+    [HideInInspector] public bool interact = false;
+    [HideInInspector] public bool inventory = false;
+    [HideInInspector] public bool firstPerson = false;
+
     [Header("Components")]
     public Hero hero;
-    public InputHandler input;
     public BuildSystem buildSystem;
     [HideInInspector] public Camera cam;
     [HideInInspector] public Camera map;
@@ -19,7 +34,7 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       hero.initRagdoll();
-      // if(hero.recipeAvatar != null){hero.LoadAvatar(hero.recipeAvatar);}
+      if (!IsServer) { Timer.Delay(this, hero.LoadAvatar, 0.1f); }
     }
 
     void Start() {
@@ -30,7 +45,7 @@ namespace Postcarbon {
       cam.transform.localPosition = new Vector3(0.2f, 0f, -3f);
       map = GameObject.Find("MapCamera").GetComponent<Camera>();
       map.gameObject.SetActive(false);
-      // hero.LoadAvatar(hero.GetAvatar());
+      hero.GetAvatar();
       hero.hud.initHUD();
       hero.Respawn();
     }
@@ -38,49 +53,93 @@ namespace Postcarbon {
     void FixedUpdate() {
       if (!IsLocalPlayer) { return; }
       hero.hud.SetBars();
-      if (hero.state == (int)pS.Dead) { return; }
+      if (hero.state.Value == (int)pS.Dead) { return; }
       hero.IsGrounded();
-      hero.Move(input.movement.x, input.movement.y);
+      hero.Move(movement.x, movement.y);
       hero.Regenerate();
     }
 
     void Update() {
       if (!IsLocalPlayer) { return; }
-      if (hero.state == (int)pS.Dead) { return; }
+      if (hero.state.Value == (int)pS.Dead) { return; }
       if (!hero.inventoryOpen) {
-        hero.Crouch(input.crouch);
-        hero.Sprint(input.sprint);
-        hero.Block(input.block);
-        if (input.attack) { hero.Attack(); }
+        hero.Crouch(crouch);
+        hero.Sprint(sprint);
+        hero.Block(block);
+        if (attack) { hero.Attack(); }
       }
       if (buildSystem.building) { buildSystem.DoBuildRay(); }
     }
 
     void LateUpdate() {
       if (!IsLocalPlayer) { return; }
-      if (hero.state == (int)pS.Dead) { return; }
-      hero.Look(input.camvect.x, input.camvect.y);
+      if (hero.state.Value == (int)pS.Dead) { return; }
+      hero.Look(camvect.x, camvect.y);
     }
 
     #region Controls
+    public void OnEnable() {
+      if (controls == null) { controls = new InputMaster(); }
+      controls.Player.Enable();
+    }
+
+    public void OnDisable() {
+      controls.Player.Disable();
+    }
+
+    #region Vectors
+    void OnMovement() {
+      if (!IsLocalPlayer) { return; }
+      movement = controls.Player.Movement.ReadValue<Vector2>();
+    }
+
+    void OnCamera() {
+      if (!IsLocalPlayer) { return; }
+      camvect = controls.Player.Camera.ReadValue<Vector2>();
+    }
+    #endregion
+
+    #region Pressed
+    void OnBlock() {
+      if (!IsLocalPlayer) { return; }
+      block = !block;
+    }
+
+    void OnAttack() {
+      if (!IsLocalPlayer) { return; }
+      attack = !attack;
+    }
+
+    void OnSprint() {
+      if (!IsLocalPlayer) { return; }
+      sprint = !sprint;
+    }
+
+    void OnCrouch() {
+      if (!IsLocalPlayer) { return; }
+      crouch = !crouch;
+    }
+    #endregion
+
+    #region Buttons
     void OnJump() {
-      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+      if (!IsLocalPlayer || hero.state.Value == (int)pS.Dead) { return; }
       hero.Jump();
     }
 
     void OnDodge() {
-      if (!IsLocalPlayer || hero.state == (int)pS.Dead || hero.inventoryOpen) { return; }
-      hero.Dodge(input.movement.x, input.movement.y);
+      if (!IsLocalPlayer || hero.state.Value == (int)pS.Dead || hero.inventoryOpen) { return; }
+      hero.Dodge(movement.x, movement.y);
     }
 
     void OnEquip() {
-      if (!IsLocalPlayer || hero.state == (int)pS.Dead || hero.inventoryOpen) { return; }
+      if (!IsLocalPlayer || hero.state.Value == (int)pS.Dead || hero.inventoryOpen) { return; }
       if (buildSystem.building) { buildSystem.preview.transform.Rotate(0, 90f, 0); }
       else { hero.Equip(); }
     }
 
     void OnInteract() {
-      if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
+      if (!IsLocalPlayer || hero.state.Value == (int)pS.Dead) { return; }
       if (buildSystem.building) { buildSystem.BuildObject(); }
       else { hero.Interact(); }
     }
@@ -89,13 +148,13 @@ namespace Postcarbon {
       if (!IsLocalPlayer) { return; }
       if (buildSystem.building) { buildSystem.CancelBuild(); }
       else {
-        if (input.menu) {
-          input.menu = false;
+        if (menu) {
+          menu = false;
           map.gameObject.SetActive(false);
           cam.gameObject.SetActive(true);
         }
         else {
-          input.menu = true;
+          menu = true;
           cam.gameObject.SetActive(false);
           map.gameObject.SetActive(true);
         }
@@ -109,15 +168,16 @@ namespace Postcarbon {
 
     void OnChangeView() {
       if (!IsLocalPlayer) { return; }
-      if (input.firstPerson) {
-        input.firstPerson = false;
+      if (firstPerson) {
+        firstPerson = false;
         cam.transform.localPosition = new Vector3(0.2f, 0, -3f);
       }
       else {
-        input.firstPerson = true;
+        firstPerson = true;
         cam.transform.localPosition = Vector3.zero;
       }
     }
+    #endregion
     #endregion
   }
 }

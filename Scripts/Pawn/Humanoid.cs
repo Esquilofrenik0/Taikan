@@ -48,7 +48,7 @@ namespace Postcarbon {
     #region Actions
     public void Block(bool block) {
       if (block) {
-        if (state == 0 || state == (int)pS.Sprint) {
+        if (state.Value == 0 || state.Value == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
           if (equipment.weapon[0] != 0 && equipment.weapon[1] == 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) {
             if (!aiming) {
@@ -60,13 +60,13 @@ namespace Postcarbon {
             }
           }
           else {
-            SetState((int)pS.Block);
+            state.Value = (int)pS.Block;
             AniTrig("Block");
           }
         }
       }
       else {
-        if (anim.GetInteger("State") == (int)pS.Block) { SetState(0); }
+        if (anim.GetInteger("State") == (int)pS.Block) { state.Value = 0; }
         if (aiming) {
           aiming = false;
           anim.SetBool("Aiming", false);
@@ -85,17 +85,17 @@ namespace Postcarbon {
     public void Sprint(bool sprint) {
       if (sprint) {
         if (grounded && !crouching) {
-          if (state == 0) { SetState((int)pS.Sprint); }
-          else if (state == (int)pS.Sprint) {
+          if (state.Value == 0) { state.Value = (int)pS.Sprint; }
+          else if (state.Value == (int)pS.Sprint) {
             if (GetComponent<Hero>()) {
               Hero hero = GetComponent<Hero>();
-              if (!hero.StaminaCost(hero.sprintCost * Time.deltaTime)) { SetState(0); }
+              if (!hero.StaminaCost(hero.sprintCost * Time.deltaTime)) { state.Value = 0; }
             }
           }
         }
-        else if (crouching || !grounded) { if (state == (int)pS.Sprint) { SetState(0); } }
+        else if (crouching || !grounded) { if (state.Value == (int)pS.Sprint) { state.Value = 0; } }
       }
-      else if (!sprint && anim.GetInteger("State") == (int)pS.Sprint) { SetState(0); }
+      else if (!sprint && anim.GetInteger("State") == (int)pS.Sprint) { state.Value = 0; }
     }
     #endregion
 
@@ -104,18 +104,18 @@ namespace Postcarbon {
       defense.Value = baseDefense;
       damage.Value = baseDamage;
       for (int i = 0; i < 2; i++) {
-        if (equipment.weapon[i] != 0) {
-          dWeapon dWeapon = GetNetworkedObject(equipment.weapon[i]).GetComponent<Weapon>().dWeapon;
+        if (equipment.equip[i] != null) {
+          dWeapon dWeapon = equipment.equip[i] as dWeapon;
           damage.Value += dWeapon.damage;
-          if(dWeapon is dShield){
-            dShield dShield = dWeapon as dShield;
+          if (dWeapon is dShield) {
+            dShield dShield = (dShield)dWeapon;
             defense.Value += dShield.defense;
           }
         }
       }
       for (int i = 0; i < 5; i++) {
-        if (equipment.armor[i] != null) {
-          dArmor dArmor = equipment.armor[i];
+        if (equipment.equip[i + 2] != null) {
+          dArmor dArmor = equipment.equip[i + 2] as dArmor;
           defense.Value += dArmor.defense;
         }
       }

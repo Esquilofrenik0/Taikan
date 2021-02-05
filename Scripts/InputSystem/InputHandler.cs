@@ -21,12 +21,6 @@ namespace Postcarbon {
     [HideInInspector] public bool inventory = false;
     [HideInInspector] public bool firstPerson = false;
 
-    void Update() {
-      if (!IsLocalPlayer) { return; }
-      movement = controls.Player.Movement.ReadValue<Vector2>();
-      camvect = controls.Player.Camera.ReadValue<Vector2>();
-    }
-
     public void OnEnable() {
       if (controls == null) { controls = new InputMaster(); }
       controls.Player.Enable();
@@ -34,6 +28,16 @@ namespace Postcarbon {
 
     public void OnDisable() {
       controls.Player.Disable();
+    }
+
+    void OnMovement() {
+      if (!IsLocalPlayer) { return; }
+      movement = controls.Player.Movement.ReadValue<Vector2>();
+    }
+
+    void OnCamera() {
+      if (!IsLocalPlayer) { return; }
+      camvect = controls.Player.Camera.ReadValue<Vector2>();
     }
 
     void OnBlock() {

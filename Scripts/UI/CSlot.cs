@@ -26,7 +26,7 @@ namespace Postcarbon {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
       slot.dItem = hero.container.inventory.item[number];
-      if (slot.amount > 0) {
+      if (slot.dItem) {
         textAmount.text = slot.amount.ToString();
         if (slot.amount == 1) { textAmount.gameObject.SetActive(false); }
         else { textAmount.gameObject.SetActive(true); }
@@ -43,7 +43,7 @@ namespace Postcarbon {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
       slot.dItem = hero.container.inventory.item[number];
-      if (slot.amount > 0) {
+      if (slot.dItem) {
         int freeSlot = hero.inventory.FreeSlot();
         if (freeSlot >= 0) {
           hero.container.Retrieve(hero, number);
@@ -56,7 +56,7 @@ namespace Postcarbon {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
       slot.dItem = hero.container.inventory.item[number];
-      if (slot.amount > 0) { hero.hud.DisplayInfo(slot.dItem); }
+      if (slot.dItem) { hero.hud.DisplayInfo(slot.dItem); }
     }
 
     public void OnPointerExit(PointerEventData pointerEventData) {

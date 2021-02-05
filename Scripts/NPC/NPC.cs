@@ -44,7 +44,7 @@ namespace Postcarbon {
     }
 
     public void EngageEnemy(float speed) {
-      if (enemy[0] && enemy[0].state != (int)pS.Dead) {
+      if (enemy[0] && enemy[0].state.Value != (int)pS.Dead) {
         agent.isStopped = false;
         agent.speed = speed;
         agent.SetDestination(enemy[0].transform.position);

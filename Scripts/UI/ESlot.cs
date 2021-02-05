@@ -21,13 +21,8 @@ namespace Postcarbon {
     }
 
     public void UpdateSlot() {
-      if (number < 2) {
-        if (hero.equipment.weapon[number] != 0) { dItem = GetNetworkedObject(hero.equipment.weapon[number]).GetComponent<Weapon>().dItem; }
-      }
-      else {
-        if (hero.equipment.armor[number-2] != null) { dItem = hero.equipment.armor[number-2]; }
-      }
-      if (dItem != null) {
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.equip[number];
         slotIcon.GetComponent<Image>().sprite = dItem.icon;
         empty = false;
       }
@@ -40,26 +35,21 @@ namespace Postcarbon {
 
     public void OnPointerClick(PointerEventData pointerEventData) {
       if (!hero) { return; }
-      if (number < 2) {
-        if (hero.equipment.weapon[number] != 0) { dItem = GetNetworkedObject(hero.equipment.weapon[number]).GetComponent<Weapon>().dItem; }
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.equip[number];
+        int slot = hero.equipment.GetSlot(dItem);
+        hero.equipment.UnequipItem(slot);
       }
-      else {
-        if (hero.equipment.armor[number-2] != null) { dItem = hero.equipment.armor[number-2]; }
-      }
-      if (dItem != null) { hero.equipment.ClearSlot(dItem); }
       UpdateSlot();
     }
 
     public void OnPointerEnter(PointerEventData pointerEventData) {
       if (!hero) { return; }
       bgImage.color = new Vector4(255, 255, 0, 200);
-      if (number < 2) {
-        if (hero.equipment.weapon[number] != 0) { dItem = GetNetworkedObject(hero.equipment.weapon[number]).GetComponent<Weapon>().dItem; }
+      if (hero.equipment.equip[number] != null) {
+        dItem = hero.equipment.equip[number];
+        hero.hud.DisplayInfo(dItem);
       }
-      else {
-        if (hero.equipment.armor[number-2] != null) { dItem = hero.equipment.armor[number-2]; }
-      }
-      if (dItem != null) { hero.hud.DisplayInfo(dItem); }
       UpdateSlot();
     }
 

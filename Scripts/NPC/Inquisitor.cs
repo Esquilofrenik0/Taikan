@@ -15,7 +15,7 @@ namespace Postcarbon {
 
     void Update() {
       if (!IsServer) { return; }
-      if (pawn.state == (int)pS.Dead) { agent.isStopped = true; return; }
+      if (pawn.state.Value == (int)pS.Dead) { agent.isStopped = true; return; }
       if (enemy.Count == 0) {
         if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
         else { SetPatrolPoint(); }

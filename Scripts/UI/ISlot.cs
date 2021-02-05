@@ -45,7 +45,6 @@ namespace Postcarbon {
       slot.amount = hero.inventory.amount[number];
       slot.dItem = hero.inventory.item[number];
       if (slot.dItem) {
-        hero.equipment.testVar.Value = slot.dItem;
         if (hero.containerOpen) {
           int freeSlot = hero.container.inventory.FreeSlot();
           if (freeSlot >= 0) { hero.container.Store(hero, number); }

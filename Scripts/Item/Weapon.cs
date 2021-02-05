@@ -16,17 +16,18 @@ namespace Postcarbon {
 
     public override void NetworkStart() {
       base.NetworkStart();
-      if (GetComponent<NetworkedObject>() && GetComponent<NetworkedObject>().IsSceneObject == true) {
-        GetComponent<Collider>().isTrigger = false;
-        return;
+      if (IsServer) { owner.Value = ownerID; }
+    }
+
+    void Start() {
+      if (GetComponent<NetworkedObject>()) {
+        if (GetComponent<NetworkedObject>().IsSceneObject == true) {
+          GetComponent<Collider>().isTrigger = false;
+          return;
+        }
+        if (owner.Value != 0) { pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>(); }
       }
-      // if (IsServer) { owner.Value = ownerID; }
-      owner.Value = ownerID;
-      if (owner.Value != 0) { pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>(); }
-      else if (GetComponentInParent<Pawn>()) {
-        pawn = GetComponentInParent<Pawn>();
-        owner.Value = pawn.NetworkId;
-      }
+      else { pawn = GetComponentInParent<Pawn>(); }
       if (GetComponent<Collider>() && pawn) { Physics.IgnoreCollision(GetComponent<Collider>(), pawn.col); }
       gameObject.layer = 2;
     }

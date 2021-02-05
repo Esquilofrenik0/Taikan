@@ -12,7 +12,7 @@ namespace Postcarbon {
     [Header("Components")]
     public Player player;
     public HUD hud;
-    public string recipeAvatar;
+    public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
 
     [Header("Camera")]
     public GameObject camTarget;
@@ -48,18 +48,18 @@ namespace Postcarbon {
     [HideInInspector] public GameObject[] iSlot;
 
     #region Init
-    public string GetAvatar() {
+    public void GetAvatar() {
       if (File.Exists(Application.persistentDataPath + "/Avatar.txt")) {
-        recipeAvatar = File.ReadAllText(Application.persistentDataPath + "/Avatar.txt");
-        return recipeAvatar;
+        recipeAvatar.Value = File.ReadAllText(Application.persistentDataPath + "/Avatar.txt");
+        LoadAvatar();
       }
-      return null;
     }
 
-    public void LoadAvatar(string recipe) {
-      avatar.ClearSlots();
-      avatar.LoadFromRecipeString(recipe);
+    public void LoadAvatar() {
       avatar.name = "Player";
+      if (recipeAvatar.Value != null) { avatar.LoadFromRecipeString(recipeAvatar.Value); }
+      avatar.ClearSlots();
+      avatar.LoadDefaultWardrobe();
       avatar.BuildCharacter();
     }
 
@@ -76,26 +76,26 @@ namespace Postcarbon {
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
-      SetState(0);
+      state.Value = 0;
       DisableRagdoll();
     }
     #endregion
 
     #region Actions
     public void Jump() {
-      if (state == (int)pS.Climb) {
-        SetState(0);
+      if (state.Value == (int)pS.Climb) {
+        state.Value = 0;
         rb.useGravity = true;
       }
       else if (grounded) {
-        if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
+        if (state.Value == 0 || state.Value == (int)pS.Block || state.Value == (int)pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
           rb.velocity += jumpHeight * Vector3.up;
           anim.SetTrigger("Jump");
         }
       }
       else if (HitWall()) {
-        SetState((int)pS.Climb);
+        state.Value = (int)pS.Climb;
         anim.SetTrigger("Climb");
         rb.useGravity = false;
         rb.velocity = Vector3.zero;
@@ -124,11 +124,11 @@ namespace Postcarbon {
       if (inventoryOpen) { xIn = 0f; yIn = 0f; }
       anim.SetFloat("Horizontal", xIn * speed);
       anim.SetFloat("Vertical", yIn * speed);
-      if (state == (int)pS.Climb) {
+      if (state.Value == (int)pS.Climb) {
         if (xIn != 0 || yIn != 0) {
           if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
             ClimbLedge();
-            SetState(0);
+            state.Value = 0;
             rb.useGravity = true;
           }
           else {
@@ -145,7 +145,7 @@ namespace Postcarbon {
         velocityChange.x = Mathf.Clamp(velocityChange.x, -10, 10);
         velocityChange.z = Mathf.Clamp(velocityChange.z, -10, 10);
         velocityChange.y = 0;
-        if (!grounded || state == (int)pS.Dodge) { rb.AddForce(velocityChange * 3, ForceMode.Impulse); }
+        if (!grounded || state.Value == (int)pS.Dodge) { rb.AddForce(velocityChange * 3, ForceMode.Impulse); }
         else { rb.AddForce(velocityChange, ForceMode.VelocityChange); }
       }
     }
@@ -161,15 +161,15 @@ namespace Postcarbon {
       }
       camTarget.transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
       if (equipment.holstered.Value || direction.sqrMagnitude > 0) {
-        if (state != (int)pS.Climb) {
+        if (state.Value != (int)pS.Climb) {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
-          if (state != (int)pS.Dodge) {
+          if (state.Value != (int)pS.Dodge) {
             spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY - 10, spine.transform.localEulerAngles.z);
             // spine1.transform.localRotation = Quaternion.Euler(mouseY/2, spine1.transform.localEulerAngles.y, spine1.transform.localEulerAngles.z);
           }
         }
       }
-      if (state != (int)pS.Dodge) {
+      if (state.Value != (int)pS.Dodge) {
         head.transform.localRotation = Quaternion.Euler(0, 0, 0);
         camTarget.transform.position = new Vector3(head.transform.position.x, head.transform.position.y + 0.05f, head.transform.position.z);
       }
@@ -177,12 +177,12 @@ namespace Postcarbon {
 
     public void Dodge(float xIn, float yIn) {
       if (grounded) {
-        if (state == 0 || state == (int)pS.Sprint) {
+        if (state.Value == 0 || state.Value == (int)pS.Sprint) {
           if (GetComponent<Hero>()) {
             Hero hero = GetComponent<Hero>();
             if (!hero.StaminaCost(hero.dodgeCost)) { return; }
           }
-          SetState((int)pS.Dodge);
+          state.Value = (int)pS.Dodge;
           if (yIn < 0) { anim.SetTrigger("Dodge"); rb.velocity += -transform.forward * dodgeStrength; }
           else if (yIn > 0) { anim.SetTrigger("Dodge"); rb.velocity += transform.forward * dodgeStrength; }
           else if (xIn < 0) { anim.SetTrigger("Dodge"); rb.velocity += -transform.right * dodgeStrength; }
@@ -260,7 +260,7 @@ namespace Postcarbon {
 
     public void Regenerate() {
       UpdateHealth(healthRegen * Time.deltaTime);
-      if (grounded && state != (int)pS.Block && state != (int)pS.Climb && state != (int)pS.Sprint) {
+      if (grounded && state.Value != (int)pS.Block && state.Value != (int)pS.Climb && state.Value != (int)pS.Sprint) {
         UpdateStamina(staminaRegen * Time.deltaTime);
       }
       UpdateMana(manaRegen * Time.deltaTime);
@@ -269,13 +269,13 @@ namespace Postcarbon {
     public override void SetSpeed() {
       if (aiming) { speed = crouchSpeed; }
       else if (crouching) { speed = crouchSpeed; }
-      else if (state == (int)pS.Idle) { speed = idleSpeed; }
-      else if (state == (int)pS.Attack) { speed = idleSpeed; }
-      else if (state == (int)pS.Block) { speed = crouchSpeed; }
-      else if (state == (int)pS.Sprint) { speed = sprintSpeed; }
-      else if (state == (int)pS.Dodge) { speed = idleSpeed; }
-      else if (state == (int)pS.Climb) { speed = crouchSpeed; }
-      else if (state == (int)pS.Swim) { speed = crouchSpeed; }
+      else if (state.Value == (int)pS.Idle) { speed = idleSpeed; }
+      else if (state.Value == (int)pS.Attack) { speed = idleSpeed; }
+      else if (state.Value == (int)pS.Block) { speed = crouchSpeed; }
+      else if (state.Value == (int)pS.Sprint) { speed = sprintSpeed; }
+      else if (state.Value == (int)pS.Dodge) { speed = idleSpeed; }
+      else if (state.Value == (int)pS.Climb) { speed = crouchSpeed; }
+      else if (state.Value == (int)pS.Swim) { speed = crouchSpeed; }
     }
     #endregion
 

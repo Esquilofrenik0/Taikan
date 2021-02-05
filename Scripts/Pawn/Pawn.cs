@@ -19,7 +19,7 @@ namespace Postcarbon {
     public float maxHealth = 100;
     public float healthRegen = 0;
     public Faction faction = Faction.Loner;
-    [HideInInspector] public int state = 0;
+    public NetworkedVarInt state = new NetworkedVarInt(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
     public NetworkedVarFloat health = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 100f);
     public NetworkedVarFloat damage = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
     public NetworkedVarFloat defense = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
@@ -45,19 +45,24 @@ namespace Postcarbon {
     public int respawnTime = 30;
     [HideInInspector] public Rigidbody[] bonesRB;
 
+    void stateChanged(int prevState, int newState) {
+      if (prevState == (int)pS.Dead) { DisableRagdoll(); }
+      if (newState == (int)pS.Dead) { EnableRagdoll(); }
+      anim.SetInteger("State", newState);
+      SetSpeed();
+    }
+
+    public override void NetworkStart() {
+      base.NetworkStart();
+      state.OnValueChanged += stateChanged;
+    }
+
     #region Init
     public void initRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       DisableRagdoll();
     }
 
-    // [ServerRPC(RequireOwnership = false)]
-    // public void DisableRagdoll() {
-    // if (IsServer) { InvokeClientRpcOnEveryone(nDisableRagdoll); }
-    // else { InvokeServerRpc(DisableRagdoll); }
-    // }
-
-    // [ClientRPC]
     public void DisableRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       for (int i = 0; i < bonesRB.Length; i++) {
@@ -69,13 +74,6 @@ namespace Postcarbon {
       if (rb) { rb.isKinematic = false; }
     }
 
-    // [ServerRPC(RequireOwnership = false)]
-    // public void EnableRagdoll() {
-    // if (IsServer) { InvokeClientRpcOnEveryone(nEnableRagdoll); }
-    // else { InvokeServerRpc(EnableRagdoll); }
-    // }
-
-    // [ClientRPC]
     public void EnableRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       for (int i = 0; i < bonesRB.Length; i++) {
@@ -91,8 +89,7 @@ namespace Postcarbon {
       transform.position = spawnPoint;
       health.Value = maxHealth;
       grounded = true;
-      SetState(0);
-      DisableRagdoll();
+      state.Value = 0;
     }
     #endregion
 
@@ -104,7 +101,7 @@ namespace Postcarbon {
     }
 
     public void Equip() {
-      if (state == 0 || state == (int)pS.Sprint) {
+      if (state.Value == 0 || state.Value == (int)pS.Sprint) {
         equipment.holstered.Value = !equipment.holstered.Value;
         equipment.Holster(equipment.holstered.Value);
       }
@@ -117,7 +114,7 @@ namespace Postcarbon {
 
     #region Combat
     public void Attack() {
-      if (state == 0 || state == (int)pS.Sprint) {
+      if (state.Value == 0 || state.Value == (int)pS.Sprint) {
         if (!equipment.holstered.Value) {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
@@ -128,7 +125,7 @@ namespace Postcarbon {
     }
 
     public void Melee() {
-      SetState((int)pS.Attack);
+      state.Value = (int)pS.Attack;
       anim.SetInteger("Combo", combo);
       AniTrig("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
@@ -137,7 +134,7 @@ namespace Postcarbon {
     }
 
     public void Shoot() {
-      SetState((int)pS.Attack);
+      state.Value = (int)pS.Attack;
       AniTrig("Attack");
       Gun gun = GetNetworkedObject(equipment.weapon[0]).GetComponent<Gun>();
       gun.audioSource.PlayOneShot(gun.dGun.audioClip[0]);
@@ -210,27 +207,16 @@ namespace Postcarbon {
     }
 
     public void Die() {
-      SetState((int)pS.Dead);
-      EnableRagdoll();
+      state.Value = (int)pS.Dead;
       Timer.Delay(this, Respawn, respawnTime);
     }
     #endregion
 
-    #region State
-    public void SetState(int pState) {
-      state = pState;
-      anim.SetInteger("State", state);
-      SetSpeed();
-    }
-
-    public virtual void SetSpeed() { }
-    #endregion
-
     #region Animator
+    public virtual void SetSpeed() { }
 
     [ServerRPC(RequireOwnership = false)]
     public void AniTrig(string name) {
-      anim.SetTrigger(name);
       if (IsServer) { InvokeClientRpcOnEveryone(nAniTrig, name); }
       else { InvokeServerRpc(AniTrig, name); }
     }
