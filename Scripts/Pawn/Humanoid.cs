@@ -19,10 +19,8 @@ namespace Postcarbon {
     #region Init
     public override void Respawn() {
       base.Respawn();
-      if (GetComponent<RandomUMA>()) { GetComponent<RandomUMA>().Randomize(avatar); }
-      else { RandomGender(); }
-      avatar.LoadDefaultWardrobe();
       equipment.init();
+      avatar.LoadDefaultWardrobe();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
     }
@@ -52,13 +50,13 @@ namespace Postcarbon {
       if (block) {
         if (state == 0 || state == (int)pS.Sprint) {
           if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
-          if (equipment.weapon[0] != 0 && equipment.weapon[1] == 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon.isRanged) {
+          if (equipment.weapon[0] != 0 && equipment.weapon[1] == 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) {
             if (!aiming) {
               aiming = true;
               anim.SetBool("Aiming", true);
               AniTrig("Aim");
               SetSpeed();
-              if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 45; }
+              if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
             }
           }
           else {
@@ -73,7 +71,7 @@ namespace Postcarbon {
           aiming = false;
           anim.SetBool("Aiming", false);
           SetSpeed();
-          if (GetComponent<Player>()) { GetComponent<Player>().heroCam.m_Lens.FieldOfView = 60; }
+          if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
         }
       }
     }
@@ -106,15 +104,18 @@ namespace Postcarbon {
       defense.Value = baseDefense;
       damage.Value = baseDamage;
       for (int i = 0; i < 2; i++) {
-        if (equipment.equip[i] != null) {
-          dWeapon dWeapon = equipment.data.GetItem(equipment.equip[i]) as dWeapon;
-          defense.Value += dWeapon.defense;
+        if (equipment.weapon[i] != 0) {
+          dWeapon dWeapon = GetNetworkedObject(equipment.weapon[i]).GetComponent<Weapon>().dWeapon;
           damage.Value += dWeapon.damage;
+          if(dWeapon is dShield){
+            dShield dShield = dWeapon as dShield;
+            defense.Value += dShield.defense;
+          }
         }
       }
       for (int i = 0; i < 5; i++) {
-        if (equipment.equip[i + 2] != null) {
-          dArmor dArmor = equipment.data.GetItem(equipment.equip[i + 2]) as dArmor;
+        if (equipment.armor[i] != null) {
+          dArmor dArmor = equipment.armor[i];
           defense.Value += dArmor.defense;
         }
       }

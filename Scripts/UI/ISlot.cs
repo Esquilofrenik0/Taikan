@@ -16,7 +16,6 @@ namespace Postcarbon {
     [HideInInspector] public GameObject slotIcon;
     [HideInInspector] public GameObject thisSlot;
 
-
     void Awake() {
       bgImage = GetComponent<Image>();
       slotIcon = transform.GetChild(0).gameObject;
@@ -27,7 +26,7 @@ namespace Postcarbon {
     public void UpdateSlot() {
       // slot = hero.inventory.slot[number];
       slot.amount = hero.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
+      slot.dItem = hero.inventory.item[number];
       if (slot.dItem) {
         textAmount.text = slot.amount.ToString();
         if (slot.amount == 1) { textAmount.gameObject.SetActive(false); }
@@ -44,16 +43,22 @@ namespace Postcarbon {
     public void OnPointerClick(PointerEventData pointerEventData) {
       // slot = hero.inventory.slot[number];
       slot.amount = hero.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
+      slot.dItem = hero.inventory.item[number];
       if (slot.dItem) {
+        hero.equipment.testVar.Value = slot.dItem;
         if (hero.containerOpen) {
           int freeSlot = hero.container.inventory.FreeSlot();
           if (freeSlot >= 0) { hero.container.Store(hero, number); }
         }
         else {
-          if (slot.dItem.type == iT.Armor || slot.dItem.type == iT.Weapon) {
+          if (slot.dItem is dArmor || slot.dItem is dWeapon) {
             hero.equipment.EquipItem(slot.dItem);
             hero.inventory.RemoveStack(number);
+          }
+          else if (slot.dItem is dBuildable) {
+            dBuildable dBuildable = slot.dItem as dBuildable;
+            hero.player.buildSystem.NewBuild(dBuildable.preview);
+            hero.inventory.Remove(number, 1);
           }
         }
       }
@@ -62,7 +67,7 @@ namespace Postcarbon {
     public void OnPointerEnter(PointerEventData pointerEventData) {
       // slot = hero.inventory.slot[number];
       slot.amount = hero.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.inventory.item[number]);
+      slot.dItem = hero.inventory.item[number];
       bgImage.color = new Vector4(255, 255, 0, 200);
       if (slot.dItem) { hero.hud.DisplayInfo(slot.dItem); }
     }

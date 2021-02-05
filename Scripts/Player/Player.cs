@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 using MLAPI;
+using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
 using MLAPI.NetworkedVar.Collections;
 
@@ -12,10 +12,9 @@ namespace Postcarbon {
     [Header("Components")]
     public Hero hero;
     public InputHandler input;
+    public BuildSystem buildSystem;
     [HideInInspector] public Camera cam;
-    [HideInInspector] public CinemachineVirtualCamera heroCam;
-    [HideInInspector] public CinemachineVirtualCamera worldCam;
-    [HideInInspector] public Cinemachine3rdPersonFollow view;
+    [HideInInspector] public Camera map;
 
     public override void NetworkStart() {
       base.NetworkStart();
@@ -28,13 +27,9 @@ namespace Postcarbon {
       hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
       cam = GameObject.FindWithTag("MainCamera").GetComponent<Camera>();
       cam.transform.SetParent(hero.camTarget.transform);
-      heroCam = GameObject.Find("HeroCam").GetComponent<CinemachineVirtualCamera>();
-      heroCam.transform.SetParent(hero.camTarget.transform);
-      heroCam.Follow = hero.camTarget.transform;
-      view = heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
-      worldCam = GameObject.Find("WorldCam").GetComponent<CinemachineVirtualCamera>();
-      worldCam.Priority = 8;
-      gameObject.layer = 9;
+      cam.transform.localPosition = new Vector3(0.2f, 0f, -3f);
+      map = GameObject.Find("MapCamera").GetComponent<Camera>();
+      map.gameObject.SetActive(false);
       // hero.LoadAvatar(hero.GetAvatar());
       hero.hud.initHUD();
       hero.Respawn();
@@ -58,6 +53,7 @@ namespace Postcarbon {
         hero.Block(input.block);
         if (input.attack) { hero.Attack(); }
       }
+      if (buildSystem.building) { buildSystem.DoBuildRay(); }
     }
 
     void LateUpdate() {
@@ -79,25 +75,30 @@ namespace Postcarbon {
 
     void OnEquip() {
       if (!IsLocalPlayer || hero.state == (int)pS.Dead || hero.inventoryOpen) { return; }
-      hero.Equip();
+      if (buildSystem.building) { buildSystem.preview.transform.Rotate(0, 90f, 0); }
+      else { hero.Equip(); }
     }
 
     void OnInteract() {
       if (!IsLocalPlayer || hero.state == (int)pS.Dead) { return; }
-      hero.Interact();
+      if (buildSystem.building) { buildSystem.BuildObject(); }
+      else { hero.Interact(); }
     }
 
     void OnMenu() {
       if (!IsLocalPlayer) { return; }
-      if (input.menu) {
-        input.menu = false;
-        worldCam.Priority = 8;
-        HideLayer(31);
-      }
+      if (buildSystem.building) { buildSystem.CancelBuild(); }
       else {
-        input.menu = true;
-        worldCam.Priority = 10;
-        ShowLayer(31);
+        if (input.menu) {
+          input.menu = false;
+          map.gameObject.SetActive(false);
+          cam.gameObject.SetActive(true);
+        }
+        else {
+          input.menu = true;
+          cam.gameObject.SetActive(false);
+          map.gameObject.SetActive(true);
+        }
       }
     }
 
@@ -110,24 +111,12 @@ namespace Postcarbon {
       if (!IsLocalPlayer) { return; }
       if (input.firstPerson) {
         input.firstPerson = false;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0.2f;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 3;
+        cam.transform.localPosition = new Vector3(0.2f, 0, -3f);
       }
       else {
         input.firstPerson = true;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().ShoulderOffset.x = 0;
-        heroCam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().CameraDistance = 0;
+        cam.transform.localPosition = Vector3.zero;
       }
-    }
-    #endregion
-
-    #region Camera
-    private void ShowLayer(int layer) {
-      cam.cullingMask |= 1 << layer;
-    }
-
-    private void HideLayer(int layer) {
-      cam.cullingMask &= ~(1 << layer);
     }
     #endregion
   }

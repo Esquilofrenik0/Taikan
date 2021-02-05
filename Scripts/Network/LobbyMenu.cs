@@ -14,7 +14,9 @@ namespace Postcarbon {
       menuPanel.SetActive(true);
 #if UNITY_SERVER
       Server();
+      return;
 #endif
+      // Host();
     }
 
     public void Host() {
@@ -24,8 +26,6 @@ namespace Postcarbon {
     }
 
     public void Server() {
-      Destroy(GameObject.Find("WorldCam"));
-      Destroy(GameObject.Find("HeroCam"));
       menuPanel.SetActive(false);
       HUD.SetActive(false);
       NetworkingManager.Singleton.StartServer();

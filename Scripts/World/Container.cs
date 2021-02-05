@@ -27,7 +27,7 @@ namespace Postcarbon {
     public void Store(Hero hero, int iSlotNumber) {
       Slot slot = new Slot();
       slot.amount = interactingHero.inventory.amount[iSlotNumber];
-      slot.dItem = interactingHero.inventory.data.GetItem(interactingHero.inventory.item[iSlotNumber]);
+      slot.dItem = interactingHero.inventory.item[iSlotNumber];
       inventory.StoreStack(slot);
       hero.inventory.RemoveStack(iSlotNumber);
     }
@@ -35,7 +35,7 @@ namespace Postcarbon {
     public void Retrieve(Hero hero, int cSlotNumber) {
       Slot slot = new Slot();
       slot.amount = inventory.amount[cSlotNumber];
-      slot.dItem = inventory.data.GetItem(inventory.item[cSlotNumber]);
+      slot.dItem = inventory.item[cSlotNumber];
       hero.inventory.StoreStack(slot);
       inventory.RemoveStack(cSlotNumber);
     }

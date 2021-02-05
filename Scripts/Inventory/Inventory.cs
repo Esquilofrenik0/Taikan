@@ -9,20 +9,13 @@ using MLAPI.Serialization;
 
 namespace Postcarbon {
   [System.Serializable]
-  public class Slot: AutoBitWritable {
-    [SerializeField] public dItem dItem;
-    [SerializeField] [Range(1, 999)] public int amount;
-  }
-
-  [System.Serializable]
   public class Inventory: NetworkedBehaviour {
     public int nSlots = 16;
     public List<Slot> initItems;
     public NetworkedList<int> amount = new NetworkedList<int>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<int>());
-    public NetworkedList<string> item = new NetworkedList<string>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<string>());
-    [HideInInspector] public Database data;
+    public NetworkedList<dItem> item = new NetworkedList<dItem>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<dItem>());
 
-    void inventoryItemChanged(NetworkedListEvent<string> changeEvent) {
+    void inventoryItemChanged(NetworkedListEvent<dItem> changeEvent) {
       if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
         GetComponent<HUD>().Refresh();
       }
@@ -46,13 +39,12 @@ namespace Postcarbon {
 
 
     public override void NetworkStart() {
-      data = GameObject.Find("Database").GetComponent<Database>();
       if (IsServer || IsLocalPlayer) {
         for (int i = 0; i < nSlots; i++) {
           item.Add(null);
           amount.Add(0);
-          if (initItems.Count > i) {
-            item[i] = initItems[i].dItem.name;
+          if (initItems.Count > i && initItems[i].dItem != null) {
+            item[i] = initItems[i].dItem;
             if (initItems[i].amount > initItems[i].dItem.stack) { initItems[i].amount = initItems[i].dItem.stack; }
             amount[i] = initItems[i].amount;
           }
@@ -83,7 +75,7 @@ namespace Postcarbon {
       }
       for (int i = 0; i < nSlots; i++) {
         if (item[i] == null) {
-          item[i] = dItem.name;
+          item[i] = dItem;
           amount[i] = storeAmount;
           return;
         }
@@ -102,7 +94,7 @@ namespace Postcarbon {
       }
       for (int i = 0; i < nSlots; i++) {
         if (item[i] == null) {
-          item[i] = toStore.dItem.name;
+          item[i] = toStore.dItem;
           amount[i] = toStore.amount;
           return;
         }
@@ -112,7 +104,7 @@ namespace Postcarbon {
     public int SearchItem(dItem dItem) {
       for (int i = 0; i < nSlots; i++) {
         if (item[i] != null) {
-          if (item[i] == dItem.name) {
+          if (item[i] == dItem) {
             return i;
           }
         }

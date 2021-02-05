@@ -12,15 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
   m_Name: (Recipe) Shield
   m_EditorClassIdentifier: 
-  type: 4
-  Name: (Recipe) Shield
   description: Teaches how to craft a Shield.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   result:
-    dItem: {fileID: 11400000, guid: a520941d4bcded842bc1a5b88cc01dd6, type: 2}
+    dItem: {fileID: 11400000, guid: 25cc4159d0192094baa55f89d06a3055, type: 2}
     amount: 1
   cost:
   - dItem: {fileID: 11400000, guid: 43c097efeb74fe042b72ee8625c53b54, type: 2}

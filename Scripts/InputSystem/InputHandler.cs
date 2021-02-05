@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 using MLAPI;
+using static UnityEngine.InputSystem.InputAction;
 
 namespace Postcarbon {
   public class InputHandler: NetworkedBehaviour {
     [HideInInspector] public InputMaster controls;
     [HideInInspector] public Vector2 movement = Vector2.zero;
     [HideInInspector] public Vector2 camvect = Vector2.zero;
-    [HideInInspector] public Vector2 mousePosition = Vector2.zero;
     [HideInInspector] public bool jump = false;
     [HideInInspector] public bool dodge = false;
     [HideInInspector] public bool attack = false;
@@ -26,11 +25,6 @@ namespace Postcarbon {
       if (!IsLocalPlayer) { return; }
       movement = controls.Player.Movement.ReadValue<Vector2>();
       camvect = controls.Player.Camera.ReadValue<Vector2>();
-      mousePosition = controls.Player.MousePosition.ReadValue<Vector2>();
-      if (controls.Player.Block.ReadValue<float>() == 0) { block = false; } else { block = true; }
-      if (controls.Player.Attack.ReadValue<float>() == 0) { attack = false; } else { attack = true; }
-      if (controls.Player.Sprint.ReadValue<float>() == 0) { sprint = false; } else { sprint = true; }
-      if (controls.Player.Crouch.ReadValue<float>() == 0) { crouch = false; } else { crouch = true; }
     }
 
     public void OnEnable() {
@@ -40,6 +34,26 @@ namespace Postcarbon {
 
     public void OnDisable() {
       controls.Player.Disable();
+    }
+
+    void OnBlock() {
+      if (!IsLocalPlayer) { return; }
+      block = !block;
+    }
+
+    void OnAttack() {
+      if (!IsLocalPlayer) { return; }
+      attack = !attack;
+    }
+
+    void OnSprint() {
+      if (!IsLocalPlayer) { return; }
+      sprint = !sprint;
+    }
+
+    void OnCrouch() {
+      if (!IsLocalPlayer) { return; }
+      crouch = !crouch;
     }
   }
 }

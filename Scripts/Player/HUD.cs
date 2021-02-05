@@ -53,7 +53,7 @@ namespace Postcarbon {
 
     public void initHUD() {
       if (!IsLocalPlayer) { return; }
-      data = GameObject.Find("Database").GetComponent<Database>();
+      data = GameObject.FindObjectOfType<Database>();
       maxSlots = 64;
       hero = gameObject.GetComponent<Hero>();
       GameObject.Find("Canvas").transform.Find("HUD").gameObject.SetActive(true);
@@ -189,9 +189,9 @@ namespace Postcarbon {
 
     public void DisplayRecipeInfo(dRecipe recipe) {
       if (!IsLocalPlayer) { return; }
-      recipeInfo[0].text = recipe.result.dItem.Name;
+      recipeInfo[0].text = recipe.result.dItem.name;
       for (int i = 0; i < recipe.cost.Count; i++) {
-        recipeInfo[i + 1].text = recipe.cost[i].amount + " x " + recipe.cost[i].dItem.Name;
+        recipeInfo[i + 1].text = recipe.cost[i].amount + " x " + recipe.cost[i].dItem.name;
       }
     }
 
@@ -204,30 +204,31 @@ namespace Postcarbon {
 
     public void DisplayInfo(dItem dItem) {
       if (!IsLocalPlayer) { return; }
-      info[0].text = "Name: " + dItem.Name;
-      info[1].text = "Type: " + dItem.type;
-      if (dItem.type == iT.Armor) {
+      info[0].text = "Name: " + dItem.name;
+      // info[1].text = "Type: " + dItem.type;
+      if (dItem is dArmor) {
         dArmor dArmor = dItem as dArmor;
         info[2].text = "Slot: " + dArmor.armorSlot;
         info[3].text = "Defense: " + dArmor.defense;
         info[4].text = "Durability: " + dArmor.durability;
       }
-      else if (dItem.type == iT.Consumable) {
+      else if (dItem is dConsumable) {
         dConsumable dConsumable = dItem as dConsumable;
         info[2].text = "Health: " + dConsumable.hRestore;
         info[3].text = "Stamina: " + dConsumable.sRestore;
         info[4].text = "Mana: " + dConsumable.mRestore;
       }
-      else if (dItem.type == iT.Weapon) {
+      else if (dItem is dWeapon) {
         dWeapon dWeapon = dItem as dWeapon;
-        if (dWeapon.wType != wT.Shield) {
-          info[2].text = "Slot: " + dWeapon.weaponSlot;
-          info[3].text = "Damage: " + dWeapon.damage;
-          info[4].text = "Durability: " + dWeapon.durability;
+        if (dWeapon is dShield) {
+          dShield dShield = dWeapon as dShield;
+          info[2].text = "Slot: " + dShield.weaponSlot;
+          info[3].text = "Defense: " + dShield.defense;
+          info[4].text = "Durability: " + dShield.durability;
         }
         else {
           info[2].text = "Slot: " + dWeapon.weaponSlot;
-          info[3].text = "Defense: " + dWeapon.defense;
+          info[3].text = "Damage: " + dWeapon.damage;
           info[4].text = "Durability: " + dWeapon.durability;
         }
       }

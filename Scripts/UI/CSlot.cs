@@ -25,7 +25,7 @@ namespace Postcarbon {
     public void UpdateSlot() {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
+      slot.dItem = hero.container.inventory.item[number];
       if (slot.amount > 0) {
         textAmount.text = slot.amount.ToString();
         if (slot.amount == 1) { textAmount.gameObject.SetActive(false); }
@@ -42,7 +42,7 @@ namespace Postcarbon {
     public void OnPointerClick(PointerEventData pointerEventData) {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
+      slot.dItem = hero.container.inventory.item[number];
       if (slot.amount > 0) {
         int freeSlot = hero.inventory.FreeSlot();
         if (freeSlot >= 0) {
@@ -55,7 +55,7 @@ namespace Postcarbon {
       bgImage.color = new Vector4(255, 255, 0, 200);
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
-      slot.dItem = hero.inventory.data.GetItem(hero.container.inventory.item[number]);
+      slot.dItem = hero.container.inventory.item[number];
       if (slot.amount > 0) { hero.hud.DisplayInfo(slot.dItem); }
     }
 

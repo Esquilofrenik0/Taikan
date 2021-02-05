@@ -12,15 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
   m_Name: (Recipe) Pistol
   m_EditorClassIdentifier: 
-  type: 4
-  Name: (Recipe) Pistol
   description: Teaches how to craft a Pistol.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01
   weight: 0.01
   stack: 1
   result:
-    dItem: {fileID: 11400000, guid: 9d127f00892c59144a219916278dfa7c, type: 2}
+    dItem: {fileID: 11400000, guid: c59e26f337dd65e4dac4c230677d6417, type: 2}
     amount: 1
   cost:
   - dItem: {fileID: 11400000, guid: 43c097efeb74fe042b72ee8625c53b54, type: 2}

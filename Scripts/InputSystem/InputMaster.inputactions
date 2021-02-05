@@ -6,6 +6,14 @@
             "id": "4bfc9dba-c027-40d5-b7d0-bbb43d9923d6",
             "actions": [
                 {
+                    "name": "MousePosition",
+                    "type": "Value",
+                    "id": "2694adf3-7890-4ef6-8ad6-0cd8fd70b52f",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "Movement",
                     "type": "PassThrough",
                     "id": "0e83a193-793b-4d5b-ae5e-ef01a4dc018f",
@@ -46,22 +54,6 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Attack",
-                    "type": "Button",
-                    "id": "128562ea-eba1-4e85-98cd-5729d49cd8cb",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Block",
-                    "type": "Button",
-                    "id": "4df4d3ef-4de1-421e-86da-e40c12214acc",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "Menu",
                     "type": "Button",
                     "id": "28f57400-2a19-460d-81e8-082c6c07f1d4",
@@ -78,25 +70,9 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Sprint",
-                    "type": "Button",
-                    "id": "bc4e270d-6a5b-443f-8954-4a4435329530",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "Equip",
                     "type": "Button",
                     "id": "d7a17bd2-462f-465d-900e-9133b663ddbd",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "Crouch",
-                    "type": "Button",
-                    "id": "d7de2c52-6e49-4cf9-88ba-c41538f36118",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -110,12 +86,36 @@
                     "interactions": ""
                 },
                 {
-                    "name": "MousePosition",
-                    "type": "Value",
-                    "id": "2694adf3-7890-4ef6-8ad6-0cd8fd70b52f",
-                    "expectedControlType": "Vector2",
+                    "name": "Attack",
+                    "type": "Button",
+                    "id": "128562ea-eba1-4e85-98cd-5729d49cd8cb",
+                    "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Block",
+                    "type": "Button",
+                    "id": "4df4d3ef-4de1-421e-86da-e40c12214acc",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Sprint",
+                    "type": "Button",
+                    "id": "bc4e270d-6a5b-443f-8954-4a4435329530",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
+                },
+                {
+                    "name": "Crouch",
+                    "type": "Button",
+                    "id": "d7de2c52-6e49-4cf9-88ba-c41538f36118",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "Press(behavior=2)"
                 }
             ],
             "bindings": [
@@ -385,83 +385,6 @@
                 },
                 {
                     "name": "",
-                    "id": "433609fe-609c-4106-bd03-47fdb9cc2721",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "1556da86-cde4-4f83-ae9e-3cce606356ec",
-                    "path": "<Keyboard>/numpad7",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "bbcd29c0-ad92-4e88-910d-cb4c85733e77",
-                    "path": "<Gamepad>/rightShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f84450cd-37bb-4790-bd45-efc2b3f77659",
-                    "path": "<Mouse>/rightButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "991f7bcc-1c19-4314-8877-d7680e574cf4",
-                    "path": "<Keyboard>/numpad9",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "f57c8333-b3c7-4f2b-ac9a-c905ef60b177",
-                    "path": "<Keyboard>/q",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "9c6dc33f-a788-495a-94ac-53d740c77658",
-                    "path": "<Gamepad>/leftShoulder",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Block",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "ca1a363b-2c6a-41e6-a5df-78c8ebccb78e",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
@@ -517,28 +440,6 @@
                 },
                 {
                     "name": "",
-                    "id": "dd773b0d-4fc1-44e2-837b-488b0602d650",
-                    "path": "<Keyboard>/shift",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "a9ef585b-c71c-4219-b34b-b60f7e57f8d3",
-                    "path": "<Gamepad>/rightTrigger",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Sprint",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "075c637a-1263-4b61-ac19-872eed33f696",
                     "path": "<Keyboard>/f",
                     "interactions": "",
@@ -556,6 +457,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "Equip",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cd029706-56ab-4bc2-8dda-77713b6b98db",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "efbd337d-6145-4468-a8a1-ad94118c9847",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -583,23 +506,100 @@
                 },
                 {
                     "name": "",
-                    "id": "cd029706-56ab-4bc2-8dda-77713b6b98db",
-                    "path": "<Keyboard>/e",
+                    "id": "dd773b0d-4fc1-44e2-837b-488b0602d650",
+                    "path": "<Keyboard>/shift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Interact",
+                    "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "efbd337d-6145-4468-a8a1-ad94118c9847",
-                    "path": "<Gamepad>/buttonWest",
+                    "id": "a9ef585b-c71c-4219-b34b-b60f7e57f8d3",
+                    "path": "<Gamepad>/rightTrigger",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Interact",
+                    "action": "Sprint",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f84450cd-37bb-4790-bd45-efc2b3f77659",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "991f7bcc-1c19-4314-8877-d7680e574cf4",
+                    "path": "<Keyboard>/numpad9",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f57c8333-b3c7-4f2b-ac9a-c905ef60b177",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9c6dc33f-a788-495a-94ac-53d740c77658",
+                    "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Block",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "433609fe-609c-4106-bd03-47fdb9cc2721",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1556da86-cde4-4f83-ae9e-3cce606356ec",
+                    "path": "<Keyboard>/numpad7",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bbcd29c0-ad92-4e88-910d-cb4c85733e77",
+                    "path": "<Gamepad>/rightShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Attack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

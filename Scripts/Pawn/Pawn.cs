@@ -4,7 +4,6 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.NetworkedVar;
 using MLAPI.Messaging;
-using Cinemachine;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -112,7 +111,7 @@ namespace Postcarbon {
     }
 
     public void PunchActive(bool active) {
-      for (int i = 0; i < 2; i++) { equipment.weaponSlot[i].GetComponent<Collider>().enabled = active; }
+      equipment.weaponSlot[0].GetComponent<Collider>().enabled = active;
     }
     #endregion
 
@@ -123,7 +122,7 @@ namespace Postcarbon {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
         }
-        if (equipment.weapon[0] != 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon.isRanged) { Shoot(); }
+        if (equipment.weapon[0] != 0 && GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) { Shoot(); }
         else { Melee(); }
       }
     }
@@ -140,24 +139,28 @@ namespace Postcarbon {
     public void Shoot() {
       SetState((int)pS.Attack);
       AniTrig("Attack");
-      Weapon weapon = GetNetworkedObject(equipment.weapon[0]).GetComponent<Weapon>();
-      weapon.audioSource.PlayOneShot(weapon.dWeapon.audioClip[0]);
-      weapon.fx.SetActive(true);
+      Gun gun = GetNetworkedObject(equipment.weapon[0]).GetComponent<Gun>();
+      gun.audioSource.PlayOneShot(gun.dGun.audioClip[0]);
+      gun.fx.SetActive(true);
+      Ray ray;
       RaycastHit hit;
       bool raycast = false;
       int prevLayer = gameObject.layer;
       gameObject.layer = 2;
       if (GetComponent<Player>()) {
         Player player = GetComponent<Player>();
-        Ray ray = new Ray(player.cam.transform.position, player.cam.transform.forward);
-        raycast = Physics.Raycast(ray, out hit, 100);
+        ray = new Ray(player.cam.transform.position, player.cam.transform.forward);
       }
-      else {
-        Ray ray = new Ray(col.bounds.center, transform.forward);
-        raycast = Physics.Raycast(ray, out hit, 100);
-      }
+      else { ray = new Ray(col.bounds.center, transform.forward); }
+      raycast = Physics.Raycast(ray, out hit, 100);
       gameObject.layer = prevLayer;
-      if (raycast && hit.collider.GetComponent<Pawn>()) { hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value); }
+      if (raycast && hit.collider.GetComponent<Pawn>()) {
+        hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value);
+        if (hit.collider.GetComponent<NPC>() && hit.collider.GetComponent<Pawn>().faction != faction) {
+          NPC npc = hit.collider.GetComponent<NPC>();
+          npc.enemy.Add(this);
+        }
+      }
     }
 
     public void ResetCombo() {
@@ -169,7 +172,6 @@ namespace Postcarbon {
     #region Stats
     public void TakeDamage(float amount) {
       UpdateHealth(-amount);
-      anim.SetTrigger("Impact");
       Timer.Delay(this, UpdateFloatingHealthBar, 0.1f);
       Timer.Delay(this, UpdateFloatingHealthBar, 0.2f);
     }

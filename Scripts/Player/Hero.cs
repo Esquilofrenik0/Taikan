@@ -83,7 +83,10 @@ namespace Postcarbon {
 
     #region Actions
     public void Jump() {
-      if (state == (int)pS.Climb) { SetState(0); rb.isKinematic = false; }
+      if (state == (int)pS.Climb) {
+        SetState(0);
+        rb.useGravity = true;
+      }
       else if (grounded) {
         if (state == 0 || state == (int)pS.Block || state == (int)pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
@@ -94,7 +97,8 @@ namespace Postcarbon {
       else if (HitWall()) {
         SetState((int)pS.Climb);
         anim.SetTrigger("Climb");
-        rb.isKinematic = true;
+        rb.useGravity = false;
+        rb.velocity = Vector3.zero;
       }
     }
 
@@ -110,8 +114,8 @@ namespace Postcarbon {
 
     public void ClimbLedge() {
       RaycastHit hit = new RaycastHit();
-      Ray ray = new Ray(col.bounds.center + (transform.forward), Vector3.down * 5);
-      if (Physics.Raycast(ray, out hit, 0.5f)) {
+      Ray ray = new Ray(col.bounds.center + (transform.forward / 2) + (Vector3.up * 2), Vector3.down * 4);
+      if (Physics.Raycast(ray, out hit, 10f)) {
         Teleport(hit.point);
       }
     }
@@ -125,7 +129,7 @@ namespace Postcarbon {
           if (!HitWall() || !StaminaCost(climbCost * Time.deltaTime)) {
             ClimbLedge();
             SetState(0);
-            rb.isKinematic = false;
+            rb.useGravity = true;
           }
           else {
             direction = new Vector3(xIn, yIn, 0f);
@@ -160,7 +164,7 @@ namespace Postcarbon {
         if (state != (int)pS.Climb) {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
           if (state != (int)pS.Dodge) {
-            spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY-10, spine.transform.localEulerAngles.z);
+            spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY - 10, spine.transform.localEulerAngles.z);
             // spine1.transform.localRotation = Quaternion.Euler(mouseY/2, spine1.transform.localEulerAngles.y, spine1.transform.localEulerAngles.z);
           }
         }
@@ -189,9 +193,7 @@ namespace Postcarbon {
     }
 
     public void Interact() {
-      if (containerOpen) {
-        CloseInventory();
-      }
+      if (containerOpen) { CloseInventory(); }
       else {
         int prevLayer = gameObject.layer;
         gameObject.layer = 2;
@@ -223,7 +225,7 @@ namespace Postcarbon {
         if (inventory.amount[i] > 0) {
           Slot slot = new Slot();
           slot.amount = inventory.amount[i];
-          slot.dItem = inventory.data.GetItem(inventory.item[i]);
+          slot.dItem = inventory.item[i];
           bag.inventory.StoreStack(slot);
           inventory.RemoveStack(i);
         }
@@ -316,7 +318,7 @@ namespace Postcarbon {
         hud.cSlot[i].number = i;
         hud.cSlot[i].hero = this;
         hud.cSlot[i].slot.amount = container.inventory.amount[i];
-        hud.cSlot[i].slot.dItem = inventory.data.GetItem(container.inventory.item[i]);
+        hud.cSlot[i].slot.dItem = container.inventory.item[i];
         hud.cSlot[i].UpdateSlot();
       }
       hud.cSlots(container.inventory.nSlots);

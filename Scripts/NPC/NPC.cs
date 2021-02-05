@@ -10,13 +10,13 @@ namespace Postcarbon {
     public Pawn pawn;
     public NavMeshAgent agent;
     [Header("AI")]
-    public float FoV = 90;
-    public float viewDistance = 10;
+    public float patrolSpeed = 2;
+    public float combatSpeed = 5;
     public int patrolDistance = 30;
-    [HideInInspector] public bool patrolling = false;
-    [HideInInspector] public Transform enemy;
+    [HideInInspector] public List<Pawn> enemy;
+    [HideInInspector] public bool enemyLost = false;
     [HideInInspector] public Vector3 patrolPoint;
-    [HideInInspector] public RaycastHit[] possibleTargets;
+    [HideInInspector] public bool patrolling = false;
 
     public Vector3 GetNavPoint(Vector3 point) {
       Vector3 navPoint = point;
@@ -43,46 +43,20 @@ namespace Postcarbon {
       if (agent.remainingDistance < 2) { patrolling = false; }
     }
 
-    public bool WithinSight(Transform targetTransform, float fieldOfViewAngle) {
-      Vector3 direction = targetTransform.position - transform.position;
-      if (Vector3.Distance(targetTransform.position, transform.position) < viewDistance) {
-        return Vector3.Angle(direction, transform.forward) < fieldOfViewAngle;
-      }
-      else { return false; }
-    }
-
-    public bool LookForEnemy() {
-      RaycastHit hit;
-      if (Physics.SphereCast(pawn.col.bounds.center, FoV / 16, transform.forward, out hit, viewDistance)) {
-        if (hit.collider.GetComponent<Pawn>()) {
-          Pawn target = hit.collider.GetComponent<Pawn>();
-          if (pawn.faction != target.faction) {
-            if (target.state != (int)pS.Dead) {
-              if (WithinSight(target.transform, FoV)) {
-                enemy = target.transform;
-                return true;
-              }
-            }
-          }
-        }
-      }
-      return false;
-    }
-
     public void EngageEnemy(float speed) {
-      if (enemy.GetComponent<Pawn>().state != (int)pS.Dead && WithinSight(enemy, FoV)) {
+      if (enemy[0] && enemy[0].state != (int)pS.Dead) {
         agent.isStopped = false;
         agent.speed = speed;
-        agent.SetDestination(enemy.transform.position);
-        if (pawn.equipment.weapon[0] != 0 && GetNetworkedObject(pawn.equipment.weapon[0]).GetComponent<Weapon>().dWeapon.isRanged) { RangedAttack(); }
+        agent.SetDestination(enemy[0].transform.position);
+        if (pawn.equipment.weapon[0] != 0 && GetNetworkedObject(pawn.equipment.weapon[0]).GetComponent<Weapon>().dWeapon is dGun) { RangedAttack(); }
         else { MeleeAttack(); }
       }
-      else { enemy = null; }
+      else { enemy.Remove(enemy[0]); }
     }
 
     public void RangedAttack() {
       if (agent.remainingDistance < 20) {
-        transform.LookAt(enemy);
+        transform.LookAt(enemy[0].transform);
         pawn.Attack();
         if (agent.remainingDistance < 5) { agent.isStopped = true; }
       }
@@ -90,15 +64,15 @@ namespace Postcarbon {
 
     public void MeleeAttack() {
       if (agent.remainingDistance < 5) {
-        transform.LookAt(enemy);
+        transform.LookAt(enemy[0].transform);
         pawn.Attack();
         if (agent.remainingDistance < 1) { agent.isStopped = true; }
       }
     }
 
     public void LookAtEnemy() {
-      if (enemy != null) {
-        Vector3 toLook = enemy.GetComponent<Collider>().bounds.center;
+      if (enemy[0]) {
+        Vector3 toLook = enemy[0].GetComponent<Collider>().bounds.center;
         pawn.spine.transform.LookAt(toLook, Vector3.right);
         float rx = 0;
         float ry = pawn.spine.transform.localEulerAngles.y;
