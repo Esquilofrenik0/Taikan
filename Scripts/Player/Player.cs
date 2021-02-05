@@ -34,7 +34,6 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       hero.initRagdoll();
-      if (!IsServer) { Timer.Delay(this, hero.LoadAvatar, 0.1f); }
     }
 
     void Start() {

@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
 using MLAPI.Messaging;
-using MLAPI.NetworkedVar;
-using MLAPI.NetworkedVar.Collections;
-using MLAPI.Connection;
-using System.IO;
 
 namespace Postcarbon {
   [System.Serializable]

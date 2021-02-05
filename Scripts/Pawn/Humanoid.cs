@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UMA;
 using UMA.CharacterSystem;
+using MLAPI.NetworkedVar;
 
 
 namespace Postcarbon {
@@ -10,6 +11,7 @@ namespace Postcarbon {
   public class Humanoid: Pawn {
     [Header("Components")]
     public DynamicCharacterAvatar avatar;
+    public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
 
     [Header("Movement")]
     [HideInInspector] public bool crouching = false;
@@ -17,10 +19,27 @@ namespace Postcarbon {
     [HideInInspector] public Vector3 direction = Vector3.zero;
 
     #region Init
+    public void recipeAvatarChanged(string oldRecipe, string newRecipe){
+      LoadAvatar();
+    }
+
+    public void LoadAvatar() {
+      if (recipeAvatar.Value != null) {
+        avatar.LoadFromRecipeString(recipeAvatar.Value);
+        avatar.LoadDefaultWardrobe();
+        avatar.BuildCharacter();
+      }
+    }
+
+    public override void NetworkStart(){
+      base.NetworkStart();
+      recipeAvatar.OnValueChanged += recipeAvatarChanged;    
+    }
+
     public override void Respawn() {
       base.Respawn();
-      equipment.init();
       avatar.LoadDefaultWardrobe();
+      equipment.init();
       Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
       Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
     }

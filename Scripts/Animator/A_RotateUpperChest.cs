@@ -7,7 +7,6 @@ namespace Postcarbon {
     public Vector3 toRotate = new Vector3(0,0,0);
 
     override public void OnStateIK(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
-      // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Transform bone = animator.GetBoneTransform(HumanBodyBones.Chest);
       animator.SetBoneLocalRotation(HumanBodyBones.Chest, Quaternion.Euler(bone.localRotation.x + toRotate.x, bone.localRotation.y + toRotate.y, bone.localRotation.z + toRotate.z));
     }

@@ -170,7 +170,6 @@ namespace Postcarbon {
     public void TakeDamage(float amount) {
       UpdateHealth(-amount);
       Timer.Delay(this, UpdateFloatingHealthBar, 0.1f);
-      Timer.Delay(this, UpdateFloatingHealthBar, 0.2f);
     }
 
     public void UpdateHealth(float amount) {

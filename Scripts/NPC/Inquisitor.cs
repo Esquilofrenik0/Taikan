@@ -20,8 +20,8 @@ namespace Postcarbon {
         if (patrolling) { MoveToPoint(patrolPoint, patrolSpeed); }
         else { SetPatrolPoint(); }
       }
-      else { 
-        LookAtEnemy(); 
+      else {
+        LookAtEnemy();
         EngageEnemy(combatSpeed);
       }
       pawn.anim.SetFloat("Vertical", agent.velocity.magnitude);

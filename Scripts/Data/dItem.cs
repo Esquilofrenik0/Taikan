@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Postcarbon {
-  [CreateAssetMenu(fileName = "Item", menuName = "SRPG/dItem")]
   [System.Serializable]
   public class dItem: ScriptableObject {
     public string description = null;

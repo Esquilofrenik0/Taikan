@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using MLAPI;
-using MLAPI.Spawning;
 using MLAPI.NetworkedVar;
-using System.IO;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -17,16 +15,13 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       if (IsServer) { owner.Value = ownerID; }
-    }
-
-    void Start() {
       if (GetComponent<NetworkedObject>()) {
         if (GetComponent<NetworkedObject>().IsSceneObject == true) {
           GetComponent<Collider>().isTrigger = false;
           return;
         }
-        if (owner.Value != 0) { pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>(); }
       }
+      if (owner.Value != 0) { pawn = GetNetworkedObject(owner.Value).GetComponent<Pawn>(); }
       else { pawn = GetComponentInParent<Pawn>(); }
       if (GetComponent<Collider>() && pawn) { Physics.IgnoreCollision(GetComponent<Collider>(), pawn.col); }
       gameObject.layer = 2;

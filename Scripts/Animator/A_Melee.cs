@@ -6,6 +6,7 @@ using MLAPI;
 namespace Postcarbon {
   public class A_Melee: StateMachineBehaviour {
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+      if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
       pawn.state.Value = (int)pS.Attack;
       pawn.resetAttack = true;
@@ -13,6 +14,7 @@ namespace Postcarbon {
     }
 
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
+      if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
       pawn.state.Value = 0;
       pawn.attacking = false;

@@ -12,7 +12,7 @@ namespace Postcarbon {
     [Header("Components")]
     public Player player;
     public HUD hud;
-    public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
+    // public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
 
     [Header("Camera")]
     public GameObject camTarget;
@@ -55,23 +55,12 @@ namespace Postcarbon {
       }
     }
 
-    public void LoadAvatar() {
-      avatar.name = "Player";
-      if (recipeAvatar.Value != null) { avatar.LoadFromRecipeString(recipeAvatar.Value); }
-      avatar.ClearSlots();
-      avatar.LoadDefaultWardrobe();
-      avatar.BuildCharacter();
-    }
-
-
     public void Teleport(Vector3 pos) { transform.position = pos; }
 
     public override void Respawn() {
       Teleport(spawnPoint);
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
-      avatar.ClearSlots();
-      avatar.LoadDefaultWardrobe();
       equipment.init();
       health.Value = maxHealth / 2;
       stamina = maxStamina / 2;
@@ -259,11 +248,15 @@ namespace Postcarbon {
     }
 
     public void Regenerate() {
-      UpdateHealth(healthRegen * Time.deltaTime);
-      if (grounded && state.Value != (int)pS.Block && state.Value != (int)pS.Climb && state.Value != (int)pS.Sprint) {
-        UpdateStamina(staminaRegen * Time.deltaTime);
+      if (health.Value != maxHealth) { UpdateHealth(healthRegen * Time.deltaTime); }
+      if (stamina != maxStamina) {
+        if (grounded && state.Value != (int)pS.Block && state.Value != (int)pS.Climb && state.Value != (int)pS.Sprint) {
+          UpdateStamina(staminaRegen * Time.deltaTime);
+        }
       }
-      UpdateMana(manaRegen * Time.deltaTime);
+      if (mana != maxMana) {
+        UpdateMana(manaRegen * Time.deltaTime);
+      }
     }
 
     public override void SetSpeed() {
