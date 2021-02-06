@@ -35,14 +35,8 @@ namespace Postcarbon {
     public override void NetworkStart() {
       base.NetworkStart();
       recipeAvatar.OnValueChanged += recipeAvatarChanged;
-    }
-
-    public override void Respawn() {
-      base.Respawn();
-      avatar.LoadDefaultWardrobe();
-      equipment.init();
-      Timer.rDelay(this, equipment.dHolster, 0.05f, equipment.holsterRoutine);
-      Timer.rDelay(this, RefreshStats, 0.1f, equipment.refreshRoutine);
+      if (IsLocalPlayer || IsServer) { return; }
+      LoadAvatar();
     }
 
     public void RandomGender() {

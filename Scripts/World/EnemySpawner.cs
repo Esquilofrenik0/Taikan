@@ -67,12 +67,10 @@ namespace Postcarbon {
         NavMeshHit myNavHit;
         if (NavMesh.SamplePosition(where, out myNavHit, 100, -1)) { where = myNavHit.position; }
         GameObject spawn = Instantiate(toSpawn, where, Quaternion.identity);
-        Pawn pawn = spawn.GetComponent<Pawn>();
-        pawn.initRagdoll();
         spawn.GetComponent<NetworkedObject>().Spawn();
-        pawn.Respawn();
+        Pawn pawn = spawn.GetComponent<Pawn>();
         pawn.spawnPoint = transform.position;
-        // spawn.transform.SetParent(transform.GetChild(0));
+        // spawn.transform.SetParent(transform);
         enemies.Add(spawn.GetComponent<NetworkedObject>());
       }
       spawned = true;

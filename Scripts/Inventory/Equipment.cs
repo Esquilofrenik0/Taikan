@@ -17,7 +17,6 @@ namespace Postcarbon {
     public List<dItem> initItems;
     public List<Transform> weaponSlot = new List<Transform>() { null, null, null, null };
     public NetworkedVarBool holstered = new NetworkedVarBool(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, false);
-    // public NetworkedList<ulong> weapon = new NetworkedList<ulong>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<ulong> { 0, 0 });
     public List<Weapon> weapon = new List<Weapon> { null, null };
     public NetworkedList<dItem> equip = new NetworkedList<dItem>(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, new List<dItem> { null, null, null, null, null, null, null });
     [HideInInspector] public Coroutine holsterRoutine;
@@ -33,29 +32,22 @@ namespace Postcarbon {
       }
     }
 
+    void holsterChanged(bool prevHolster, bool newHolster) {
+      Holster(newHolster);
+    }
+
     public override void NetworkStart() {
       base.NetworkStart();
       equip.OnListChanged += equipChanged;
+      holstered.OnValueChanged += holsterChanged;
       if (IsServer) { for (int i = 0; i < initItems.Count; i++) { EquipItem(initItems[i]); } }
-      init();
     }
 
     public void init() {
       for (int i = 0; i < 7; i++) { if (equip[i]) { Dress(equip[i]); } }
-      Timer.rDelay(this, dHolster, 0.05f, holsterRoutine);
-      Timer.rDelay(this, humanoid.RefreshStats, 0.1f, refreshRoutine);
     }
 
-    public void dHolster() { Holster(holstered.Value); }
-
-    [ServerRPC(RequireOwnership = false)]
     public void Holster(bool equipped) {
-      if (IsServer) { InvokeClientRpcOnEveryone(nHolster, equipped); }
-      else { InvokeServerRpc(Holster, equipped); }
-    }
-
-    [ClientRPC]
-    public void nHolster(bool equipped) {
       for (int i = 0; i < weapon.Count; i++) {
         if (weapon[i]) {
           if (equipped) { weapon[i].transform.SetParent(weaponSlot[i]); }
@@ -64,6 +56,58 @@ namespace Postcarbon {
           weapon[i].transform.localRotation = Quaternion.identity;
         }
       }
+    }
+
+    public void Dress(dItem dItem) {
+      if (dItem is dArmor) {
+        dArmor dArmor = dItem as dArmor;
+        humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.name);
+        humanoid.avatar.BuildCharacter();
+      }
+      else if (dItem is dWeapon) {
+        if (weapon[GetSlot(dItem)] == null) {
+          SpawnWeapon(GetSlot(dItem), dItem);
+        }
+      }
+    }
+
+    public void Undress(int slot) {
+      if (slot > 1) {
+        aS armorSlot = (aS)(slot - 2);
+        humanoid.avatar.ClearSlot(armorSlot.ToString());
+        humanoid.avatar.BuildCharacter();
+      }
+      else {
+        if (weapon[slot] != null) {
+          DestroyWeapon(slot);
+        }
+      }
+    }
+
+    public void SpawnWeapon(int slot, dItem dItem) {
+      dWeapon dWeapon = dItem as dWeapon;
+      GameObject spawn = Instantiate(dWeapon.resource, weaponSlot[EquipSlot(slot)]);
+      weapon[slot] = spawn.GetComponent<Weapon>();
+    }
+
+    public void DestroyWeapon(int slot) {
+      if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
+      else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
+      Destroy(weapon[slot].gameObject);
+      weapon[slot] = null;
+    }
+
+    public void EquipItem(dItem dItem) {
+      int slot = GetSlot(dItem);
+      ClearSlot(slot, dItem);
+      UpdateSlot(slot, dItem);
+      equip[slot] = dItem;
+    }
+
+    public void UnequipItem(int slot) {
+      if (equip[slot] == null) { return; }
+      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip[slot], 1); }
+      equip[slot] = null;
     }
 
     public void ClearSlot(int slot, dItem dItem) {
@@ -83,72 +127,6 @@ namespace Postcarbon {
       else if (slot == 1) {
         dWeapon dWeapon = dItem as dWeapon;
         if (dWeapon is dShield) { humanoid.anim.SetBool("Shield", true); }
-      }
-    }
-
-    public void EquipItem(dItem dItem) {
-      int slot = GetSlot(dItem);
-      ClearSlot(slot, dItem);
-      UpdateSlot(slot, dItem);
-      equip[slot] = dItem;
-    }
-
-    public void SpawnWeapon(int slot, dItem dItem) {
-      dWeapon dWeapon = dItem as dWeapon;
-      GameObject spawn = Instantiate(dWeapon.resource, weaponSlot[EquipSlot(slot)]);
-      weapon[slot] = spawn.GetComponent<Weapon>();
-    }
-
-    public void UnequipItem(int slot) {
-      if (equip[slot] == null) { return; }
-      if (GetComponent<Inventory>()) { GetComponent<Inventory>().Store(equip[slot], 1); }
-      equip[slot] = null;
-    }
-
-    public void DestroyWeapon(int slot) {
-      if (slot == 0) { humanoid.anim.SetInteger("Weapon", 0); }
-      else if (slot == 1) { humanoid.anim.SetBool("Shield", false); }
-      Destroy(weapon[slot].gameObject);
-      weapon[slot] = null;
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void Dress(dItem dItem) {
-      if (IsServer) { InvokeClientRpcOnEveryone(nDress, dItem); }
-      else { InvokeServerRpc(Dress, dItem); }
-    }
-
-    [ClientRPC]
-    public void nDress(dItem dItem) {
-      if (dItem is dArmor) {
-        dArmor dArmor = dItem as dArmor;
-        humanoid.avatar.SetSlot(dArmor.armorSlot.ToString(), dArmor.name);
-        humanoid.avatar.BuildCharacter();
-      }
-      else if (dItem is dWeapon) {
-        if (weapon[GetSlot(dItem)] == null) {
-          SpawnWeapon(GetSlot(dItem), dItem);
-        }
-      }
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void Undress(int slot) {
-      if (IsServer) { InvokeClientRpcOnEveryone(nUndress, slot); }
-      else { InvokeServerRpc(Undress, slot); }
-    }
-
-    [ClientRPC]
-    public void nUndress(int slot) {
-      if (slot > 1) {
-        aS armorSlot = (aS)(slot - 2);
-        humanoid.avatar.ClearSlot(armorSlot.ToString());
-        humanoid.avatar.BuildCharacter();
-      }
-      else {
-        if (weapon[slot] != null) {
-          DestroyWeapon(slot);
-        }
       }
     }
 

@@ -6,8 +6,8 @@ using UnityEngine.AI;
 namespace Postcarbon {
   public class Inquisitor: NPC {
     public override void NetworkStart() {
-      if (!IsServer) { return; }
       enemy = new List<Pawn>();
+      if (!IsServer) { return; }
       pawn.spawnPoint = GetNavPoint(transform.position);
       pawn.initRagdoll();
       pawn.Respawn();
