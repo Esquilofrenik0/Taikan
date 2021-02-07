@@ -5,6 +5,7 @@ using MLAPI;
 using MLAPI.Messaging;
 using MLAPI.NetworkedVar;
 using MLAPI.NetworkedVar.Collections;
+using UMA.CharacterSystem;
 
 namespace Postcarbon {
   [System.Serializable]
@@ -47,6 +48,9 @@ namespace Postcarbon {
       hero.GetAvatar();
       hero.hud.initHUD();
       hero.Respawn();
+
+      hero.hud.WriteWorldInfo(hero.name + "Joined World");
+      hero.hud.WriteWorldInfo("This is a Paragraph.");
     }
 
     void FixedUpdate() {
@@ -102,6 +106,11 @@ namespace Postcarbon {
     void OnBlock() {
       if (!IsLocalPlayer) { return; }
       block = !block;
+      if(!block){
+        if(hero.state.Value == (int)pS.Aim || hero.state.Value == (int)pS.Block){
+          hero.state.Value = 0;
+        }
+      }
     }
 
     void OnAttack() {
@@ -112,6 +121,9 @@ namespace Postcarbon {
     void OnSprint() {
       if (!IsLocalPlayer) { return; }
       sprint = !sprint;
+      if(!sprint && hero.state.Value == (int)pS.Sprint){
+        hero.state.Value = 0;
+      }
     }
 
     void OnCrouch() {
@@ -168,12 +180,16 @@ namespace Postcarbon {
     void OnChangeView() {
       if (!IsLocalPlayer) { return; }
       if (firstPerson) {
-        firstPerson = false;
+        hero.GetComponent<UmaHideHead>().RenderersEnabled = false;
+        hero.avatar.BuildCharacter();
         cam.transform.localPosition = new Vector3(0.2f, 0, -3f);
+        firstPerson = false;
       }
       else {
-        firstPerson = true;
+        hero.GetComponent<UmaHideHead>().RenderersEnabled = true;
+        hero.avatar.BuildCharacter();
         cam.transform.localPosition = Vector3.zero;
+        firstPerson = true;
       }
     }
     #endregion

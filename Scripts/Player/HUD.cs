@@ -15,12 +15,14 @@ namespace Postcarbon {
     [HideInInspector] public ISlot[] iSlot;
     [HideInInspector] public RSlot[] rSlot;
     [HideInInspector] public Text[] recipeInfo;
-    [HideInInspector] public Text[] info;
     [HideInInspector] public Text[] stats;
+    [HideInInspector] public Text[] itemInfo;
+    [HideInInspector] public Text worldInfo;
     [HideInInspector] public GameObject inventoryUI;
     [HideInInspector] public GameObject containerUI;
     [HideInInspector] public GameObject craftingUI;
     [HideInInspector] public int maxSlots = 64;
+    [HideInInspector] public Coroutine clearWorldInfo;
     [HideInInspector] public Database data;
 
     public void Refresh() {
@@ -67,16 +69,31 @@ namespace Postcarbon {
       containerUI.SetActive(true);
       initContainer();
       recipeInfo = new Text[8];
-      info = new Text[8];
+      itemInfo = new Text[8];
       stats = new Text[5];
-      for (int i = 0; i < info.Length; i++) {
+      for (int i = 0; i < itemInfo.Length; i++) {
         recipeInfo[i] = GameObject.Find("HUD/InventoryUI/RecipeUI/RecipeInfo").transform.GetChild(i).GetComponent<Text>();
-        info[i] = GameObject.Find("HUD/InventoryUI/BagUI/Info").transform.GetChild(i).GetComponent<Text>();
+        itemInfo[i] = GameObject.Find("HUD/InventoryUI/BagUI/Info").transform.GetChild(i).GetComponent<Text>();
       }
       for (int i = 0; i < stats.Length; i++) {
         stats[i] = GameObject.Find("HUD/InventoryUI/EquipmentUI/Stats").transform.GetChild(i).GetComponent<Text>();
       }
       inventoryUI.SetActive(false);
+      worldInfo = GameObject.Find("HUD/WorldInfo").GetComponent<Text>();
+      worldInfo.gameObject.SetActive(false);
+    }
+
+    public void WriteWorldInfo(string text) {
+      if (!IsLocalPlayer) { return; }
+      worldInfo.gameObject.SetActive(true);
+      worldInfo.text += "\n" + text;
+      Timer.rDelay(this, ClearWorldInfo, 5f, clearWorldInfo);
+    }
+
+    public void ClearWorldInfo() {
+      if (!IsLocalPlayer) { return; }
+      worldInfo.text = null;
+      worldInfo.gameObject.SetActive(false);
     }
 
     public void initRecipe() {
@@ -202,45 +219,45 @@ namespace Postcarbon {
       }
     }
 
-    public void DisplayInfo(dItem dItem) {
+    public void DisplayItemInfo(dItem dItem) {
       if (!IsLocalPlayer) { return; }
-      info[0].text = "Name: " + dItem.name;
-      // info[1].text = "Type: " + dItem.type;
+      itemInfo[0].text = "Name: " + dItem.name;
+      // itemInfo[1].text = "Type: " + dItem.type;
       if (dItem is dArmor) {
         dArmor dArmor = dItem as dArmor;
-        info[2].text = "Slot: " + dArmor.armorSlot;
-        info[3].text = "Defense: " + dArmor.defense;
-        info[4].text = "Durability: " + dArmor.durability;
+        itemInfo[2].text = "Slot: " + dArmor.armorSlot;
+        itemInfo[3].text = "Defense: " + dArmor.defense;
+        itemInfo[4].text = "Durability: " + dArmor.durability;
       }
       else if (dItem is dConsumable) {
         dConsumable dConsumable = dItem as dConsumable;
-        info[2].text = "Health: " + dConsumable.hRestore;
-        info[3].text = "Stamina: " + dConsumable.sRestore;
-        info[4].text = "Mana: " + dConsumable.mRestore;
+        itemInfo[2].text = "Health: " + dConsumable.hRestore;
+        itemInfo[3].text = "Stamina: " + dConsumable.sRestore;
+        itemInfo[4].text = "Mana: " + dConsumable.mRestore;
       }
       else if (dItem is dWeapon) {
         dWeapon dWeapon = dItem as dWeapon;
         if (dWeapon is dShield) {
           dShield dShield = dWeapon as dShield;
-          info[2].text = "Slot: " + dShield.weaponSlot;
-          info[3].text = "Defense: " + dShield.defense;
-          info[4].text = "Durability: " + dShield.durability;
+          itemInfo[2].text = "Slot: " + dShield.weaponSlot;
+          itemInfo[3].text = "Defense: " + dShield.defense;
+          itemInfo[4].text = "Durability: " + dShield.durability;
         }
         else {
-          info[2].text = "Slot: " + dWeapon.weaponSlot;
-          info[3].text = "Damage: " + dWeapon.damage;
-          info[4].text = "Durability: " + dWeapon.durability;
+          itemInfo[2].text = "Slot: " + dWeapon.weaponSlot;
+          itemInfo[3].text = "Damage: " + dWeapon.damage;
+          itemInfo[4].text = "Durability: " + dWeapon.durability;
         }
       }
-      info[5].text = "Value: " + dItem.value;
-      info[6].text = "Weight: " + dItem.weight;
-      info[7].text = "Description: " + dItem.description;
+      itemInfo[5].text = "Value: " + dItem.value;
+      itemInfo[6].text = "Weight: " + dItem.weight;
+      itemInfo[7].text = "Description: " + dItem.description;
     }
 
     public void ResetInfo() {
       if (!IsLocalPlayer) { return; }
-      for (int i = 0; i < info.Length; i++) {
-        info[i].text = "";
+      for (int i = 0; i < itemInfo.Length; i++) {
+        itemInfo[i].text = "";
       }
     }
   }

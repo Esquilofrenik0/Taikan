@@ -47,15 +47,20 @@ namespace Postcarbon {
       if (slot.dItem) {
         if (hero.containerOpen) {
           int freeSlot = hero.container.inventory.FreeSlot();
-          if (freeSlot >= 0) { hero.container.Store(hero, number); }
+          if (freeSlot >= 0) {
+            hero.hud.WriteWorldInfo("Stored " + slot.amount + "x " + slot.dItem.name);
+            hero.container.Store(hero, number);
+          }
         }
         else {
           if (slot.dItem is dArmor || slot.dItem is dWeapon) {
+            hero.hud.WriteWorldInfo("Equipped " + slot.dItem.name);
             hero.equipment.EquipItem(slot.dItem);
             hero.inventory.RemoveStack(number);
           }
           else if (slot.dItem is dBuildable) {
             dBuildable dBuildable = slot.dItem as dBuildable;
+            hero.hud.WriteWorldInfo("Consumed 1x " + slot.dItem.name);
             hero.player.buildSystem.NewBuild(dBuildable.preview);
             hero.inventory.Remove(number, 1);
           }
@@ -68,7 +73,7 @@ namespace Postcarbon {
       slot.amount = hero.inventory.amount[number];
       slot.dItem = hero.inventory.item[number];
       bgImage.color = new Vector4(255, 255, 0, 200);
-      if (slot.dItem) { hero.hud.DisplayInfo(slot.dItem); }
+      if (slot.dItem) { hero.hud.DisplayItemInfo(slot.dItem); }
     }
 
     public void OnPointerExit(PointerEventData pointerEventData) {

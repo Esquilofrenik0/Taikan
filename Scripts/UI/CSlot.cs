@@ -46,6 +46,7 @@ namespace Postcarbon {
       if (slot.dItem) {
         int freeSlot = hero.inventory.FreeSlot();
         if (freeSlot >= 0) {
+          hero.hud.WriteWorldInfo("Retrieved " + slot.dItem.name);
           hero.container.Retrieve(hero, number);
         }
       }
@@ -56,7 +57,7 @@ namespace Postcarbon {
       // slot = hero.container.inventory.slot[number];
       slot.amount = hero.container.inventory.amount[number];
       slot.dItem = hero.container.inventory.item[number];
-      if (slot.dItem) { hero.hud.DisplayInfo(slot.dItem); }
+      if (slot.dItem) { hero.hud.DisplayItemInfo(slot.dItem); }
     }
 
     public void OnPointerExit(PointerEventData pointerEventData) {

@@ -35,20 +35,28 @@ namespace Postcarbon {
     public float baseDamage = 1;
     public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
-    [HideInInspector] public bool aiming = false;
     [HideInInspector] public bool attacking = false;
     [HideInInspector] public bool resetAttack = true;
     [HideInInspector] public Coroutine resetCombo;
     [HideInInspector] public Coroutine disableHealthBar;
+    [HideInInspector] public Coroutine meleeRoutine;
 
     [Header("Ragdoll")]
     public int respawnTime = 30;
     [HideInInspector] public Rigidbody[] bonesRB;
 
     void stateChanged(int prevState, int newState) {
-      if (prevState == (int)pS.Dead) { DisableRagdoll(); }
-      if (newState == (int)pS.Dead) { EnableRagdoll(); }
       anim.SetInteger("State", newState);
+      if (prevState == (int)pS.Dead) { DisableRagdoll(); }
+      else if (prevState == (int)pS.Aim) {
+        if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
+      }
+      if (newState == (int)pS.Dead) { EnableRagdoll(); }
+      else if (newState == (int)pS.Aim) {
+        anim.SetTrigger("Aim");
+        if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
+      }
+      else if (newState == (int)pS.Block) { anim.SetTrigger("Block"); }
       SetSpeed();
     }
 
@@ -114,7 +122,7 @@ namespace Postcarbon {
 
     #region Combat
     public void Attack() {
-      if (state.Value == 0 || state.Value == (int)pS.Sprint) {
+      if (state.Value == 0 || state.Value == (int)pS.Aim || state.Value == (int)pS.Sprint) {
         if (!equipment.holstered.Value) {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
@@ -124,8 +132,15 @@ namespace Postcarbon {
       }
     }
 
+    public void StartMeleeAttack() {
+      resetAttack = true;
+      attacking = true;
+      if (equipment.weapon[0] == null) { PunchActive(true); }
+    }
+
     public void Melee() {
       state.Value = (int)pS.Attack;
+      Timer.rDelay(this, StartMeleeAttack, 0.1f, meleeRoutine);
       anim.SetInteger("Combo", combo);
       AniTrig("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);

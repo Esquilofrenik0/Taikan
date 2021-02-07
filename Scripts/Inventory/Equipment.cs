@@ -41,6 +41,7 @@ namespace Postcarbon {
       equip.OnListChanged += equipChanged;
       holstered.OnValueChanged += holsterChanged;
       if (IsServer) { for (int i = 0; i < initItems.Count; i++) { EquipItem(initItems[i]); } }
+      humanoid.RefreshStats();
     }
 
     public void init() {

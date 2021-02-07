@@ -38,6 +38,7 @@ namespace Postcarbon {
       if (hero.equipment.equip[number] != null) {
         dItem = hero.equipment.equip[number];
         int slot = hero.equipment.GetSlot(dItem);
+        hero.hud.WriteWorldInfo("Unequipped " + dItem.name);
         hero.equipment.UnequipItem(slot);
       }
       UpdateSlot();
@@ -48,7 +49,7 @@ namespace Postcarbon {
       bgImage.color = new Vector4(255, 255, 0, 200);
       if (hero.equipment.equip[number] != null) {
         dItem = hero.equipment.equip[number];
-        hero.hud.DisplayInfo(dItem);
+        hero.hud.DisplayItemInfo(dItem);
       }
       UpdateSlot();
     }

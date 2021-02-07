@@ -5,11 +5,11 @@ using MLAPI;
 using UnityEngine.AI;
 
 namespace Postcarbon {
-  public class EnemySpawner: NetworkedBehaviour {
+  public class NPCSpawner: NetworkedBehaviour {
     public GameObject toSpawn;
     public int number = 5;
-    [HideInInspector] public List<ulong> players;
-    [HideInInspector] public List<NetworkedObject> enemies;
+    [HideInInspector] public List<Player> players;
+    [HideInInspector] public List<NetworkedObject> npc;
     [HideInInspector] public Coroutine unspawnRoutine;
     bool spawned = false;
     bool unspawn = false;
@@ -23,35 +23,29 @@ namespace Postcarbon {
     private void OnTriggerEnter(Collider other) {
       if (!IsServer) { return; }
       if (other.tag == "Player") {
-        players.Add(other.GetComponent<Player>().OwnerClientId);
-        SpawnEnemies();
+        players.Add(other.GetComponent<Player>());
+        if (!spawned) { SpawnEnemies(); }
       }
     }
 
     private void OnTriggerExit(Collider other) {
       if (!IsServer) { return; }
       if (other.tag == "Player") {
-        players.Remove(other.GetComponent<Player>().OwnerClientId);
-        if (players.Count == 0) { UnspawnEnemies(); }
+        players.Remove(other.GetComponent<Player>());
+        if (spawned) { UnspawnEnemies(); }
       }
     }
 
     public void DestroyEnemy(int i) {
       if (!IsServer) { return; }
-      NetworkedObject[] equips = enemies[i].GetComponentsInChildren<NetworkedObject>();
-      for (int j = 0; j < equips.Length; j++) {
-        Destroy(equips[j].gameObject);
-      }
-      Destroy(enemies[i].gameObject);
-      enemies.RemoveAt(i);
+      Destroy(npc[i].gameObject);
+      npc.RemoveAt(i);
     }
 
     public void UnspawnEnemies() {
       if (!IsServer) { return; }
-      for (int i = enemies.Count - 1; i >= 0; i--) {
-        if (enemies[i]) {
-          DestroyEnemy(i);
-        }
+      for (int i = npc.Count - 1; i >= 0; i--) {
+        if (npc[i]) { DestroyEnemy(i); }
         spawned = false;
         print("Enemies Unspawned!");
       }
@@ -71,7 +65,7 @@ namespace Postcarbon {
         Pawn pawn = spawn.GetComponent<Pawn>();
         pawn.spawnPoint = transform.position;
         // spawn.transform.SetParent(transform);
-        enemies.Add(spawn.GetComponent<NetworkedObject>());
+        npc.Add(spawn.GetComponent<NetworkedObject>());
       }
       spawned = true;
       print("Enemies Spawned!");

@@ -12,7 +12,6 @@ namespace Postcarbon {
     [Header("Components")]
     public DynamicCharacterAvatar avatar;
     public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
-
     [Header("Movement")]
     [HideInInspector] public bool crouching = false;
     [HideInInspector] public Vector3 velocity = Vector3.zero;
@@ -36,7 +35,7 @@ namespace Postcarbon {
       base.NetworkStart();
       recipeAvatar.OnValueChanged += recipeAvatarChanged;
       if (IsLocalPlayer || IsServer) { return; }
-      LoadAvatar();
+      recipeAvatar.Value = avatar.GetCurrentRecipe();
     }
 
     public void RandomGender() {
@@ -49,7 +48,6 @@ namespace Postcarbon {
         if (avatar.activeRace.name == "HumanFemale") { avatar.ChangeRace("HumanMale"); }
         else if (avatar.activeRace.name == "o3n Female") { avatar.ChangeRace("o3n Male"); }
       }
-      avatar.BuildCharacter();
     }
 
     public void SetHeight(float height) {
@@ -63,27 +61,14 @@ namespace Postcarbon {
     public void Block(bool block) {
       if (block) {
         if (state.Value == 0 || state.Value == (int)pS.Sprint) {
-          if (!equipment.holstered.Value) { equipment.holstered.Value = true; equipment.Holster(equipment.holstered.Value); }
+          if (!equipment.holstered.Value) {
+            equipment.holstered.Value = true;
+            equipment.Holster(equipment.holstered.Value);
+          }
           if (equipment.weapon[0] && equipment.weapon[1] == null && equipment.weapon[0].dWeapon is dGun) {
-            if (!aiming) {
-              aiming = true;
-              anim.SetBool("Aiming", true);
-              AniTrig("Aim");
-              if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
-            }
+            state.Value = (int)pS.Aim;
           }
-          else {
-            state.Value = (int)pS.Block;
-            AniTrig("Block");
-          }
-        }
-      }
-      else {
-        if (anim.GetInteger("State") == (int)pS.Block) { state.Value = 0; }
-        if (aiming) {
-          aiming = false;
-          anim.SetBool("Aiming", false);
-          if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
+          else { state.Value = (int)pS.Block; }
         }
       }
     }
@@ -91,6 +76,7 @@ namespace Postcarbon {
     public void Crouch(bool crouch) {
       crouching = crouch;
       anim.SetBool("Crouching", crouch);
+      SetSpeed();
     }
 
     public void Sprint(bool sprint) {
@@ -106,7 +92,6 @@ namespace Postcarbon {
         }
         else if (crouching || !grounded) { if (state.Value == (int)pS.Sprint) { state.Value = 0; } }
       }
-      else if (!sprint && anim.GetInteger("State") == (int)pS.Sprint) { state.Value = 0; }
     }
     #endregion
 

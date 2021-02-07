@@ -142,7 +142,7 @@ namespace Postcarbon {
     public void Look(float xIn, float yIn) {
       if (!inventoryOpen) {
         float rot;
-        if (!aiming) { rot = rotationSpeed; }
+        if (state.Value != (int)pS.Aim) { rot = rotationSpeed; }
         else { rot = rotationSpeed * 0.2f; }
         mouseX += xIn * rot;
         mouseY -= yIn * rot;
@@ -260,14 +260,14 @@ namespace Postcarbon {
     }
 
     public override void SetSpeed() {
-      if (aiming) { speed = crouchSpeed; }
-      else if (crouching) { speed = crouchSpeed; }
+      if (crouching) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Idle) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Attack) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Block) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Sprint) { speed = sprintSpeed; }
       else if (state.Value == (int)pS.Dodge) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Climb) { speed = crouchSpeed; }
+      else if (state.Value == (int)pS.Aim) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Swim) { speed = crouchSpeed; }
     }
     #endregion
