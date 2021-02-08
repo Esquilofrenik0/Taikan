@@ -20,6 +20,7 @@ namespace Postcarbon {
     [HideInInspector] public float mouseY = 0;
 
     [Header("Stats")]
+    // public HeroStats stats;
     public float maxMana = 100;
     public float maxStamina = 100;
     public float manaRegen = 1;
@@ -61,7 +62,7 @@ namespace Postcarbon {
       Cursor.visible = false;
       Cursor.lockState = CursorLockMode.Locked;
       equipment.init();
-      health.Value = maxHealth / 2;
+      stats.health.Value = stats.maxHealth / 2;
       stamina = maxStamina / 2;
       mana = maxMana / 2;
       state.Value = 0;
@@ -246,7 +247,7 @@ namespace Postcarbon {
     }
 
     public void Regenerate() {
-      if (health.Value != maxHealth) { UpdateHealth(healthRegen * Time.deltaTime); }
+      if (stats.health.Value != stats.maxHealth) { stats.UpdateHealth(stats.healthRegen * Time.deltaTime); }
       if (stamina != maxStamina) {
         if (grounded && state.Value != (int)pS.Block && state.Value != (int)pS.Climb && state.Value != (int)pS.Sprint) {
           UpdateStamina(staminaRegen * Time.deltaTime);

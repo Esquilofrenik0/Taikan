@@ -29,7 +29,7 @@ namespace Postcarbon {
           Pawn hitPawn = other.GetComponent<Pawn>();
           if (hitPawn.state.Value == (int)pS.Block) { pawn.AniTrig("Impact"); }
           else {
-            hitPawn.TakeDamage(pawn.damage.Value);
+            hitPawn.stats.TakeDamage(pawn.stats.damage.Value);
             hitPawn.AniTrig("Impact");
             if (hitPawn.GetComponent<NPC>() && hitPawn.faction != pawn.faction) {
               NPC npc = hitPawn.GetComponent<NPC>();

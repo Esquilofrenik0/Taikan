@@ -12,17 +12,8 @@ namespace Postcarbon {
     public Animator anim;
     public Rigidbody rb;
     public Collider col;
+    public Stats stats;
     public Equipment equipment;
-    public GameObject floatingHealthBar;
-
-    [Header("Stats")]
-    public float maxHealth = 100;
-    public float healthRegen = 0;
-    public Faction faction = Faction.Loner;
-    public NetworkedVarInt state = new NetworkedVarInt(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
-    public NetworkedVarFloat health = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 100f);
-    public NetworkedVarFloat damage = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
-    public NetworkedVarFloat defense = new NetworkedVarFloat(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 1f);
 
     [Header("Movement")]
     [HideInInspector] public float speed = 5;
@@ -32,18 +23,24 @@ namespace Postcarbon {
     [Header("Combat")]
     public GameObject head;
     public GameObject spine;
-    public float baseDamage = 1;
-    public float baseDefense = 1;
     [HideInInspector] public int combo = 0;
     [HideInInspector] public bool attacking = false;
     [HideInInspector] public bool resetAttack = true;
     [HideInInspector] public Coroutine resetCombo;
-    [HideInInspector] public Coroutine disableHealthBar;
     [HideInInspector] public Coroutine meleeRoutine;
 
     [Header("Ragdoll")]
     public int respawnTime = 30;
     [HideInInspector] public Rigidbody[] bonesRB;
+
+    [Header("State")]
+    public Faction faction = Faction.Loner;
+    public NetworkedVarInt state = new NetworkedVarInt(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendTickrate = 0f }, 0);
+
+    public override void NetworkStart() {
+      base.NetworkStart();
+      state.OnValueChanged += stateChanged;
+    }
 
     void stateChanged(int prevState, int newState) {
       anim.SetInteger("State", newState);
@@ -52,17 +49,7 @@ namespace Postcarbon {
       SetSpeed();
     }
 
-    public override void NetworkStart() {
-      base.NetworkStart();
-      state.OnValueChanged += stateChanged;
-    }
-
     #region Init
-    public void initRagdoll() {
-      bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
-      DisableRagdoll();
-    }
-
     public void DisableRagdoll() {
       bonesRB = transform.GetChild(0).GetComponentsInChildren<Rigidbody>(true);
       for (int i = 0; i < bonesRB.Length; i++) {
@@ -87,7 +74,7 @@ namespace Postcarbon {
 
     public virtual void Respawn() {
       transform.position = spawnPoint;
-      health.Value = maxHealth;
+      stats.health.Value = stats.maxHealth;
       grounded = true;
       state.Value = 0;
     }
@@ -173,7 +160,7 @@ namespace Postcarbon {
       raycast = Physics.Raycast(ray, out hit, 100);
       gameObject.layer = prevLayer;
       if (raycast && hit.collider.GetComponent<Pawn>()) {
-        hit.collider.GetComponent<Pawn>().TakeDamage(damage.Value);
+        hit.collider.GetComponent<Pawn>().stats.TakeDamage(stats.damage.Value);
         if (hit.collider.GetComponent<NPC>() && hit.collider.GetComponent<Pawn>().faction != faction) {
           NPC npc = hit.collider.GetComponent<NPC>();
           npc.enemy.Add(this);
@@ -187,52 +174,12 @@ namespace Postcarbon {
     }
     #endregion
 
-    #region Stats
-    public void TakeDamage(float amount) {
-      UpdateHealth(-amount);
-      Timer.Delay(this, UpdateFloatingHealthBar, 0.1f);
-    }
-
-    public void UpdateHealth(float amount) {
-      InvokeServerRpc(sUpdateHealth, amount);
-    }
-
-    [ServerRPC(RequireOwnership = false)]
-    public void sUpdateHealth(float amount) {
-      health.Value += amount;
-      if (health.Value > maxHealth) { health.Value = maxHealth; }
-      else if (health.Value <= 0) {
-        health.Value = 0f;
-        Die();
-      }
-    }
-
-    public void UpdateFloatingHealthBar() {
-      float percent = health.Value / maxHealth;
-      floatingHealthBar.SetActive(true);
-      floatingHealthBar.GetComponent<UI_Bar>().SetPercent(percent);
-      Timer.rDelay(this, DisableHealthBar, 5, disableHealthBar);
-    }
-
-    public void DisableHealthBar() {
-      floatingHealthBar.SetActive(false);
-    }
-
-    public bool HealthCost(float cost) {
-      if (health.Value - cost > 0) {
-        health.Value -= cost;
-        return true;
-      }
-      else { return false; }
-    }
-
+    #region State
     public void Die() {
       state.Value = (int)pS.Dead;
       Timer.Delay(this, Respawn, respawnTime);
     }
-    #endregion
 
-    #region Animator
     public virtual void SetSpeed() { }
 
     [ServerRPC(RequireOwnership = false)]

@@ -33,11 +33,6 @@ namespace Postcarbon {
     [HideInInspector] public Camera cam;
     [HideInInspector] public Camera map;
 
-    public override void NetworkStart() {
-      base.NetworkStart();
-      hero.initRagdoll();
-    }
-
     void Start() {
       if (!IsLocalPlayer) { return; }
       hero.spawnPoint = GameObject.Find("PlayerSpawner").GetComponent<PlayerSpawner>().spawnPoints[0].position;
@@ -98,7 +93,7 @@ namespace Postcarbon {
     }
 
     void OnCamera() {
-      if (!IsLocalPlayer) { return; }
+      if (!IsLocalPlayer) { return; } 
       camvect = controls.Player.Camera.ReadValue<Vector2>();
     }
     #endregion
@@ -202,8 +197,7 @@ namespace Postcarbon {
 
     void OnWeaponSwap() {
       if (!IsLocalPlayer) { return; }
-      weaponSwap = !weaponSwap;
-      if (weaponSwap && hero.state.Value == 0) {
+      if (hero.state.Value == 0) {
         dWeapon[] w = new dWeapon[4];
         for (int i = 0; i < 4; i++) { w[i] = hero.equipment.weapon[i]; }
         for (int i = 0; i < 4; i++) { hero.equipment.weapon[i] = w[(i + 2) % 4]; }

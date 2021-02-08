@@ -152,7 +152,7 @@ namespace Postcarbon {
 
     public void SetHealthBar() {
       if (!IsLocalPlayer) { return; }
-      float healthPercent = hero.health.Value / hero.maxHealth;
+      float healthPercent = hero.stats.health.Value / hero.stats.maxHealth;
       healthBar.SetPercent(healthPercent);
     }
 
@@ -216,11 +216,11 @@ namespace Postcarbon {
 
     public void DisplayStats() {
       if (!IsLocalPlayer) { return; }
-      stats[0].text = "Health: " + hero.maxHealth + " (+" + hero.healthRegen + "/s)";
+      stats[0].text = "Health: " + hero.stats.maxHealth + " (+" + hero.stats.healthRegen + "/s)";
       stats[1].text = "Stamina: " + hero.maxStamina + " (+" + hero.staminaRegen + "/s)";
       stats[2].text = "Mana: " + hero.maxMana + " (+" + hero.manaRegen + "/s)";
-      stats[3].text = "Damage: " + hero.damage.Value;
-      stats[4].text = "Defense: " + hero.defense.Value;
+      stats[3].text = "Damage: " + hero.stats.damage.Value;
+      stats[4].text = "Defense: " + hero.stats.defense.Value;
     }
 
     public void DisplayRecipeInfo(dRecipe recipe) {

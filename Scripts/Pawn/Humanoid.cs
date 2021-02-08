@@ -112,26 +112,5 @@ namespace Postcarbon {
       }
     }
     #endregion
-
-    #region Stats
-    public void RefreshStats() {
-      defense.Value = baseDefense;
-      damage.Value = baseDamage;
-      for (int i = 0; i < 2; i++) {
-        if (equipment.weapon[i]) {
-          damage.Value += equipment.weapon[i].damage;
-          if (equipment.weapon[i] is dShield) {
-            dShield dShield = (dShield)equipment.weapon[i];
-            defense.Value += dShield.defense;
-          }
-        }
-      }
-      for (int i = 0; i < equipment.armor.Count; i++) {
-        if (equipment.armor[i]) {
-          defense.Value += equipment.armor[i].defense;
-        }
-      }
-    }
-    #endregion
   }
 }

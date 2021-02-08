@@ -9,7 +9,7 @@ namespace Postcarbon {
       if (!IsServer) { return; }
       enemy = new List<Pawn>();
       pawn.spawnPoint = GetNavPoint(transform.position);
-      pawn.initRagdoll();
+      pawn.DisableRagdoll();
       pawn.Respawn();
     }
 

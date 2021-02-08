@@ -27,7 +27,7 @@ namespace Postcarbon {
     void armorChanged(NetworkedListEvent<dArmor> changeEvent) {
       if (armor[changeEvent.index] == null) { UndressArmor(changeEvent.index); }
       else { DressArmor(armor[changeEvent.index]); }
-      humanoid.RefreshStats();
+      humanoid.stats.RefreshStats();
       if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
         GetComponent<HUD>().Refresh();
         GetComponent<HUD>().DisplayStats();
@@ -40,7 +40,7 @@ namespace Postcarbon {
         DressWeapon(changeEvent.index, weapon[changeEvent.index]);
         UpdateWeaponSlot(changeEvent.index, weapon[changeEvent.index]);
       }
-      humanoid.RefreshStats();
+      humanoid.stats.RefreshStats();
       if (IsLocalPlayer && GetComponent<HUD>() && GetComponent<HUD>().hero) {
         GetComponent<HUD>().Refresh();
         GetComponent<HUD>().DisplayStats();
@@ -57,7 +57,7 @@ namespace Postcarbon {
       weapon.OnListChanged += weaponChanged;
       holstered.OnValueChanged += holsterChanged;
       if (IsServer) { for (int i = 0; i < initItems.Count; i++) { EquipItem(Instantiate(initItems[i])); } }
-      humanoid.RefreshStats();
+      humanoid.stats.RefreshStats();
     }
 
     public void init() {
