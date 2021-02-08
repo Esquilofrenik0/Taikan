@@ -10,7 +10,5 @@ namespace Postcarbon {
     public aS armorSlot = aS.Helmet;
     public float defense = 1;
     public float durability = 100;
-
-    public void Awake() { this.stack = 1; }
   }
 }

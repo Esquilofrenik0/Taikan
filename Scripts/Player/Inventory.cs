@@ -44,7 +44,7 @@ namespace Postcarbon {
           item.Add(null);
           amount.Add(0);
           if (initItems.Count > i && initItems[i].dItem != null) {
-            item[i] = initItems[i].dItem;
+            item[i] = Instantiate(initItems[i].dItem);
             if (initItems[i].amount > initItems[i].dItem.stack) { initItems[i].amount = initItems[i].dItem.stack; }
             amount[i] = initItems[i].amount;
           }
@@ -63,6 +63,15 @@ namespace Postcarbon {
       return -1;
     }
 
+    public int FindItem(dItem dItem) {
+      for (int i = 0; i < nSlots; i++) {
+        if (item[i] == dItem) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
     public void Store(dItem dItem, int storeAmount) {
       if (dItem.stack > 1) {
         int number = SearchItem(dItem);
@@ -70,6 +79,11 @@ namespace Postcarbon {
           if (amount[number] + storeAmount <= dItem.stack) {
             amount[number] += storeAmount;
             return;
+          }
+          else {
+            int newAmount = dItem.stack - amount[number];
+            amount[number] += newAmount;
+            storeAmount -= newAmount;
           }
         }
       }

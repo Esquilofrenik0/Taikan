@@ -5,7 +5,7 @@ using System;
 
 namespace Postcarbon {
   //pawnState
-  public enum pS { Idle, Attack, Block, Sprint, Dodge, Climb, Aim, Stun, Swim, Dead };
+  public enum pS { Idle, Attack, Block, Sprint, Dodge, Climb, Stun, Swim, Dead };
   //itemType
   public enum iT { Scrap, Consumable, Weapon, Armor, Recipe };
   //armorType

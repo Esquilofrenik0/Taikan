@@ -12,8 +12,7 @@ namespace Postcarbon {
     [Header("Components")]
     public Player player;
     public HUD hud;
-    // public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
-
+    
     [Header("Camera")]
     public GameObject camTarget;
     public float rotationSpeed = 1;
@@ -77,7 +76,7 @@ namespace Postcarbon {
         rb.useGravity = true;
       }
       else if (grounded) {
-        if (state.Value == 0 || state.Value == (int)pS.Block || state.Value == (int)pS.Sprint) {
+        if (state.Value == 0 || state.Value == (int)pS.Block || state.Value == (int)pS.Attack || state.Value == (int)pS.Sprint) {
           if (!StaminaCost(jumpCost)) { return; }
           rb.velocity += jumpHeight * Vector3.up;
           anim.SetTrigger("Jump");
@@ -142,7 +141,7 @@ namespace Postcarbon {
     public void Look(float xIn, float yIn) {
       if (!inventoryOpen) {
         float rot;
-        if (state.Value != (int)pS.Aim) { rot = rotationSpeed; }
+        if (!aiming) { rot = rotationSpeed; }
         else { rot = rotationSpeed * 0.2f; }
         mouseX += xIn * rot;
         mouseY -= yIn * rot;
@@ -154,7 +153,6 @@ namespace Postcarbon {
           transform.rotation = Quaternion.Euler(0, mouseX, 0);
           if (state.Value != (int)pS.Dodge) {
             spine.transform.localRotation = Quaternion.Euler(spine.transform.localEulerAngles.x, mouseY - 10, spine.transform.localEulerAngles.z);
-            // spine1.transform.localRotation = Quaternion.Euler(mouseY/2, spine1.transform.localEulerAngles.y, spine1.transform.localEulerAngles.z);
           }
         }
       }
@@ -260,14 +258,13 @@ namespace Postcarbon {
     }
 
     public override void SetSpeed() {
-      if (crouching) { speed = crouchSpeed; }
+      if (crouching || aiming) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Idle) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Attack) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Block) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Sprint) { speed = sprintSpeed; }
       else if (state.Value == (int)pS.Dodge) { speed = idleSpeed; }
       else if (state.Value == (int)pS.Climb) { speed = crouchSpeed; }
-      else if (state.Value == (int)pS.Aim) { speed = crouchSpeed; }
       else if (state.Value == (int)pS.Swim) { speed = crouchSpeed; }
     }
     #endregion

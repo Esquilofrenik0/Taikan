@@ -48,15 +48,7 @@ namespace Postcarbon {
     void stateChanged(int prevState, int newState) {
       anim.SetInteger("State", newState);
       if (prevState == (int)pS.Dead) { DisableRagdoll(); }
-      else if (prevState == (int)pS.Aim) {
-        if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
-      }
       if (newState == (int)pS.Dead) { EnableRagdoll(); }
-      else if (newState == (int)pS.Aim) {
-        anim.SetTrigger("Aim");
-        if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
-      }
-      else if (newState == (int)pS.Block) { anim.SetTrigger("Block"); }
       SetSpeed();
     }
 
@@ -122,12 +114,12 @@ namespace Postcarbon {
 
     #region Combat
     public void Attack() {
-      if (state.Value == 0 || state.Value == (int)pS.Aim || state.Value == (int)pS.Sprint) {
+      if (state.Value == 0 || state.Value == (int)pS.Sprint) {
         if (!equipment.holstered.Value) {
           equipment.holstered.Value = true;
           equipment.Holster(equipment.holstered.Value);
         }
-        if (equipment.weapon[0] && equipment.weapon[0].dWeapon is dGun) { Shoot(); }
+        if (equipment.weapon[0] is dGun) { Shoot(); }
         else { Melee(); }
       }
     }
@@ -140,7 +132,7 @@ namespace Postcarbon {
 
     public void Melee() {
       state.Value = (int)pS.Attack;
-      Timer.rDelay(this, StartMeleeAttack, 0.1f, meleeRoutine);
+      Timer.rDelay(this, StartMeleeAttack, 0.2f, meleeRoutine);
       anim.SetInteger("Combo", combo);
       AniTrig("Attack");
       resetCombo = Timer.rDelay(this, ResetCombo, 2, resetCombo);
@@ -149,6 +141,23 @@ namespace Postcarbon {
     }
 
     public void Shoot() {
+      if (equipment.weapon[0] is dGun) {
+        dGun dGun = equipment.weapon[0] as dGun;
+        if (dGun.clipAmmo - 1 >= 0) {
+          dGun.clipAmmo -= 1;
+          if (this is Hero) {
+            Hero hero = this as Hero;
+            hero.hud.RefreshAmmo();
+          }
+        }
+        else {
+          if (dGun.totalAmmo > 0 || GetComponent<NPC>()) {
+            state.Value = (int)pS.Attack;
+            AniTrig("Reload");
+          }
+          return;
+        }
+      }
       state.Value = (int)pS.Attack;
       AniTrig("Attack");
       Ray ray;

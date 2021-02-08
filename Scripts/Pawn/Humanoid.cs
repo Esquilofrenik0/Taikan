@@ -13,6 +13,7 @@ namespace Postcarbon {
     public DynamicCharacterAvatar avatar;
     public NetworkedVarString recipeAvatar = new NetworkedVarString(new NetworkedVarSettings { WritePermission = NetworkedVarPermission.Everyone, ReadPermission = NetworkedVarPermission.Everyone, SendChannel = "Avatar", SendTickrate = 0f }, null);
     [Header("Movement")]
+    [HideInInspector] public bool aiming = false;
     [HideInInspector] public bool crouching = false;
     [HideInInspector] public Vector3 velocity = Vector3.zero;
     [HideInInspector] public Vector3 direction = Vector3.zero;
@@ -65,18 +66,35 @@ namespace Postcarbon {
             equipment.holstered.Value = true;
             equipment.Holster(equipment.holstered.Value);
           }
-          if (equipment.weapon[0] && equipment.weapon[1] == null && equipment.weapon[0].dWeapon is dGun) {
-            state.Value = (int)pS.Aim;
+          if (equipment.weapon[0] && equipment.weapon[1] == null && equipment.weapon[0] is dGun) {
+            if (!aiming) {
+              aiming = true;
+              anim.SetBool("Aiming", true);
+              AniTrig("Aim");
+              SetSpeed();
+              if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 45; }
+            }
           }
-          else { state.Value = (int)pS.Block; }
+          else {
+            state.Value = (int)pS.Block;
+            AniTrig("Block");
+          }
         }
       }
+      // else if (aiming) {
+      //   aiming = false;
+      //   anim.SetBool("Aiming", false);
+      //   SetSpeed();
+      //   if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
+      // }
     }
 
     public void Crouch(bool crouch) {
-      crouching = crouch;
-      anim.SetBool("Crouching", crouch);
-      SetSpeed();
+      if (crouching != crouch) {
+        crouching = crouch;
+        anim.SetBool("Crouching", crouch);
+        SetSpeed();
+      }
     }
 
     public void Sprint(bool sprint) {
@@ -100,19 +118,17 @@ namespace Postcarbon {
       defense.Value = baseDefense;
       damage.Value = baseDamage;
       for (int i = 0; i < 2; i++) {
-        if (equipment.equip[i] != null) {
-          dWeapon dWeapon = equipment.equip[i] as dWeapon;
-          damage.Value += dWeapon.damage;
-          if (dWeapon is dShield) {
-            dShield dShield = (dShield)dWeapon;
+        if (equipment.weapon[i]) {
+          damage.Value += equipment.weapon[i].damage;
+          if (equipment.weapon[i] is dShield) {
+            dShield dShield = (dShield)equipment.weapon[i];
             defense.Value += dShield.defense;
           }
         }
       }
-      for (int i = 0; i < 5; i++) {
-        if (equipment.equip[i + 2] != null) {
-          dArmor dArmor = equipment.equip[i + 2] as dArmor;
-          defense.Value += dArmor.defense;
+      for (int i = 0; i < equipment.armor.Count; i++) {
+        if (equipment.armor[i]) {
+          defense.Value += equipment.armor[i].defense;
         }
       }
     }

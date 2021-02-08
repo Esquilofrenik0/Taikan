@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb03ae84d4b64b448b87fce7f181a7b7, type: 3}
   m_Name: (Recipe) Assault Rifle
   m_EditorClassIdentifier: 
+  Name: (Recipe) Assault Rifle
   description: Teaches how to craft an Assault Rifle.
   icon: {fileID: 21300000, guid: 86aefa2655c3f114ab27823c16e3f431, type: 3}
   value: 0.01

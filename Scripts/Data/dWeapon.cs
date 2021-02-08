@@ -10,7 +10,5 @@ namespace Postcarbon {
     public wS weaponSlot = wS.RightHand;
     public float damage = 1;
     public float durability = 100;
-
-    public void Awake() { this.stack = 1; }
   }
 }

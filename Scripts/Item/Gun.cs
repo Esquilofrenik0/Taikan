@@ -13,6 +13,11 @@ namespace Postcarbon {
     public AudioSource audioSource;
     [HideInInspector] public dGun dGun;
 
+    public override void SetData(dItem data) {
+      base.SetData(data);
+      dGun = data as dGun;
+    }
+
     void Awake() {
       dWeapon = dItem as dWeapon;
       dGun = dItem as dGun;

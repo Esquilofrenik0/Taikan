@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f53f65e769d93ee45aeb53bd20e69b9f, type: 3}
   m_Name: Assault Rifle
   m_EditorClassIdentifier: 
+  Name: Assault Rifle
   description: Mechanical relic from the past.
   icon: {fileID: 21300000, guid: a86c839d6f9c6ac499a86d3dde07bd6c, type: 3}
   value: 0.01
@@ -21,8 +22,10 @@ MonoBehaviour:
   wType: 2
   weaponSlot: 2
   damage: 4
-  defense: 0
   durability: 100
-  clipSize: 15
+  clipSize: 20
   audioClip:
   - {fileID: 8300000, guid: 1b145bcffd767854fb0c71c37678ebaa, type: 3}
+  dAmmo: {fileID: 0}
+  clipAmmo: 0
+  totalAmmo: 0

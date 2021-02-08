@@ -8,6 +8,11 @@ namespace Postcarbon {
     [HideInInspector] public dMelee dMelee;
     [HideInInspector] public List<Collider> hits;
 
+    public override void SetData(dItem data) {
+      base.SetData(data);
+      dMelee = data as dMelee;
+    }
+
     void Awake() {
       dWeapon = dItem as dWeapon;
       dMelee = dItem as dMelee;

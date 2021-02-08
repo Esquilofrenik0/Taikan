@@ -8,7 +8,7 @@ namespace Postcarbon {
     public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
       // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
-      Gun gun = (Gun)pawn.equipment.weapon[0];
+      Gun gun = (Gun)pawn.equipment.weaponObject[0];
       gun.audioSource.PlayOneShot(gun.dGun.audioClip[0]);
       gun.fx.SetActive(true);
     }
@@ -16,7 +16,7 @@ namespace Postcarbon {
     public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex) {
       // if (!animator.GetComponent<Pawn>().IsLocalPlayer) { return; }
       Pawn pawn = animator.GetComponent<Pawn>();
-      Gun gun = (Gun)pawn.equipment.weapon[0];
+      Gun gun = (Gun)pawn.equipment.weaponObject[0];
       if (gun.fx != null) { gun.fx.SetActive(false); }
     }
   }

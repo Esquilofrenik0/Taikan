@@ -58,6 +58,13 @@ namespace Postcarbon {
             hero.equipment.EquipItem(slot.dItem);
             hero.inventory.RemoveStack(number);
           }
+          else if (slot.dItem is dAmmo) {
+            if (hero.equipment.weapon[0] is dGun) {
+              dGun dGun = hero.equipment.weapon[0] as dGun;
+              dGun.EquipAmmo((dAmmo)slot.dItem, slot.amount);
+              hero.inventory.RemoveStack(number);
+            }
+          }
           else if (slot.dItem is dBuildable) {
             dBuildable dBuildable = slot.dItem as dBuildable;
             hero.hud.WriteWorldInfo("Consumed 1x " + slot.dItem.name);

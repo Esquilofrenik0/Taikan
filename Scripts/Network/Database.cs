@@ -13,8 +13,8 @@ namespace Postcarbon {
 
     public dItem GetItem(string _name) {
       for (int i = 0; i < database.Count; i++) {
-        if (database[i].name == _name) {
-          return database[i];
+        if (database[i].Name == _name) {
+          return Instantiate(database[i]);
         }
       }
       return null;
@@ -32,13 +32,14 @@ namespace Postcarbon {
       write_dMelee();
       write_dGun();
       write_dShield();
+      write_dAmmo();
     }
 
     #region dItem
     void write_dItem() {
       SerializationManager.RegisterSerializationHandlers<dItem>((Stream stream, dItem instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           if (instance is dArmor) {
@@ -57,13 +58,15 @@ namespace Postcarbon {
             else if (dWeapon is dGun) {
               dGun dGun = (dGun)dWeapon;
               writer.WriteInt32Packed(dGun.clipSize);
+              writer.WriteInt32Packed(dGun.clipAmmo);
+              writer.WriteInt32Packed(dGun.totalAmmo);
             }
           }
         }
       },
       (Stream stream) => {
         using (PooledBitReader reader = PooledBitReader.Get(stream)) {
-          dItem dItem = (dItem)GetItem(reader.ReadStringPacked().ToString());
+          dItem dItem = GetItem(reader.ReadStringPacked().ToString());
           dItem.value = (float)reader.ReadDoublePacked();
           dItem.weight = (float)reader.ReadDoublePacked();
           if (dItem is dArmor) {
@@ -84,6 +87,8 @@ namespace Postcarbon {
             else if (dWeapon is dGun) {
               dGun dGun = (dGun)dWeapon;
               dGun.clipSize = reader.ReadInt32Packed();
+              dGun.clipAmmo = reader.ReadInt32Packed();
+              dGun.totalAmmo = reader.ReadInt32Packed();
               dWeapon = (dWeapon)dGun;
             }
             dItem = (dItem)dWeapon;
@@ -96,7 +101,7 @@ namespace Postcarbon {
     void write_dBuildable() {
       SerializationManager.RegisterSerializationHandlers<dBuildable>((Stream stream, dBuildable instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
         }
@@ -114,7 +119,7 @@ namespace Postcarbon {
     void write_dConsumable() {
       SerializationManager.RegisterSerializationHandlers<dConsumable>((Stream stream, dConsumable instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
         }
@@ -132,7 +137,7 @@ namespace Postcarbon {
     void write_dScrap() {
       SerializationManager.RegisterSerializationHandlers<dScrap>((Stream stream, dScrap instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
         }
@@ -147,11 +152,29 @@ namespace Postcarbon {
       });
     }
 
+    void write_dAmmo() {
+      SerializationManager.RegisterSerializationHandlers<dAmmo>((Stream stream, dAmmo instance) => {
+        using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
+          writer.WriteStringPacked(instance.Name);
+          writer.WriteDoublePacked(instance.value);
+          writer.WriteDoublePacked(instance.weight);
+        }
+      },
+      (Stream stream) => {
+        using (PooledBitReader reader = PooledBitReader.Get(stream)) {
+          dAmmo dAmmo = (dAmmo)GetItem(reader.ReadStringPacked().ToString());
+          dAmmo.value = (float)reader.ReadDoublePacked();
+          dAmmo.weight = (float)reader.ReadDoublePacked();
+          return dAmmo;
+        }
+      });
+    }
+
 
     void write_dRecipe() {
       SerializationManager.RegisterSerializationHandlers<dRecipe>((Stream stream, dRecipe instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
         }
@@ -166,12 +189,10 @@ namespace Postcarbon {
       });
     }
 
-
-
     void write_dArmor() {
       SerializationManager.RegisterSerializationHandlers<dArmor>((Stream stream, dArmor instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           writer.WriteDoublePacked(instance.defense);
@@ -193,7 +214,7 @@ namespace Postcarbon {
     void write_dWeapon() {
       SerializationManager.RegisterSerializationHandlers<dWeapon>((Stream stream, dWeapon instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           writer.WriteDoublePacked(instance.damage);
@@ -205,6 +226,8 @@ namespace Postcarbon {
           else if (instance is dGun) {
             dGun dGun = (dGun)instance;
             writer.WriteInt32Packed(dGun.clipSize);
+            writer.WriteInt32Packed(dGun.clipAmmo);
+            writer.WriteInt32Packed(dGun.totalAmmo);
           }
         }
       },
@@ -221,10 +244,12 @@ namespace Postcarbon {
             dWeapon = (dWeapon)dShield;
           }
           else if (dWeapon is dGun) {
-            dGun dGun = (dGun)dWeapon;
-            dGun.clipSize = reader.ReadInt32Packed();
-            dWeapon = (dWeapon)dGun;
-          }
+              dGun dGun = (dGun)dWeapon;
+              dGun.clipSize = reader.ReadInt32Packed();
+              dGun.clipAmmo = reader.ReadInt32Packed();
+              dGun.totalAmmo = reader.ReadInt32Packed();
+              dWeapon = (dWeapon)dGun;
+            }
           return dWeapon;
         }
       });
@@ -233,7 +258,7 @@ namespace Postcarbon {
     void write_dMelee() {
       SerializationManager.RegisterSerializationHandlers<dMelee>((Stream stream, dMelee instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           writer.WriteDoublePacked(instance.damage);
@@ -255,12 +280,14 @@ namespace Postcarbon {
     void write_dGun() {
       SerializationManager.RegisterSerializationHandlers<dGun>((Stream stream, dGun instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           writer.WriteDoublePacked(instance.damage);
           writer.WriteDoublePacked(instance.durability);
           writer.WriteInt32Packed(instance.clipSize);
+          writer.WriteInt32Packed(instance.clipAmmo);
+          writer.WriteInt32Packed(instance.totalAmmo);
         }
       },
       (Stream stream) => {
@@ -271,6 +298,8 @@ namespace Postcarbon {
           dGun.damage = (float)reader.ReadDoublePacked();
           dGun.durability = (float)reader.ReadDoublePacked();
           dGun.clipSize = reader.ReadInt32Packed();
+          dGun.clipAmmo = reader.ReadInt32Packed();
+          dGun.totalAmmo = reader.ReadInt32Packed();
           return dGun;
         }
       });
@@ -279,7 +308,7 @@ namespace Postcarbon {
     void write_dShield() {
       SerializationManager.RegisterSerializationHandlers<dShield>((Stream stream, dShield instance) => {
         using (PooledBitWriter writer = PooledBitWriter.Get(stream)) {
-          writer.WriteStringPacked(instance.name);
+          writer.WriteStringPacked(instance.Name);
           writer.WriteDoublePacked(instance.value);
           writer.WriteDoublePacked(instance.weight);
           writer.WriteDoublePacked(instance.damage);

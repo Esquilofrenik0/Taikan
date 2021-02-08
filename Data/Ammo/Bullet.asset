@@ -9,12 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0047293bea148e45b893b31ec661685, type: 3}
-  m_Name: Stone
+  m_Script: {fileID: 11500000, guid: 903454d164537e649b10367983aedd92, type: 3}
+  m_Name: Bullet
   m_EditorClassIdentifier: 
-  Name: Stone
-  description: Polished stone.
-  icon: {fileID: 21300000, guid: c8977b1ade051034dbfed01d0465020e, type: 3}
+  description: Bullet for a gun.
+  icon: {fileID: 21300000, guid: 9f69b220176e6964fbd87f5f158d45e3, type: 3}
   value: 0.01
   weight: 0.01
-  stack: 100
+  stack: 999

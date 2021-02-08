@@ -10,6 +10,11 @@ namespace Postcarbon {
     [HideInInspector] public dWeapon dWeapon;
     [HideInInspector] public Pawn pawn;
     
+    public override void SetData(dItem data) {
+      base.SetData(data);
+      dWeapon = data as dWeapon;
+    }
+
     public void Start() {
       if (GetComponentInParent<Pawn>()) {
         pawn = GetComponentInParent<Pawn>();

@@ -12,9 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f0047293bea148e45b893b31ec661685, type: 3}
   m_Name: Wood
   m_EditorClassIdentifier: 
-  resource: {fileID: 3878300646211823214, guid: 99d9ec255f8551f469201903d418a9d2,
-    type: 3}
-  type: 0
   Name: Wood
   description: Can be gathered from trees.
   icon: {fileID: 21300000, guid: 02965bb096d1ff24897cfbedbc22f1a7, type: 3}

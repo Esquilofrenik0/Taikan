@@ -129,6 +129,14 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press(behavior=2)""
+                },
+                {
+                    ""name"": ""WeaponSwap"",
+                    ""type"": ""Button"",
+                    ""id"": ""2a4dd021-febb-4c9b-8a96-d9b87271323f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": ""Press(behavior=2)""
                 }
             ],
             ""bindings"": [
@@ -626,6 +634,17 @@ public class @InputMaster : IInputActionCollection, IDisposable
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0b35b49b-9ab0-4008-abd3-43b53a83ef82"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""WeaponSwap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -694,6 +713,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         m_Player_Block = m_Player.FindAction("Block", throwIfNotFound: true);
         m_Player_Sprint = m_Player.FindAction("Sprint", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
+        m_Player_WeaponSwap = m_Player.FindAction("WeaponSwap", throwIfNotFound: true);
         // Server
         m_Server = asset.FindActionMap("Server", throwIfNotFound: true);
         m_Server_Chat = m_Server.FindAction("Chat", throwIfNotFound: true);
@@ -761,6 +781,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
     private readonly InputAction m_Player_Block;
     private readonly InputAction m_Player_Sprint;
     private readonly InputAction m_Player_Crouch;
+    private readonly InputAction m_Player_WeaponSwap;
     public struct PlayerActions
     {
         private @InputMaster m_Wrapper;
@@ -779,6 +800,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         public InputAction @Block => m_Wrapper.m_Player_Block;
         public InputAction @Sprint => m_Wrapper.m_Player_Sprint;
         public InputAction @Crouch => m_Wrapper.m_Player_Crouch;
+        public InputAction @WeaponSwap => m_Wrapper.m_Player_WeaponSwap;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -830,6 +852,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Crouch.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
                 @Crouch.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
                 @Crouch.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnCrouch;
+                @WeaponSwap.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnWeaponSwap;
+                @WeaponSwap.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnWeaponSwap;
+                @WeaponSwap.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnWeaponSwap;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -876,6 +901,9 @@ public class @InputMaster : IInputActionCollection, IDisposable
                 @Crouch.started += instance.OnCrouch;
                 @Crouch.performed += instance.OnCrouch;
                 @Crouch.canceled += instance.OnCrouch;
+                @WeaponSwap.started += instance.OnWeaponSwap;
+                @WeaponSwap.performed += instance.OnWeaponSwap;
+                @WeaponSwap.canceled += instance.OnWeaponSwap;
             }
         }
     }
@@ -937,6 +965,7 @@ public class @InputMaster : IInputActionCollection, IDisposable
         void OnBlock(InputAction.CallbackContext context);
         void OnSprint(InputAction.CallbackContext context);
         void OnCrouch(InputAction.CallbackContext context);
+        void OnWeaponSwap(InputAction.CallbackContext context);
     }
     public interface IServerActions
     {

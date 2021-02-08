@@ -25,6 +25,7 @@ namespace Postcarbon {
     [HideInInspector] public bool interact = false;
     [HideInInspector] public bool inventory = false;
     [HideInInspector] public bool firstPerson = false;
+    [HideInInspector] public bool weaponSwap = false;
 
     [Header("Components")]
     public Hero hero;
@@ -106,9 +107,15 @@ namespace Postcarbon {
     void OnBlock() {
       if (!IsLocalPlayer) { return; }
       block = !block;
-      if(!block){
-        if(hero.state.Value == (int)pS.Aim || hero.state.Value == (int)pS.Block){
+      if (!block) {
+        if (hero.state.Value == (int)pS.Block) {
           hero.state.Value = 0;
+        }
+        else if (hero.aiming) {
+          hero.aiming = false;
+          hero.anim.SetBool("Aiming", false);
+          hero.SetSpeed();
+          if (GetComponent<Player>()) { GetComponent<Player>().cam.fieldOfView = 60; }
         }
       }
     }
@@ -121,7 +128,7 @@ namespace Postcarbon {
     void OnSprint() {
       if (!IsLocalPlayer) { return; }
       sprint = !sprint;
-      if(!sprint && hero.state.Value == (int)pS.Sprint){
+      if (!sprint && hero.state.Value == (int)pS.Sprint) {
         hero.state.Value = 0;
       }
     }
@@ -190,6 +197,23 @@ namespace Postcarbon {
         hero.avatar.BuildCharacter();
         cam.transform.localPosition = Vector3.zero;
         firstPerson = true;
+      }
+    }
+
+    void OnWeaponSwap() {
+      if (!IsLocalPlayer) { return; }
+      weaponSwap = !weaponSwap;
+      if (weaponSwap && hero.state.Value == 0) {
+        dWeapon[] w = new dWeapon[4];
+        for (int i = 0; i < 4; i++) { w[i] = hero.equipment.weapon[i]; }
+        for (int i = 0; i < 4; i++) { hero.equipment.weapon[i] = w[(i + 2) % 4]; }
+        for (int i = 0; i < 4; i++) {
+          hero.equipment.UndressWeapon(i);
+          if (hero.equipment.weapon[i]) { 
+            hero.equipment.DressWeapon(i, hero.equipment.weapon[i]); 
+            hero.equipment.UpdateWeaponSlot(i,hero.equipment.weapon[i]);
+          }
+        }
       }
     }
     #endregion

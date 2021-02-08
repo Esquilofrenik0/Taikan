@@ -10,6 +10,10 @@ namespace Postcarbon {
     public dItem dItem;
     [HideInInspector] public bool spawned = true;
 
+    public virtual void SetData(dItem data) {
+      dItem = data;
+    }
+
     public void Despawn() {
       InvokeServerRpc(sUnspawn);
       StartCoroutine(Respawn(10));

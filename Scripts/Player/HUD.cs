@@ -11,13 +11,16 @@ namespace Postcarbon {
     [HideInInspector] private UI_Bar staminaBar;
     [HideInInspector] private UI_Bar manaBar;
     [HideInInspector] public CSlot[] cSlot;
-    [HideInInspector] public ESlot[] eSlot;
+    // [HideInInspector] public ESlot[] eSlot;
+    [HideInInspector] public ASlot[] aSlot;
+    [HideInInspector] public WSlot[] wSlot;
     [HideInInspector] public ISlot[] iSlot;
     [HideInInspector] public RSlot[] rSlot;
     [HideInInspector] public Text[] recipeInfo;
     [HideInInspector] public Text[] stats;
     [HideInInspector] public Text[] itemInfo;
     [HideInInspector] public Text worldInfo;
+    [HideInInspector] public Text ammoText;
     [HideInInspector] public GameObject inventoryUI;
     [HideInInspector] public GameObject containerUI;
     [HideInInspector] public GameObject craftingUI;
@@ -48,9 +51,17 @@ namespace Postcarbon {
 
     public void RefreshEquipment() {
       if (!IsLocalPlayer) { return; }
-      for (int i = 0; i < eSlot.Length; i++) {
-        eSlot[i].UpdateSlot();
+      for (int i = 0; i < wSlot.Length; i++) { wSlot[i].UpdateSlot(); }
+      for (int i = 0; i < aSlot.Length; i++) { aSlot[i].UpdateSlot(); }
+      RefreshAmmo();
+    }
+
+    public void RefreshAmmo() {
+      if (hero.equipment.weapon[0] is dGun) {
+        dGun dGun = hero.equipment.weapon[0] as dGun;
+        ammoText.text = dGun.clipAmmo + " / " + dGun.totalAmmo + " ";
       }
+      else { ammoText.text = "0 / 0 "; }
     }
 
     public void initHUD() {
@@ -81,6 +92,7 @@ namespace Postcarbon {
       inventoryUI.SetActive(false);
       worldInfo = GameObject.Find("HUD/WorldInfo").GetComponent<Text>();
       worldInfo.gameObject.SetActive(false);
+      ammoText = GameObject.Find("HUD/AmmoText").GetComponent<Text>();
     }
 
     public void WriteWorldInfo(string text) {
@@ -181,17 +193,24 @@ namespace Postcarbon {
 
     public void initEquipment() {
       if (!IsLocalPlayer) { return; }
-      eSlot = new ESlot[7];
-      eSlot[0] = GameObject.Find("HUD/InventoryUI/EquipmentUI/RightHandSlot").GetComponent<ESlot>();
-      eSlot[1] = GameObject.Find("HUD/InventoryUI/EquipmentUI/LeftHandSlot").GetComponent<ESlot>();
-      eSlot[2] = GameObject.Find("HUD/InventoryUI/EquipmentUI/HelmetSlot").GetComponent<ESlot>();
-      eSlot[3] = GameObject.Find("HUD/InventoryUI/EquipmentUI/ChestSlot").GetComponent<ESlot>();
-      eSlot[4] = GameObject.Find("HUD/InventoryUI/EquipmentUI/HandsSlot").GetComponent<ESlot>();
-      eSlot[5] = GameObject.Find("HUD/InventoryUI/EquipmentUI/LegsSlot").GetComponent<ESlot>();
-      eSlot[6] = GameObject.Find("HUD/InventoryUI/EquipmentUI/FeetSlot").GetComponent<ESlot>();
-      for (int i = 0; i < eSlot.Length; i++) {
-        eSlot[i].hero = hero;
-        eSlot[i].number = i;
+      wSlot = new WSlot[4];
+      wSlot[0] = GameObject.Find("HUD/InventoryUI/EquipmentUI/RightHandSlot").GetComponent<WSlot>();
+      wSlot[1] = GameObject.Find("HUD/InventoryUI/EquipmentUI/LeftHandSlot").GetComponent<WSlot>();
+      wSlot[2] = GameObject.Find("HUD/InventoryUI/EquipmentUI/RightOffHandSlot").GetComponent<WSlot>();
+      wSlot[3] = GameObject.Find("HUD/InventoryUI/EquipmentUI/LeftOffHandSlot").GetComponent<WSlot>();
+      for (int i = 0; i < wSlot.Length; i++) {
+        wSlot[i].hero = hero;
+        wSlot[i].number = i;
+      }
+      aSlot = new ASlot[5];
+      aSlot[0] = GameObject.Find("HUD/InventoryUI/EquipmentUI/HelmetSlot").GetComponent<ASlot>();
+      aSlot[1] = GameObject.Find("HUD/InventoryUI/EquipmentUI/ChestSlot").GetComponent<ASlot>();
+      aSlot[2] = GameObject.Find("HUD/InventoryUI/EquipmentUI/HandsSlot").GetComponent<ASlot>();
+      aSlot[3] = GameObject.Find("HUD/InventoryUI/EquipmentUI/LegsSlot").GetComponent<ASlot>();
+      aSlot[4] = GameObject.Find("HUD/InventoryUI/EquipmentUI/FeetSlot").GetComponent<ASlot>();
+      for (int i = 0; i < aSlot.Length; i++) {
+        aSlot[i].hero = hero;
+        aSlot[i].number = i;
       }
     }
 
@@ -206,9 +225,9 @@ namespace Postcarbon {
 
     public void DisplayRecipeInfo(dRecipe recipe) {
       if (!IsLocalPlayer) { return; }
-      recipeInfo[0].text = recipe.result.dItem.name;
+      recipeInfo[0].text = recipe.result.dItem.Name;
       for (int i = 0; i < recipe.cost.Count; i++) {
-        recipeInfo[i + 1].text = recipe.cost[i].amount + " x " + recipe.cost[i].dItem.name;
+        recipeInfo[i + 1].text = recipe.cost[i].amount + " x " + recipe.cost[i].dItem.Name;
       }
     }
 
@@ -221,7 +240,7 @@ namespace Postcarbon {
 
     public void DisplayItemInfo(dItem dItem) {
       if (!IsLocalPlayer) { return; }
-      itemInfo[0].text = "Name: " + dItem.name;
+      itemInfo[0].text = "Name: " + dItem.Name;
       // itemInfo[1].text = "Type: " + dItem.type;
       if (dItem is dArmor) {
         dArmor dArmor = dItem as dArmor;
